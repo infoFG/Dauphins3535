@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dauphins3535 — Résidences</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ========== SIDEBAR ========== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="assets/logo-dauphins.jpg" alt="Dauphins3535">
+      <h1>Dauphins3535</h1>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li><a href="#apropos"><span class="nav-icon">🏠</span> À propos</a></li>
+        <li><a href="#reglements"><span class="nav-icon">📋</span> Règlements</a></li>
+        <li><a href="#installations"><span class="nav-icon">🏊</span> Installations</a></li>
+        <li><a href="#unites"><span class="nav-icon">🔑</span> Unités à vendre</a></li>
+        <li><a href="#condomanager"><span class="nav-icon">⚙️</span> CondoManager</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="main-content">
+
+    <!-- À PROPOS -->
+    <section class="section section-hero" id="apropos">
+      <h2 class="section-title">À propos</h2>
+      <div class="section-content">
+        <p>Bienvenue aux <strong>Dauphins3535</strong>, un immeuble résidentiel où confort et communauté se rencontrent. Situé dans un quartier paisible, notre immeuble offre un cadre de vie agréable à ses résidents.</p>
+        <p>Notre conseil d'administration veille au bon fonctionnement de la copropriété et à l'entretien des lieux communs. Transparence, respect et qualité de vie sont au cœur de notre mission.</p>
+      </div>
+    </section>
+
+    <!-- RÈGLEMENTS -->
+    <section class="section" id="reglements">
+      <h2 class="section-title">Règlements</h2>
+      <div class="section-content">
+        <p>Pour assurer une cohabitation harmonieuse, certains règlements sont en vigueur dans l'immeuble :</p>
+        <ul>
+          <li>Respect des heures de silence entre 22 h et 7 h</li>
+          <li>Utilisation adéquate des aires communes</li>
+          <li>Gestion responsable des déchets et du recyclage</li>
+          <li>Stationnement réservé aux détenteurs d'une vignette</li>
+          <li>Animaux de compagnie autorisés sous conditions</li>
+        </ul>
+        <p style="margin-top:1rem;">Le règlement complet est disponible sur demande auprès du conseil d'administration.</p>
+      </div>
+    </section>
+
+    <!-- INSTALLATIONS -->
+    <section class="section" id="installations">
+      <h2 class="section-title">Installations</h2>
+      <div class="section-content">
+        <p>Les résidents des Dauphins3535 ont accès à plusieurs installations communes :</p>
+        <ul>
+          <li>Piscine extérieure chauffée (ouverte en saison estivale)</li>
+          <li>Salle d'entraînement avec équipements de base</li>
+          <li>Salle communautaire pour rassemblements et fêtes</li>
+          <li>Terrasse paysagée avec aires de repos</li>
+          <li>Stationnement intérieur et extérieur</li>
+          <li>Rangement pour vélos et équipements saisonniers</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- UNITÉS À VENDRE -->
+    <section class="section" id="unites">
+      <h2 class="section-title">Unités à vendre</h2>
+      <div class="section-content">
+        <p>Consultez la liste des unités actuellement disponibles à la vente dans notre immeuble. Pour plus d'informations ou pour planifier une visite, contactez le conseil d'administration.</p>
+        <p style="margin-top:1rem; color: var(--bleu-fonce); font-style: italic;">Aucune unité n'est présentement listée. Revenez bientôt.</p>
+      </div>
+    </section>
+
+    <!-- CONDOMANAGER -->
+    <section class="section" id="condomanager">
+      <h2 class="section-title">CondoManager</h2>
+      <div class="section-content">
+        <p><strong>CondoManager</strong> est la plateforme de gestion utilisée par notre copropriété. Elle permet aux résidents de :</p>
+        <ul>
+          <li>Consulter les documents officiels (procès-verbaux, états financiers)</li>
+          <li>Soumettre des demandes d'entretien</li>
+          <li>Réserver les installations communes</li>
+          <li>Recevoir les communications du conseil</li>
+          <li>Consulter le solde de votre compte de copropriété</li>
+        </ul>
+        <div class="condo-card">
+          <h3>Accès CondoManager</h3>
+          <p>Pour créer votre compte ou réinitialiser votre mot de passe, contactez le conseil d'administration ou écrivez à l'adresse courriel de l'immeuble.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // === Mobile menu toggle ===
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const toggle = document.getElementById('menuToggle');
+
+    function closeMenu() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
+      toggle.textContent = '☰';
+    }
+
+    function openMenu() {
+      sidebar.classList.add('open');
+      overlay.classList.add('open');
+      toggle.textContent = '✕';
+    }
+
+    toggle.addEventListener('click', () => {
+      if (sidebar.classList.contains('open')) closeMenu();
+      else openMenu();
+    });
+
+    overlay.addEventListener('click', closeMenu);
+
+    // Close menu on nav click (mobile)
+    document.querySelectorAll('.sidebar-nav a').forEach(a => {
+      a.addEventListener('click', () => {
+        if (window.innerWidth <= 768) closeMenu();
+      });
+    });
+
+    // === Active section highlight in sidebar ===
+    const sections = document.querySelectorAll('.section');
+    const navLinks = document.querySelectorAll('.sidebar-nav li');
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id');
+          navLinks.forEach(li => {
+            li.classList.toggle('active', li.querySelector('a')?.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    }, { rootMargin: '-30% 0px -50% 0px' });
+
+    sections.forEach(s => observer.observe(s));
+  </script>
+</body>
+</html>

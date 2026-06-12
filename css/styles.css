@@ -1,0 +1,280 @@
+/* ========== VARIABLES ========== */
+:root {
+  --bleu-fonce: #37474F;
+  --orange: #FF9900;
+  --bleu-pale: #D7EFFF;
+  --burn: #3A2404;
+  --bleu-moyen: #77AAED;
+  --sidebar-width: 280px;
+  --transition: 0.3s ease;
+}
+
+/* ========== RESET ========== */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: var(--burn);
+  background: #fafafa;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ========== SIDEBAR ========== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bleu-fonce);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.sidebar-logo img {
+  max-width: 140px;
+  height: auto;
+  display: block;
+  margin: 0 auto 0.75rem;
+}
+
+.sidebar-logo h1 {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1.5rem 0;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+}
+
+.sidebar-nav li {
+  border-left: 3px solid transparent;
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.sidebar-nav li:hover,
+.sidebar-nav li.active {
+  border-left-color: var(--orange);
+  background: rgba(255,255,255,0.05);
+}
+
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.5rem;
+  color: var(--bleu-pale);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color var(--transition);
+}
+
+.sidebar-nav a:hover {
+  color: #fff;
+}
+
+.sidebar-nav .nav-icon {
+  font-size: 1.2rem;
+  width: 24px;
+  text-align: center;
+  opacity: 0.8;
+}
+
+/* ========== MAIN CONTENT ========== */
+.main-content {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  min-height: 100vh;
+}
+
+.section {
+  padding: 4rem 3rem;
+  max-width: 900px;
+}
+
+.section:nth-child(even) {
+  background: var(--bleu-pale);
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--bleu-fonce);
+  margin-bottom: 1.5rem;
+  position: relative;
+  padding-bottom: 0.75rem;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: var(--orange);
+  border-radius: 2px;
+}
+
+.section-content p {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+  color: var(--burn);
+}
+
+.section-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.section-content li {
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  line-height: 1.6;
+}
+
+.section-content li::before {
+  content: '▸';
+  color: var(--orange);
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+/* ========== HAMBURGER (mobile) ========== */
+.menu-toggle {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 200;
+  background: var(--bleu-fonce);
+  color: #fff;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: background var(--transition);
+}
+
+.menu-toggle:hover {
+  background: var(--orange);
+}
+
+/* ========== OVERLAY (mobile) ========== */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 99;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform var(--transition);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-overlay.open {
+    display: block;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .section {
+    padding: 3rem 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.6rem;
+  }
+}
+
+/* ========== HERO (first section) ========== */
+.section-hero {
+  padding: 6rem 3rem;
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.section-hero .section-title {
+  font-size: 2.5rem;
+}
+
+.section-hero .section-title::after {
+  width: 80px;
+}
+
+/* ========== SCROLL INDICATOR ========== */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-width);
+  height: 3px;
+  background: var(--orange);
+  z-index: 50;
+  width: 0;
+  transition: width 0.1s;
+}
+
+/* ========== CONDOMANAGER CARD ========== */
+.condo-card {
+  background: #fff;
+  border: 1px solid var(--bleu-pale);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  box-shadow: 0 2px 8px rgba(55,71,79,0.06);
+}
+
+.condo-card h3 {
+  color: var(--bleu-fonce);
+  margin-bottom: 0.5rem;
+}
