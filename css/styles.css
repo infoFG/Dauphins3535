@@ -234,34 +234,81 @@ body {
   }
 }
 
-/* ========== HERO (first section) ========== */
-.section-hero {
-  padding: 6rem 3rem;
-  min-height: 70vh;
+/* ========== HERO PAGE (landing) ========== */
+.home-page .main-content {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
 }
 
-.section-hero .section-title {
-  font-size: 2.5rem;
+.hero-section {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
 }
 
-.section-hero .section-title::after {
-  width: 80px;
+.hero-content {
+  max-width: 500px;
 }
 
-/* ========== SCROLL INDICATOR ========== */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: var(--sidebar-width);
-  height: 3px;
+.hero-logo {
+  max-width: 200px;
+  height: auto;
+  margin-bottom: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(55,71,79,0.15);
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--bleu-fonce);
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.03em;
+}
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: var(--bleu-moyen);
+  font-weight: 500;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.hero-tagline {
+  font-size: 1.1rem;
+  color: var(--burn);
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+  opacity: 0.85;
+}
+
+.hero-cta {
+  display: inline-block;
+  padding: 0.9rem 2.5rem;
   background: var(--orange);
-  z-index: 50;
-  width: 0;
-  transition: width 0.1s;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.05rem;
+  border-radius: 8px;
+  transition: background var(--transition), transform var(--transition);
+  box-shadow: 0 4px 16px rgba(255,153,0,0.3);
+}
+
+.hero-cta:hover {
+  background: #e68a00;
+  transform: translateY(-2px);
+}
+
+/* ========== CONTENT PAGE (sub-pages) ========== */
+.content-page .section:first-child {
+  padding-top: 5rem;
 }
 
 /* ========== CONDOMANAGER CARD ========== */
