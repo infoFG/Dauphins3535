@@ -257,9 +257,9 @@ body {
 
 .hero-image {
   width: 100%;
-  max-width: 600px;
+  max-width: 500px;
   height: auto;
-  margin-bottom: 2rem;
+  margin: 0 auto 2rem;
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(55,71,79,0.15);
   display: block;
