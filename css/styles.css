@@ -382,7 +382,7 @@ body {
   opacity: 0.85;
 }
 
-.hero-cta {
+.hero-cta:link, .hero-cta:visited {
   display: inline-block;
   padding: 0.9rem 2.5rem;
   background: var(--orange);
@@ -395,9 +395,10 @@ body {
   box-shadow: 0 4px 16px rgba(96,96,89,0.3);
 }
 
-.hero-cta:hover {
+.hero-cta:hover, .hero-cta:active {
   background: #8C8770;
   transform: translateY(-2px);
+  color: #fff;
 }
 
 /* ========== CONTENT PAGE (sub-pages) ========== */
