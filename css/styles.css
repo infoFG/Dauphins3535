@@ -9,6 +9,14 @@
   --transition: 0.3s ease;
 }
 
+a {
+  color: var(--orange);
+}
+
+a:hover {
+  color: #B8B09A;
+}
+
 /* ========== RESET ========== */
 *, *::before, *::after {
   margin: 0;
