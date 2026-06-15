@@ -263,6 +263,46 @@ body {
   background: var(--orange);
 }
 
+/* ========== LANGUAGE SWITCHER ========== */
+.lang-switch {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 200;
+  display: flex;
+  gap: 2px;
+  background: var(--bleu-fonce);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.lang-switch a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--bleu-pale);
+  text-decoration: none;
+  transition: all var(--transition);
+}
+
+.lang-switch a:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.lang-switch a.active {
+  background: var(--orange);
+  color: #fff;
+}
+
+.lang-switch a.active:hover {
+  background: #e68a00;
+}
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
   .section {
