@@ -1,10 +1,10 @@
 /* ========== VARIABLES ========== */
 :root {
-  --bleu-fonce: #37474F;
-  --orange: #FF9900;
-  --bleu-pale: #D7EFFF;
+  --bleu-fonce: #606059;
+  --orange: #A19B80;
+  --bleu-pale: #8B8F8D;
   --burn: #3A2404;
-  --bleu-moyen: #77AAED;
+  --bleu-moyen: #B8B09A;
   --sidebar-width: 280px;
   --transition: 0.3s ease;
 }
@@ -260,7 +260,7 @@ body {
 }
 
 .menu-toggle:hover {
-  background: var(--orange);
+  background: #8C8770;
 }
 
 /* ========== LANGUAGE SWITCHER ========== */
@@ -300,7 +300,7 @@ body {
 }
 
 .lang-switch a.active:hover {
-  background: #e68a00;
+  background: #8C8770;
 }
 
 /* ========== RESPONSIVE ========== */
@@ -345,7 +345,7 @@ body {
   height: auto;
   margin: 0 auto 2rem;
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(55,71,79,0.15);
+  box-shadow: 0 8px 32px rgba(96,96,89,0.15);
   display: block;
 }
 
@@ -384,11 +384,11 @@ body {
   font-size: 1.05rem;
   border-radius: 8px;
   transition: background var(--transition), transform var(--transition);
-  box-shadow: 0 4px 16px rgba(255,153,0,0.3);
+  box-shadow: 0 4px 16px rgba(96,96,89,0.3);
 }
 
 .hero-cta:hover {
-  background: #e68a00;
+  background: #8C8770;
   transform: translateY(-2px);
 }
 
@@ -404,7 +404,7 @@ body {
   border-radius: 12px;
   padding: 1.5rem;
   margin: 1rem 0;
-  box-shadow: 0 2px 8px rgba(55,71,79,0.06);
+  box-shadow: 0 2px 8px rgba(96,96,89,0.06);
 }
 
 .condo-card h3 {
