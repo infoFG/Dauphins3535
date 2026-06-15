@@ -175,6 +175,37 @@ body {
   box-shadow: 0 6px 20px rgba(0,0,0,0.15);
 }
 
+/* Petit format 2×2 pour les galettes */
+.gallery-grid-4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 1rem;
+}
+
+.gallery-grid-4 img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery-grid-4 img:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+}
+
+@media (max-width: 600px) {
+  .gallery-grid-4 {
+    grid-template-columns: 1fr;
+  }
+  .gallery-grid-4 img {
+    height: 200px;
+  }
+}
+
 .gallery-mosaic .gallery-wide {
   grid-column: span 2;
   height: 260px;
