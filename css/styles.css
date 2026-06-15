@@ -40,6 +40,24 @@ body {
   flex-direction: column;
   z-index: 100;
   overflow-y: auto;
+  transform: translateX(-100%);
+  transition: transform var(--transition);
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 99;
+}
+
+.sidebar-overlay.open {
+  display: block;
 }
 
 .sidebar-logo {
@@ -107,7 +125,7 @@ body {
 
 /* ========== MAIN CONTENT ========== */
 .main-content {
-  margin-left: var(--sidebar-width);
+  margin-left: 0;
   flex: 1;
   min-height: 100vh;
 }
@@ -168,9 +186,11 @@ body {
   font-weight: bold;
 }
 
-/* ========== HAMBURGER (mobile) ========== */
+/* ========== HAMBURGER ========== */
 .menu-toggle {
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: fixed;
   top: 1rem;
   left: 1rem;
@@ -191,40 +211,8 @@ body {
   background: var(--orange);
 }
 
-/* ========== OVERLAY (mobile) ========== */
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  z-index: 99;
-}
-
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
-  .menu-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .sidebar {
-    transform: translateX(-100%);
-    transition: transform var(--transition);
-  }
-
-  .sidebar.open {
-    transform: translateX(0);
-  }
-
-  .sidebar-overlay.open {
-    display: block;
-  }
-
-  .main-content {
-    margin-left: 0;
-  }
-
   .section {
     padding: 3rem 1.5rem;
   }

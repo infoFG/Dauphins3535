@@ -3,43 +3,135 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Les Dauphins sur-le-parc</title>
+  <title>Les Dauphins sur-le-parc — Immeuble à condos &amp; galerie commerciale</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="home-page">
+<body>
 
+  <!-- ========== BURGER TOGGLE ========== -->
   <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <!-- ========== SIDEBAR ========== -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <img src="assets/logo-dauphins.jpg" alt="Dauphins3535">
+      <img src="assets/logo-dauphins.jpg" alt="Les Dauphins sur-le-parc">
       <h1>Les Dauphins sur-le-parc</h1>
     </div>
     <nav class="sidebar-nav">
       <ul>
-        <li><a href="apropos.html"><span class="nav-icon">🏠</span> À propos</a></li>
-        <li><a href="reglements.html"><span class="nav-icon">📋</span> Règlements</a></li>
-        <li><a href="installations.html"><span class="nav-icon">🏊</span> Installations</a></li>
-        <li><a href="galerie-commerciale.html"><span class="nav-icon">🛍️</span> Galerie Commerciale</a></li>
-        <li><a href="unites.html"><span class="nav-icon">🔑</span> Unités à vendre</a></li>
-        <li><a href="condoweb.html"><span class="nav-icon">⚙️</span> CondoWeb</a></li>
+        <li><a href="#apropos"><span class="nav-icon">🏠</span> À propos</a></li>
+        <li><a href="#installations"><span class="nav-icon">🏊</span> Installations</a></li>
+        <li><a href="#galerie-commerciale"><span class="nav-icon">🛍️</span> Galerie Commerciale</a></li>
+        <li><a href="#unites"><span class="nav-icon">🔑</span> Unités à vendre</a></li>
+        <li><a href="#reglements"><span class="nav-icon">📋</span> Règlements</a></li>
+        <li><a href="#condoweb"><span class="nav-icon">⚙️</span> CondoWeb</a></li>
       </ul>
     </nav>
   </aside>
 
-  <!-- ========== HERO ========== -->
-  <main class="main-content">
-    <section class="hero-section">
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="main-content single-page">
+
+    <!-- ===== HERO ===== -->
+    <section class="hero-section" id="accueil">
       <div class="hero-content">
-        <img src="assets/hero-batiment.jpg" alt="Les Dauphins sur-le-parc" class="hero-image">
+        <img src="assets/hero-batiment.jpg" alt="Les Dauphins sur-le-parc — Façade de l'immeuble" class="hero-image">
         <h1 class="hero-title">Les Dauphins sur-le-parc</h1>
         <p class="hero-subtitle">Immeuble à condos et galerie commerciale</p>
         <p class="hero-tagline">Confort et communauté au cœur de votre quotidien</p>
-        <a href="apropos.html" class="hero-cta">Découvrir</a>
+        <a href="#apropos" class="hero-cta">Découvrir</a>
       </div>
     </section>
+
+    <!-- ===== À PROPOS ===== -->
+    <section class="section" id="apropos">
+      <h2 class="section-title">À propos</h2>
+      <div class="section-content">
+        <p>Bienvenue aux Dauphins sur-le-parc, un immeuble à condos résidentiel où confort et communauté se rencontrent. Situé dans l'est du Plateau Mont-Royal à Montréal, face au Parc Lafontaine, notre immeuble offre un cadre de vie agréable à ses résidents et une qualité de vie exceptionnelle.</p>
+        <p>Nous avons 15 employés qui veillent au bon fonctionnement de l'immeuble et l'entretien des lieux communs. Cinq administrateurs font de même pour le Syndicat de copropriété.</p>
+        <p>Transparence, respect et qualité de vie sont au cœur de notre mission.</p>
+      </div>
+    </section>
+
+    <!-- ===== INSTALLATIONS ===== -->
+    <section class="section" id="installations">
+      <h2 class="section-title">Installations</h2>
+      <div class="section-content">
+        <p>Les résidents des Dauphins sur-le-parc ont accès à plusieurs installations communes :</p>
+        <ul>
+          <li>Piscine intérieure chauffée</li>
+          <li>Sauna et hammam</li>
+          <li>Salle d'entraînement avec équipements de base</li>
+          <li>Salle communautaire pour rassemblements et fêtes</li>
+          <li>Terrasse sur le toit avec aires de repos</li>
+          <li>Rangement pour vélos et équipements saisonniers</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== GALERIE COMMERCIALE ===== -->
+    <section class="section" id="galerie-commerciale">
+      <h2 class="section-title">Galerie Commerciale</h2>
+      <div class="section-content">
+        <p>Notre galerie commerciale située au rez-de-chaussée du 3535 avenue Papineau regroupe plusieurs commerces et services pour répondre aux besoins des résidents et du quartier.</p>
+        <p>Voici les commerces présents dans notre galerie :</p>
+        <ul>
+          <li><strong>Stars Hair Collections</strong> — Salon de coiffure</li>
+          <li><strong>Maison Las Palmas</strong> — Services d'esthétique et bien-être</li>
+          <li><strong>JaJi santé clinique</strong> — Clinique de santé et bien-être — <a href="https://www.jajiheadspa.com/" target="_blank" rel="noopener">jajiheadspa.com</a></li>
+          <li><strong>Prosper Fitness</strong> — Entraînement personnel — <a href="https://prosperfitness.net/" target="_blank" rel="noopener">prosperfitness.net</a></li>
+          <li><strong>Sage Art Studio</strong> — Studio de tatouage — <a href="https://www.sagearttattoostudio.com/" target="_blank" rel="noopener">sagearttattoostudio.com</a></li>
+          <li><strong>Café Grain d'Or</strong> — <a href="https://facebook.com/cafegraindor" target="_blank" rel="noopener">facebook.com/cafegraindor</a></li>
+          <li><strong>Dépanneur Le 35</strong></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== UNITÉS À VENDRE ===== -->
+    <section class="section" id="unites">
+      <h2 class="section-title">Unités à vendre</h2>
+      <div class="section-content">
+        <p>Consultez la liste des unités actuellement disponibles à la vente dans notre immeuble.</p>
+        <p style="margin-top:1rem; color: var(--bleu-fonce); font-style: italic;">Revenez bientôt pour voir la liste.</p>
+      </div>
+    </section>
+
+    <!-- ===== RÈGLEMENTS ===== -->
+    <section class="section" id="reglements">
+      <h2 class="section-title">Règlements</h2>
+      <div class="section-content">
+        <p>Pour assurer une cohabitation harmonieuse, certains règlements sont en vigueur dans l'immeuble :</p>
+        <ul>
+          <li>Respect des heures de silence entre 22 h et 7 h</li>
+          <li>Utilisation adéquate des aires communes</li>
+          <li>Gestion responsable des déchets et du recyclage</li>
+          <li>Animaux de compagnie autorisés sous conditions</li>
+        </ul>
+        <p style="margin-top:1rem;">Le règlement complet est disponible sur <a href="https://mon.condoweb.app/" target="_blank" rel="noopener"><strong>CondoWeb</strong></a>.</p>
+      </div>
+    </section>
+
+    <!-- ===== CONDOWEB ===== -->
+    <section class="section" id="condoweb">
+      <h2 class="section-title">CondoWeb</h2>
+      <div class="section-content">
+        <p><strong>CondoWeb</strong> (i.e. CondoManager) est la plateforme de gestion utilisée par notre copropriété. Elle permet aux résidents de :</p>
+        <ul>
+          <li>Consulter les documents officiels (procès-verbaux, états financiers)</li>
+          <li>Recevoir les communications du conseil</li>
+          <li>Consulter le solde de votre compte de copropriété</li>
+        </ul>
+        <div class="condo-card">
+          <h3>Accès CondoWeb</h3>
+          <ul>
+            <li>Accédez à CondoWeb <a href="https://mon.condoweb.app/" target="_blank" rel="noopener">ici</a>.</li>
+            <li>Contactez le bureau de l'administration pour créer votre compte</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <script>
@@ -66,10 +158,17 @@
 
     overlay.addEventListener('click', closeMenu);
 
+    // Nav links — fermer le menu + scroll fluide
     document.querySelectorAll('.sidebar-nav a').forEach(a => {
-      a.addEventListener('click', () => {
-        if (window.innerWidth <= 768) closeMenu();
+      a.addEventListener('click', (e) => {
+        closeMenu();
+        // Le href="#..." gère le scroll natif
       });
+    });
+
+    // Fermer le menu avec Échap
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMenu();
     });
   </script>
 </body>

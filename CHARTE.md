@@ -1,4 +1,4 @@
-# 🎨 Charte de couleurs — Dauphins3535
+# 🎨 Charte de couleurs — Les Dauphins sur-le-parc
 
 | Rôle | Nom | Hex | Usage |
 |------|-----|-----|-------|
