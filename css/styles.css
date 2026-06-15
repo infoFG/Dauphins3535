@@ -115,7 +115,7 @@ body {
   padding: 0.9rem 1.5rem;
   color: var(--bleu-pale);
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em;
   font-weight: 500;
   transition: color var(--transition);
 }
