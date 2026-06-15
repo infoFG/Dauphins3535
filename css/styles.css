@@ -131,12 +131,17 @@ body {
 }
 
 .section {
-  padding: 4rem 3rem;
-  max-width: 900px;
+  padding: 4rem 0;
 }
 
 .section:nth-child(even) {
   background: var(--bleu-pale);
+}
+
+.section-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 3rem;
 }
 
 .section-title {
@@ -214,7 +219,11 @@ body {
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
   .section {
-    padding: 3rem 1.5rem;
+    padding: 3rem 0;
+  }
+
+  .section-inner {
+    padding: 0 1.5rem;
   }
 
   .section-title {
