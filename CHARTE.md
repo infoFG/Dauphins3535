@@ -1,4 +1,4 @@
-# 🎨 Charte de couleurs — Les Dauphins sur-le-parc
+# 🎨 Charte de couleurs — Les Dauphins-sur-le Parc
 
 | Rôle | Nom | Hex | Usage |
 |------|-----|-----|-------|
