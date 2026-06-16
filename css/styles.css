@@ -900,3 +900,22 @@ body {
   font-style: italic;
   padding: 1rem 0;
 }
+
+/* ========== SPLIT ROW (half-screen bubbles) ========== */
+.content-box-row {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+}
+
+.content-box-col {
+  flex: 1;
+  min-width: 0;
+}
+
+/* On mobile, stack the columns */
+@media (max-width: 768px) {
+  .content-box-row {
+    flex-direction: column;
+  }
+}
