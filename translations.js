@@ -81,8 +81,8 @@ const translations = {
     "cultural_calendar_title": "Calendrier des activités culturelles de l'arrondissement",
     "cultural_calendar_p1": "Le programme de soutien aux actions culturelles du Plateau (PSAC) a une fois de plus cette année été riche en candidatures. Il en résulte une programmation variée, festive et gratuite.",
     "cultural_calendar_link": "En voici un aperçu",
-    "theater_p1": "Situé au cœur du parc La Fontaine, le Théâtre de Verdure propose une programmation en plein air gratuite durant l'été. Des spectacles de musique, de danse, de cirque, de théâtre et des films sont présentés dans cet amphithéâtre de 2 000 places.",
-    "robin_p1": "Le Robin des Bois est un restaurant bienfaiteur fondé en 2006, qui soutient la réinsertion sociale, la lutte contre l'isolement et la pauvreté. Il est installé au Chalet du Parc Lafontaine depuis quelques années.",
+    "theater_p1": "Situé au cœur du parc La Fontaine, le Théâtre de Verdure propose une programmation en plein air gratuite durant l'été. Des spectacles de musique, de danse, de cirque, de théâtre et des films sont présentés dans cet amphithéâtre de 2 000 places. <a href='https://montreal.ca/lieux/theatre-de-verdure' target='_blank' rel='noopener'>Consultez la programmation <span style='font-size:0.85em;'>→</span></a>",
+    "robin_p1": "Le Robin des Bois est un restaurant bienfaiteur fondé en 2006, qui soutient la réinsertion sociale, la lutte contre l'isolement et la pauvreté. Il est installé au Chalet du Parc Lafontaine depuis quelques années et offre, en plus des créations de sa cuisine, une programmation culturelle dynamique et diversifiée. <a href='https://robindesbois.ca/programmation/' target='_blank' rel='noopener'>Voir la programmation <span style='font-size:0.85em;'>→</span></a>",
 
     "carousel_loading": "Chargement des événements...",
     "carousel_empty": "Aucun événement trouvé pour le moment."
@@ -169,8 +169,8 @@ const translations = {
     "cultural_calendar_title": "Cultural Activities Calendar — Plateau Borough",
     "cultural_calendar_p1": "The Plateau's Cultural Action Support Program (PSAC) has once again received many applications. The result is a varied, festive, and free program.",
     "cultural_calendar_link": "Get a preview",
-    "theater_p1": "Located in the heart of La Fontaine Park, Théâtre de Verdure offers a free outdoor program throughout the summer. Music, dance, circus, theater, and film are presented in this 2,000-seat amphitheater.",
-    "robin_p1": "Robin des Bois is a charitable restaurant founded in 2006 that supports social reintegration and the fight against isolation and poverty. It has been located in the Chalet du Parc Lafontaine for several years.",
+    "theater_p1": "Located in the heart of La Fontaine Park, Théâtre de Verdure offers a free outdoor program throughout the summer. Music, dance, circus, theater, and film are presented in this 2,000-seat amphitheater. <a href='https://montreal.ca/lieux/theatre-de-verdure' target='_blank' rel='noopener'>Check the program <span style='font-size:0.85em;'>→</span></a>",
+    "robin_p1": "Robin des Bois is a charitable restaurant founded in 2006 that supports social reintegration and the fight against isolation and poverty. It has been located in the Chalet du Parc Lafontaine for several years and offers, in addition to its culinary creations, a dynamic and diverse cultural program. <a href='https://robindesbois.ca/programmation/' target='_blank' rel='noopener'>View the program <span style='font-size:0.85em;'>→</span></a>",
 
     "carousel_loading": "Loading events...",
     "carousel_empty": "No events found at the moment."
