@@ -330,7 +330,6 @@ body {
   #quartier .section-inner > :nth-child(n+3) {
     flex: 1 1 100% !important;
     max-width: 100% !important;
-    transform: translateY(30px); /* Slide up for stacked items */
   }
 
   #quartier .content-box:first-child { transform: translateX(-50px); }
