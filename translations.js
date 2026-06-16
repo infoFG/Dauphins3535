@@ -38,7 +38,7 @@ const translations = {
     "gallery_item_5": "<strong>Sage Art Studio</strong> — Studio de tatouage — <a href='https://www.sagearttattoostudio.com/' target='_blank' rel='noopener'>www.sagearttattoostudio.com</a>",
     "gallery_item_6": "<strong>Café Lafontaine</strong> — <a href='https://www.facebook.com/cafelafontaine/' target='_blank' rel='noopener'>facebook.com/cafelafontaine</a>",
     "gallery_item_7": "<strong>Dépanneur Le 35</strong>",
-    "gallery_item_8": "<strong>Le Délice glacé</strong> — Crèmerie",
+    "gallery_item_8": "<strong>Le Délice glacé</strong> — Crèmerie — <a href='https://www.facebook.com/61589163615629' target='_blank' rel='noopener'>facebook.com/LeDéliceGlacé</a>",
 
     "title_values": "Valeurs",
     "values_p1": "Pour assurer une cohabitation harmonieuse, certains règlements sont en vigueur dans l'immeuble :",
@@ -126,7 +126,7 @@ const translations = {
     "gallery_item_5": "<strong>Sage Art Studio</strong> — Tattoo studio — <a href='https://www.sagearttattoostudio.com/' target='_blank' rel='noopener'>www.sagearttattoostudio.com</a>",
     "gallery_item_6": "<strong>Café Lafontaine</strong> — <a href='https://www.facebook.com/cafelafontaine/' target='_blank' rel='noopener'>facebook.com/cafelafontaine</a>",
     "gallery_item_7": "<strong>Dépanneur Le 35</strong>",
-    "gallery_item_8": "<strong>Le Délice glacé</strong> — Ice cream parlor",
+    "gallery_item_8": "<strong>Le Délice glacé</strong> — Ice cream parlor — <a href='https://www.facebook.com/61589163615629' target='_blank' rel='noopener'>facebook.com/LeDéliceGlacé</a>",
 
     "title_values": "Values",
     "values_p1": "To ensure harmonious cohabitation, certain values are upheld in our building:",
