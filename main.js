@@ -148,7 +148,7 @@ async function initEventsCarousel() { // Renamed track ID for clarity
       if (events.length > 0) {
         localStorage.setItem(CACHE_KEY, JSON.stringify(events));
         localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
-        return events;
+        render(events);
       }
     } catch (error) {
       console.error('Error fetching events:', error);
@@ -215,10 +215,23 @@ async function initBusinessGallery() {
       return (business.images || []).map((image) => {
         const imageUrl = `/assets/Businesses/${image}`;
         const fallbackImageUrl = `/assets/Businesses/${business.folder}/${image}`;
+        const hoursHtml = business.business_hours ? formatBusinessHours(business.business_hours) : '';
         return `
-          <a href="#" class="business-carousel-card">
+          <div class="business-carousel-card lightbox-trigger" aria-label="${escapeHtml(business.name)}">
+            <div class="business-header">
+              <div class="business-name">${escapeHtml(business.name)}</div>
+              <div class="business-desc">${escapeHtml(business.description || '')}</div>
+            </div>
             <img src="${imageUrl}" alt="${escapeHtml(business.name)}" loading="lazy" draggable="false" class="lightbox-trigger" onerror="if (this.src !== '${fallbackImageUrl}') this.src='${fallbackImageUrl}'" />
-          </a>
+            <div class="business-overlay">
+              <div class="business-hours">${hoursHtml}</div>
+              <div class="business-links">
+                ${business.website ? `<a href="${escapeHtml(business.website)}" target="_blank" rel="noopener"><span class="icon">🌐</span> Site web</a>` : ''}
+                ${business.social_media && business.social_media.facebook ? `<a href="${escapeHtml(business.social_media.facebook)}" target="_blank" rel="noopener"><span class="icon">📘</span> Facebook</a>` : ''}
+
+              </div>
+            </div>
+          </div>
         `;
       });
     });
@@ -280,7 +293,7 @@ async function loadStaticCarouselImages(trackId, folderPath) {
       }
 
       track.innerHTML = imageList.map(imageName => `
-        <img src="${folderPath}/${imageName}" alt="${imageName.split('.')[0]}" loading="lazy" class="lightbox-trigger" draggable="false">
+        <img src="${folderPath}/${imageName}" alt="${imageName.split('.')[0]}" aria-label="${imageName.split('.')[0]}" loading="lazy" class="lightbox-trigger" draggable="false">
       `).join('');
     } else {
       // Fallback: If JSON is missing, show a message or hide the container
@@ -360,8 +373,8 @@ function initEnhancedCarousels(targetContainer = null) {
     
     if (!track) return;
 
-    // 0. Setup Infinite Loop (Clone first and last elements) — skip for business gallery
-    if (track.id !== 'business-gallery-track' && track.children.length > 1 && !track.dataset.cloned) {
+    // 0. Setup Infinite Loop (Clone first and last elements)
+    if (track.children.length > 1 && !track.dataset.cloned) {
       const firstClone = track.children[0].cloneNode(true);
       const lastClone = track.children[track.children.length - 1].cloneNode(true);
       track.appendChild(firstClone);
@@ -707,31 +720,59 @@ function initScrollReveal() {
 function initLightbox() {
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightbox-img');
+  const lightboxCaption = document.getElementById('lightbox-caption');
   const closeBtn = document.getElementById('lightboxClose');
   
   if (!lightbox || !lightboxImg) return;
 
   document.addEventListener('click', async (e) => { // Make async to await image loading
-    if (e.target.classList.contains('lightbox-trigger')) {
-      // Threshold check: prevent opening if the user was actually dragging the carousel
-      const track = e.target.closest('.carousel-track');
+    // Get the primary trigger element
+    let trigger = e.target.closest('.lightbox-trigger');
+    if (trigger) {
+      // If clicking a link/button inside a trigger card, let the link work instead of opening lightbox
+      const interactive = e.target.closest('a, button');
+      if (interactive && trigger.contains(interactive) && interactive !== trigger) return;
+
+      // Dragging check: prevent opening if the user was actually dragging the carousel
+      const track = trigger.closest('.carousel-track');
       if (track) {
         // If the track is currently in dragging state, don't open lightbox
         if (track.classList.contains('dragging')) return;
 
-        // For carousels with old mouseDown tracking, check delta movement
+        // Use coordinate delta to distinguish click from drag
         if (track.mouseDownX !== undefined && track.mouseDownY !== undefined) {
           const deltaX = Math.abs(e.clientX - track.mouseDownX);
           const deltaY = Math.abs(e.clientY - track.mouseDownY);
-          // Increased threshold slightly to be more forgiving for small accidental movements
-          if (deltaX > 15 || deltaY > 15) return; 
+          // Relaxed threshold to be more forgiving for accidental movements during click (especially on touch)
+          if (deltaX > 30 || deltaY > 30) return; 
         }
       }
       // Prevent the anchor link from firing (especially important for business gallery href="#")
       e.preventDefault();
       
-      lightboxImg.src = e.target.src;
-      lightbox.classList.add('open');
+      let source = "";
+      let caption = "";
+
+      if (trigger.tagName === 'IMG') {
+        source = trigger.src;
+        caption = trigger.getAttribute('alt') || trigger.getAttribute('aria-label') || "";
+      } else {
+        // For cards/divs acting as triggers
+        const img = trigger.querySelector('img');
+        if (img) {
+          source = img.src;
+          caption = trigger.getAttribute('aria-label') || img.getAttribute('alt') || "";
+        }
+        // Fallback for business cards
+        const nameEl = trigger.querySelector('.business-name');
+        if (!caption && nameEl) caption = nameEl.textContent;
+      }
+
+      if (source) {
+        lightboxImg.src = source;
+        if (lightboxCaption) lightboxCaption.textContent = caption;
+        lightbox.classList.add('open');
+      }
     }
   });
 
@@ -743,5 +784,10 @@ function initLightbox() {
     if (e.target !== lightboxImg) {
       closeLightbox();
     }
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
   });
 }
