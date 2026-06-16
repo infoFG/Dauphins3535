@@ -188,29 +188,11 @@ async function initBusinessGallery() {
     const cards = businessData.filter(Boolean).flatMap((business) => {
       return (business.images || []).map((image, index) => {
         const imageUrl = `assets/Businesses/${image}`;
-        const hoursHtml = formatBusinessHours(business.business_hours || {});
-        const socialHtml = Object.entries(business.social_media || {}).map(([k, v]) => {
-          if (!v) return '';
-          return `<a class="social-btn" href="${v}" target="_blank" rel="noopener noreferrer">${escapeHtml(k)}</a>`;
-        }).join('');
-        const websiteBtn = business.website ? `<a class="social-btn" href="${business.website}" target="_blank" rel="noopener noreferrer">Site</a>` : '';
 
         return `
-          <a href="#" class="business-carousel-card">
+          <div class="business-carousel-card">
             <img src="${imageUrl}" alt="${escapeHtml(business.name)}" loading="lazy" draggable="false" class="lightbox-trigger" />
-            <div class="business-overlay">
-              <div class="overlay-top">
-                <h3>${escapeHtml(business.name)}</h3>
-              </div>
-              <div class="overlay-mid">
-                <p>${escapeHtml(business.description || '')}</p>
-              </div>
-              <div class="overlay-bottom">
-                <div class="business-hours">${hoursHtml}</div>
-                <div class="social-links">${websiteBtn}${socialHtml}</div>
-              </div>
-            </div>
-          </a>
+          </div>
         `;
       });
     });
@@ -234,25 +216,6 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
-}
-
-function formatBusinessHours(hoursObj) {
-  // Expecting an object like { monday: "08:00 - 18:00", ... }
-  const order = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
-  const labels = {
-    monday: 'Mon',
-    tuesday: 'Tue',
-    wednesday: 'Wed',
-    thursday: 'Thu',
-    friday: 'Fri',
-    saturday: 'Sat',
-    sunday: 'Sun'
-  };
-  return order.map(day => {
-    const val = hoursObj[day];
-    if (!val) return '';
-    return `<div class="bh-row"><span class="bh-day">${labels[day]}</span><span class="bh-time">${escapeHtml(val)}</span></div>`;
-  }).join('');
 }
 
 /* ========== ENHANCED CAROUSEL (Drag, Arrows, Pips) ========== */

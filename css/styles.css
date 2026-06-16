@@ -777,58 +777,10 @@ body {
   background: var(--bleu-pale);
 }
 
-.business-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  padding: 1.25rem;
-  background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%);
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  pointer-events: auto;
-  z-index: 2;
-}
-
-.business-overlay h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 800;
-}
-
-.business-overlay .overlay-top {
-  /* Top area: name/title */
-}
-
-.business-overlay .overlay-mid {
-  /* Middle area: description */
-  margin-top: 0.5rem;
-  flex: 1 1 auto;
-}
-
-.business-overlay .overlay-bottom {
-  /* Bottom area: hours and social links */
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.business-overlay p {
-  font-size: 0.85rem;
-  line-height: 1.4;
-  opacity: 0.95;
-  margin: 0;
-}
-
 .business-carousel-card {
   position: relative;
   overflow: hidden;
-  flex: 0 0 80%; /* use flex-basis so each card occupies its own space */
+  flex: 0 0 80%;
   display: block;
   box-sizing: border-box;
   scroll-snap-align: center;
@@ -844,28 +796,7 @@ body {
   height: 100%;
   max-height: 520px;
   object-fit: cover;
-  z-index: 1;
 }
-
-.business-hours {
-  margin-top: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-.bh-row { display:flex; justify-content:space-between; font-size:0.8rem; opacity:0.95; }
-.bh-day { font-weight:700; margin-right:0.5rem; }
-.bh-time { color: rgba(255,255,255,0.95); }
-.social-links { display:flex; gap:0.5rem; }
-.social-btn {
-  background: rgba(255,255,255,0.12);
-  color: #fff;
-  padding: 0.35rem 0.6rem;
-  border-radius: 8px;
-  text-decoration: none;
-  font-size: 0.85rem;
-}
-.social-btn:hover { background: rgba(255,255,255,0.18); }
 
 .card-content {
   padding: 1rem;
