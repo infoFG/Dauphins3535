@@ -144,6 +144,7 @@ body {
   position: relative;
   background: #fff;
   overflow: hidden;
+  scroll-margin-top: 5rem;
 }
 
 /* Fixed Background Layer */
