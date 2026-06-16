@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ========== LANGUAGE MANAGEMENT ========== */
 function initLanguage() {
-  const btnEn = document.querySelector('.lang-switch a[href="en.html"]') || document.querySelector('.lang-switch a:last-child');
-  const btnFr = document.querySelector('.lang-switch a[href="./"]');
+  const btnEn = document.getElementById('lang-en');
+  const btnFr = document.getElementById('lang-fr');
 
   if (!btnEn || !btnFr) return;
   
@@ -35,8 +35,8 @@ function initLanguage() {
     localStorage.setItem('preferred-lang', lang);
   };
 
-  btnEn.addEventListener('click', (e) => { e.preventDefault(); updateDOM('en'); });
-  btnFr.addEventListener('click', (e) => { e.preventDefault(); updateDOM('fr'); });
+  btnEn.addEventListener('click', () => updateDOM('en'));
+  btnFr.addEventListener('click', () => updateDOM('fr'));
 
   // Load preference
   const savedLang = localStorage.getItem('preferred-lang') || 'fr';
@@ -120,7 +120,6 @@ async function initEventsCarousel() {
       if (events.length > 0) {
         localStorage.setItem(CACHE_KEY, JSON.stringify(events));
         localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
-        setTimeout(initEnhancedCarousels, 100); // Re-init controls for dynamic content
         return events;
       }
     } catch (error) {
@@ -153,11 +152,11 @@ async function initEventsCarousel() {
 
   if (cachedData && cachedTime && (now - parseInt(cachedTime) < ONE_WEEK)) {
     render(JSON.parse(cachedData));
-    initEnhancedCarousels();
   } else {
     const events = await fetchAndParse();
     render(events || (cachedData ? JSON.parse(cachedData) : null));
   }
+  initEnhancedCarousels(); // Standardize: init after render attempt
 }
 
 /* ========== ENHANCED CAROUSEL (Drag, Arrows, Pips) ========== */
