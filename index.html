@@ -64,13 +64,7 @@
         <div class="carousel-container image-carousel">
           <button class="carousel-btn prev">❮</button>
           <button class="carousel-btn next">❯</button>
-          <div class="carousel-track">
-            <img src="assets/apropos-1.webp" alt="Façade" loading="lazy" class="lightbox-trigger" draggable="false">
-            <img src="assets/apropos-2.webp" alt="Entrée" loading="lazy" class="lightbox-trigger" draggable="false">
-            <img src="assets/apropos-3.webp" alt="Hall" loading="lazy" class="lightbox-trigger" draggable="false">
-            <img src="assets/apropos-4.webp" alt="Quartier" loading="lazy" class="lightbox-trigger" draggable="false">
-            <img src="assets/apropos-5.webp" alt="Parc" loading="lazy" class="lightbox-trigger" draggable="false">
-          </div>
+          <div class="carousel-track" id="apropos-carousel-track"></div>
           <div class="carousel-pips"></div>
         </div>
       </div>
@@ -96,16 +90,7 @@
         <div class="carousel-container image-carousel">
           <button class="carousel-btn prev">❮</button>
           <button class="carousel-btn next">❯</button>
-          <div class="carousel-track">
-            <img src="assets/install-1.webp" alt="Piscine" loading="lazy" class="lightbox-trigger" draggable="false">
-            <img src="assets/install-2.webp" alt="Sauna" loading="lazy" class="lightbox-trigger" draggable="false">
-            <img src="assets/install-3.webp" alt="Salle" loading="lazy" class="lightbox-trigger" draggable="false">
-            <img src="assets/install-4.webp" alt="Gym" loading="lazy" class="lightbox-trigger" draggable="false">
-            <img src="assets/install-5.webp" alt="Terrasse" loading="lazy" class="lightbox-trigger" draggable="false">
-            <img src="assets/install-6.webp" alt="Hammam" loading="lazy" class="lightbox-trigger" draggable="false">
-            <img src="assets/install-7.webp" alt="Vélos" loading="lazy" class="lightbox-trigger" draggable="false">
-            <img src="assets/install-8.webp" alt="Vue" loading="lazy" class="lightbox-trigger" draggable="false">
-          </div>
+          <div class="carousel-track" id="installations-carousel-track"></div>
           <div class="carousel-pips"></div>
         </div>
       </div>
@@ -199,13 +184,7 @@
         <div class="carousel-container image-carousel">
           <button class="carousel-btn prev">❮</button>
           <button class="carousel-btn next">❯</button>
-          <div class="carousel-track">
-            <img src="assets/quartier-parc.webp" alt="Parc" loading="lazy" class="lightbox-trigger" draggable="false">
-            <img src="assets/quartier-user-1.webp" alt="Vie de quartier" loading="lazy" class="lightbox-trigger" draggable="false">
-            <img src="assets/quartier-user-2.webp" alt="Vie de quartier" loading="lazy" class="lightbox-trigger" draggable="false">
-            <img src="assets/quartier-user-3.webp" alt="Vie de quartier" loading="lazy" class="lightbox-trigger" draggable="false">
-            <img src="assets/quartier-user-4.webp" alt="Vie de quartier" loading="lazy" class="lightbox-trigger" draggable="false">
-          </div>
+          <div class="carousel-track" id="quartier-park-carousel-track"></div>
           <div class="carousel-pips"></div>
         </div>
 
@@ -280,7 +259,7 @@
           <p style="margin-bottom:0.5rem;"><strong>Calendrier du Théâtre de Verdure</strong></p>
           <p data-i18n="theater_p1">Situé au cœur du parc La Fontaine...</p>
           <div class="gallery-grid-4">
-            <img src="assets/quartier-theatre.webp" alt="Théâtre de Verdure — Parc La Fontaine" loading="lazy" />
+            <img src="assets/quartier-theatre.webp" alt="Théâtre de Verdure — Parc La Fontaine" loading="lazy" class="lightbox-trigger" />
           </div>
         </div>
 
@@ -291,10 +270,10 @@
           <p style="margin-bottom:0.5rem;"><strong>Calendrier du Robin des Bois</strong></p>
             <p data-i18n="robin_p1">Le Robin des Bois est un restaurant bienfaiteur...</p>
           <div class="gallery-grid-4">
-            <img src="assets/robin-1.webp" alt="Robin des Bois — Chalet du Parc" loading="lazy" />
-            <img src="assets/robin-2.webp" alt="Robin des Bois — terrasse" loading="lazy" />
-            <img src="assets/robin-3.webp" alt="Robin des Bois — cuisine" loading="lazy" />
-            <img src="assets/robin-4.webp" alt="Robin des Bois — salle" loading="lazy" />
+            <img src="assets/robin-1.webp" alt="Robin des Bois — Chalet du Parc" loading="lazy" class="lightbox-trigger" />
+            <img src="assets/robin-2.webp" alt="Robin des Bois — terrasse" loading="lazy" class="lightbox-trigger" />
+            <img src="assets/robin-3.webp" alt="Robin des Bois — cuisine" loading="lazy" class="lightbox-trigger" />
+            <img src="assets/robin-4.webp" alt="Robin des Bois — salle" loading="lazy" class="lightbox-trigger" />
           </div>
         </div>
       </div>
@@ -322,6 +301,7 @@
   <!-- Lightbox -->
   <div id="lightbox" class="lightbox">
     <img id="lightbox-img" src="" alt="View">
+    <div id="lightbox-caption" class="lightbox-caption"></div>
     <button id="lightboxClose" class="lightbox-close" aria-label="Fermer">✕</button>
   </div>
 
