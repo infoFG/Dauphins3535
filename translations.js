@@ -10,7 +10,7 @@ const translations = {
 
     // Hero
     "hero_subtitle": "Immeuble à condos et galerie commerciale",
-    "hero_tagline": "Confort et communauté au cœur de votre quotidien",
+    "hero_tagline": "Confort et communauté au cœur de votre quotidien.<br>Ressources pour résidents et copropriétaires.",
     "hero_cta": "Découvrir",
 
     // Sections
@@ -98,7 +98,7 @@ const translations = {
 
     // Hero
     "hero_subtitle": "Condo building and commercial gallery",
-    "hero_tagline": "Comfort and community at the heart of your daily life",
+    "hero_tagline": "Comfort and community at the heart of your daily life.<br>Resources for residents and condominium owners.",
     "hero_cta": "Discover",
 
     // Sections
