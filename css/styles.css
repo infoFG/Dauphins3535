@@ -246,7 +246,7 @@ body {
   scrollbar-color: var(--orange) transparent;
   cursor: grab;
   user-select: none;
-  touch-action: pan-y;
+  touch-action: pan-x pan-y;
 }
 
 /* Class added by JS to make dragging smooth */
