@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMenu();
   initEventsCarousel();
   initLanguage();
+  initBusinessGallery();
   initEnhancedCarousels();
   initLightbox();
   initScrollReveal();
@@ -137,7 +138,7 @@ async function initEventsCarousel() {
 
     track.innerHTML = events.map(event => `
       <a href="${event.link}" target="_blank" class="carousel-card">
-        ${event.image ? `<img src="${event.image}" alt="${event.title}" loading="lazy">` : '<div style="height:140px; background:var(--bleu-pale);"></div>'}
+        ${event.image ? `<img src="${event.image}" alt="${event.title}" loading="lazy" class="lightbox-trigger">` : '<div style="height:140px; background:var(--bleu-pale);"></div>'}
         <div class="card-content">
           <div class="card-date">${event.date}</div>
           <h4 class="card-title">${event.title}</h4>
@@ -160,6 +161,71 @@ async function initEventsCarousel() {
   initEnhancedCarousels(); // Standardize: init after render attempt
 }
 
+async function initBusinessGallery() {
+  const galleryTrack = document.getElementById('business-gallery-track');
+  if (!galleryTrack) return;
+
+  try {
+    const registryResponse = await fetch('assets/Businesses/Registery.json');
+    const registry = await registryResponse.json();
+    const businessFiles = registry?.Businesses || [];
+
+    const businessData = await Promise.all(businessFiles.map(async (filename) => {
+      const response = await fetch(`assets/Businesses/${filename}`);
+      return response.ok ? response.json() : null;
+    }));
+
+    const cards = businessData.filter(Boolean).flatMap((business) => {
+      return (business.images || []).map((image, index) => {
+        const imageUrl = `assets/Businesses/${image}`;
+        return `
+          <a href="#" class="business-carousel-card">
+            <img src="${imageUrl}" alt="${escapeHtml(business.name)}" loading="lazy" draggable="false" class="lightbox-trigger" />
+          </a>
+        `;
+      });
+    });
+
+    if (cards.length === 0) {
+      galleryTrack.innerHTML = '<p class="loading-msg">Aucune image disponible pour la galerie commerciale.</p>';
+    } else {
+      galleryTrack.innerHTML = cards.join('');
+      initEnhancedCarousels();
+    }
+  } catch (error) {
+    console.error('Erreur de chargement de la galerie commerciale:', error);
+    galleryTrack.innerHTML = '<p class="loading-msg">Impossible de charger la galerie commerciale.</p>';
+  }
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function formatBusinessHours(hoursObj) {
+  // Expecting an object like { monday: "08:00 - 18:00", ... }
+  const order = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+  const labels = {
+    monday: 'Mon',
+    tuesday: 'Tue',
+    wednesday: 'Wed',
+    thursday: 'Thu',
+    friday: 'Fri',
+    saturday: 'Sat',
+    sunday: 'Sun'
+  };
+  return order.map(day => {
+    const val = hoursObj[day];
+    if (!val) return '';
+    return `<div class="bh-row"><span class="bh-day">${labels[day]}</span><span class="bh-time">${escapeHtml(val)}</span></div>`;
+  }).join('');
+}
+
 /* ========== ENHANCED CAROUSEL (Drag, Arrows, Pips) ========== */
 function initEnhancedCarousels() {
   const containers = document.querySelectorAll('.carousel-container');
@@ -172,8 +238,8 @@ function initEnhancedCarousels() {
     
     if (!track) return;
 
-    // 0. Setup Infinite Loop (Clone first and last elements)
-    if (track.children.length > 1 && !track.dataset.cloned) {
+    // 0. Setup Infinite Loop (Clone first and last elements) — skip for business gallery
+    if (track.id !== 'business-gallery-track' && track.children.length > 1 && !track.dataset.cloned) {
       const firstClone = track.children[0].cloneNode(true);
       const lastClone = track.children[track.children.length - 1].cloneNode(true);
       track.appendChild(firstClone);
@@ -206,13 +272,19 @@ function initEnhancedCarousels() {
       clearTimeout(container.autoPlayTimeout);
       clearInterval(container.autoPlayTimer);
     };
-    const resetAutoPlay = () => { stopAutoPlay(); startAutoPlay(); };
+    let isInteracting = false;
+    const resetAutoPlay = () => {
+      stopAutoPlay();
+      if (!isInteracting) startAutoPlay();
+    };
 
     // Stagger the initial start by 2 seconds per carousel
     container.autoPlayTimeout = setTimeout(startAutoPlay, index * 2000);
 
     track.addEventListener('mouseenter', stopAutoPlay);
-    track.addEventListener('mouseleave', startAutoPlay);
+    track.addEventListener('mouseleave', () => {
+      if (!isInteracting) startAutoPlay();
+    });
 
     // 1. Navigation Arrows
     if (prevBtn) prevBtn.onclick = () => { 
@@ -227,30 +299,58 @@ function initEnhancedCarousels() {
     // 2. Drag to Scroll
     let isDown = false;
     let startX;
+    let startY;
     let scrollLeft;
+    let activePointerId = null;
 
-    track.addEventListener('mousedown', (e) => {
+    const onPointerDown = (e) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      e.preventDefault();
       isDown = true;
+      isInteracting = true;
+      activePointerId = e.pointerId;
+      track.setPointerCapture(activePointerId);
+      stopAutoPlay();
+      track.isAnimationCanceled = true;
+      if (track.scrollRequestID) {
+        cancelAnimationFrame(track.scrollRequestID);
+        track.scrollRequestID = null;
+      }
+      track.classList.remove('is-animating');
+      track.classList.add('dragging');
+      track.style.scrollSnapType = 'none';
+      startX = e.clientX - track.getBoundingClientRect().left;
+      startY = e.clientY - track.getBoundingClientRect().top;
+      scrollLeft = track.scrollLeft;
       track.mouseDownX = e.pageX;
       track.mouseDownY = e.pageY;
-      track.isAnimationCanceled = true; // Stop autoplay animation on interaction
-      track.classList.add('dragging');
-      startX = e.pageX - track.offsetLeft;
-      scrollLeft = track.scrollLeft;
-    });
+    };
+
+    const onPointerMove = (e) => {
+      if (!isDown || e.pointerId !== activePointerId) return;
+      e.preventDefault();
+      const x = e.clientX - track.getBoundingClientRect().left;
+      const walk = x - startX;
+      track.scrollLeft = scrollLeft - walk;
+    };
 
     const stopDragging = () => {
+      if (!isDown) return;
       isDown = false;
-      track.classList.remove('dragging');
-      resetAutoPlay(); // Reset autoplay timer after drag
+      isInteracting = false;
+      if (activePointerId !== null) {
+        track.releasePointerCapture(activePointerId);
+        activePointerId = null;
+      }
+      track.classList.remove('dragging'); // Remove immediately so lightbox can open
       
-      // Find the nearest snap point (center of the closest image)
+      // Start the snap animation before restoring browser scroll snapping.
       const items = track.children;
       const scrollCenter = track.scrollLeft + track.offsetWidth / 2;
       
       let closestIdx = 0;
       let minDistance = Infinity;
-      items.forEach((item, idx) => {
+      Array.from(items).forEach((item, idx) => {
         const itemCenter = item.offsetLeft + item.offsetWidth / 2;
         const dist = Math.abs(itemCenter - scrollCenter);
         if (dist < minDistance) {
@@ -259,30 +359,26 @@ function initEnhancedCarousels() {
         }
       });
 
-      let targetScroll = items[closestIdx].offsetLeft - (track.offsetWidth - items[closestIdx].offsetWidth) / 2;
+      const targetScroll = items[closestIdx].offsetLeft - (track.offsetWidth - items[closestIdx].offsetWidth) / 2;
       let teleportTarget = null;
 
-      // If the closest item is a clone, set up teleportation
-      if (closestIdx === 0) { // If closest is the start clone
+      if (closestIdx === 0) {
         teleportTarget = items[items.length - 2].offsetLeft - (track.offsetWidth - items[items.length - 2].offsetWidth) / 2;
-      } else if (closestIdx === items.length - 1) { // If closest is the end clone
+      } else if (closestIdx === items.length - 1) {
         teleportTarget = items[1].offsetLeft - (track.offsetWidth - items[1].offsetWidth) / 2;
       }
 
-      // Animate to the nearest snap point
-      smoothScrollTo(track, targetScroll, 750, teleportTarget); // 750ms for drag snap
+      smoothScrollTo(track, targetScroll, 750, teleportTarget, () => {
+        track.style.scrollSnapType = '';
+        isInteracting = false;
+        resetAutoPlay();
+      });
     };
 
-    track.addEventListener('mouseleave', stopDragging);
-    track.addEventListener('mouseup', stopDragging);
-    
-    track.addEventListener('mousemove', (e) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const x = e.pageX - track.offsetLeft;
-      const walk = (x - startX); // 1:1 ratio for natural feel
-      track.scrollLeft = scrollLeft - walk;
-    });
+    track.addEventListener('pointerdown', onPointerDown);
+    track.addEventListener('pointermove', onPointerMove);
+    track.addEventListener('pointerup', stopDragging);
+    track.addEventListener('pointercancel', stopDragging);
 
     // 3. Pips (Pagination)
     if (pipsContainer) {
@@ -323,7 +419,7 @@ function initEnhancedCarousels() {
  * @param {number} duration Animation duration in ms
  * @param {number|null} teleportTarget Position to jump to after finish
  */
-function smoothScrollTo(el, target, duration, teleportTarget = null) {
+function smoothScrollTo(el, target, duration, teleportTarget = null, onFinish = null) {
   if (el.scrollRequestID) cancelAnimationFrame(el.scrollRequestID);
 
   const start = el.scrollLeft;
@@ -351,6 +447,7 @@ function smoothScrollTo(el, target, duration, teleportTarget = null) {
       el.classList.remove('is-animating');
       if (teleportTarget !== null) el.scrollLeft = teleportTarget;
       el.scrollRequestID = null;
+      if (typeof onFinish === 'function') onFinish();
     }
   }
   el.scrollRequestID = requestAnimationFrame(animate);
@@ -444,11 +541,16 @@ function initLightbox() {
     if (e.target.classList.contains('lightbox-trigger')) {
       // Threshold check: prevent opening if the user was actually dragging the carousel
       const track = e.target.closest('.carousel-track');
-      if (track && track.mouseDownX !== undefined) {
-        const deltaX = Math.abs(e.pageX - track.mouseDownX);
-        const deltaY = Math.abs(e.pageY - track.mouseDownY);
-        // If the mouse moved more than 10px, treat it as a drag, not a click
-        if (deltaX > 10 || deltaY > 10) return;
+      if (track) {
+        // If the track is currently in dragging state, don't open lightbox
+        if (track.classList.contains('dragging')) return;
+        
+        // For carousels with old mouseDown tracking, check delta movement
+        if (track.mouseDownX !== undefined) {
+          const deltaX = Math.abs(e.pageX - track.mouseDownX);
+          const deltaY = Math.abs(e.pageY - track.mouseDownY);
+          if (deltaX > 10 || deltaY > 10) return;
+        }
       }
 
       lightboxImg.src = e.target.src;

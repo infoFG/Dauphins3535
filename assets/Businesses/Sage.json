@@ -1,0 +1,23 @@
+{
+  "name": "Sage Art Studio",
+  "description": "A brief description of what the business does, its history, or its mission statement.",
+  "business_hours": {
+    "monday": "08:00 AM - 06:00 PM",
+    "tuesday": "08:00 AM - 03:00 PM",
+    "wednesday": "08:00 AM - 03:00 PM",
+    "thursday": "08:00 AM - 06:00 PM",
+    "friday": "08:00 AM - 06:00 PM",
+    "saturday": "09:00 AM - 06:00 PM",
+    "sunday": "Closed"
+  },
+  "images": [
+    "SageArt_01.jpg"
+  ],
+  "website": "",
+  "social_media": {
+    "instagram": "https://instagram.com/examplebusiness",
+    "facebook": "https://facebook.com/examplebusiness",
+    "twitter": null,
+    "linkedin": null
+  }
+}
