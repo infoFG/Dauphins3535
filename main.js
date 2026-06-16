@@ -216,6 +216,30 @@ async function initBusinessGallery() {
         const imageUrl = `/assets/Businesses/${image}`;
         const fallbackImageUrl = `/assets/Businesses/${business.folder}/${image}`;
         const hoursHtml = business.business_hours ? formatBusinessHours(business.business_hours) : '';
+        
+        const ensureProtocol = (url) => (url && !url.startsWith('http')) ? `https://${url}` : url;
+
+        // Generate social media links
+        let linksHtml = '';
+        if (business.website) {
+          const siteUrl = ensureProtocol(business.website);
+          linksHtml += `<a href="${escapeHtml(siteUrl)}" target="_blank" rel="noopener"><span class="icon">🌐</span> Site web</a>`;
+        }
+        if (business.social_media) {
+          const platforms = {
+            facebook: { icon: '📘', label: 'Facebook' },
+            instagram: { icon: '📸', label: 'Instagram' },
+            twitter: { icon: '🐦', label: 'Twitter' },
+            linkedin: { icon: '💼', label: 'LinkedIn' }
+          };
+          Object.entries(business.social_media).forEach(([key, url]) => {
+            if (url && platforms[key] && typeof url === 'string') {
+              const socialUrl = ensureProtocol(url);
+              linksHtml += `<a href="${escapeHtml(socialUrl)}" target="_blank" rel="noopener"><span class="icon">${platforms[key].icon}</span> ${platforms[key].label}</a>`;
+            }
+          });
+        }
+
         return `
           <div class="business-carousel-card lightbox-trigger" aria-label="${escapeHtml(business.name)}">
             <div class="business-header">
@@ -226,9 +250,7 @@ async function initBusinessGallery() {
             <div class="business-overlay">
               <div class="business-hours">${hoursHtml}</div>
               <div class="business-links">
-                ${business.website ? `<a href="${escapeHtml(business.website)}" target="_blank" rel="noopener"><span class="icon">🌐</span> Site web</a>` : ''}
-                ${business.social_media && business.social_media.facebook ? `<a href="${escapeHtml(business.social_media.facebook)}" target="_blank" rel="noopener"><span class="icon">📘</span> Facebook</a>` : ''}
-
+                ${linksHtml}
               </div>
             </div>
           </div>
@@ -445,7 +467,6 @@ function initEnhancedCarousels(targetContainer = null) {
       isDown = true;
       isInteracting = true;
       activePointerId = e.pointerId;
-      track.setPointerCapture(activePointerId);
       stopAutoPlay();
       track.isAnimationCanceled = true;
       if (track.scrollRequestID) {
@@ -464,7 +485,23 @@ function initEnhancedCarousels(targetContainer = null) {
 
     const onPointerMove = (e) => {
       if (!isDown || e.pointerId !== activePointerId) return;
-      e.preventDefault();
+      
+      const dx = Math.abs(e.clientX - track.mouseDownX);
+      const dy = Math.abs(e.clientY - track.mouseDownY);
+
+      // Only transition to "dragging" state if the pointer has moved enough
+      // This prevents capturing simple clicks as drags
+      if (!track.classList.contains('dragging')) {
+        if (dx > 10 || dy > 10) {
+          track.classList.add('dragging');
+          track.setPointerCapture(activePointerId);
+          track.style.scrollSnapType = 'none';
+        } else {
+          return; // Still a potential click, don't move the track yet
+        }
+      }
+
+      e.preventDefault(); // Stop browser scrolling/drag-drop now that we are dragging
       const x = e.clientX - track.getBoundingClientRect().left;
       const walk = x - startX;
       track.scrollLeft = scrollLeft - walk;
@@ -474,10 +511,10 @@ function initEnhancedCarousels(targetContainer = null) {
       if (!isDown) return;
       isDown = false;
       isInteracting = false;
-      if (activePointerId !== null) {
+      if (activePointerId !== null && track.hasPointerCapture(activePointerId)) {
         track.releasePointerCapture(activePointerId);
-        activePointerId = null;
       }
+      activePointerId = null;
       track.classList.remove('dragging'); // Remove immediately so lightbox can open
       
       // Start the snap animation before restoring browser scroll snapping.
@@ -731,7 +768,11 @@ function initLightbox() {
     if (trigger) {
       // If clicking a link/button inside a trigger card, let the link work instead of opening lightbox
       const interactive = e.target.closest('a, button');
-      if (interactive && trigger.contains(interactive) && interactive !== trigger) return;
+      if (interactive) {
+        // If the link is inside the trigger (like business links in a card), prioritize the link.
+        // If the trigger is inside the link (like event image in a link), prioritize the lightbox.
+        if (trigger.contains(interactive) && trigger !== interactive) return;
+      }
 
       // Dragging check: prevent opening if the user was actually dragging the carousel
       const track = trigger.closest('.carousel-track');
