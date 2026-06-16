@@ -474,8 +474,6 @@ function initEnhancedCarousels(targetContainer = null) {
         track.scrollRequestID = null;
       }
       track.classList.remove('is-animating');
-      track.classList.add('dragging');
-      track.style.scrollSnapType = 'none';
       startX = e.clientX - track.getBoundingClientRect().left;
       startY = e.clientY - track.getBoundingClientRect().top;
       scrollLeft = track.scrollLeft;
