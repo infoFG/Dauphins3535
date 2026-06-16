@@ -1,6 +1,6 @@
 {
-  "name": "Maison Las Palmas",
-  "description": "A brief description of what the business does, its history, or its mission statement.",
+  "name": "Aime-toi",
+  "description": "Centre esthétique — Soins du visage, du corps et bien-être.",
   "business_hours": {
     "monday": "08:00 AM - 06:00 PM",
     "tuesday": "08:00 AM - 03:00 PM",
@@ -10,14 +10,10 @@
     "saturday": "09:00 AM - 06:00 PM",
     "sunday": "Closed"
   },
-    "images": [
-    "LaveTout_01.jpg"
-  ],
-  "website": null,
+  "images": [],
+  "website": "https://www.m-toi.com/",
   "social_media": {
-    "instagram": "https://instagram.com/examplebusiness",
-    "facebook": "https://facebook.com/examplebusiness",
-    "twitter": null,
-    "linkedin": null
+    "facebook": null,
+    "instagram": null
   }
 }

@@ -362,20 +362,23 @@ async function loadSectionBackground(sectionId, folderPath = '/assets/Apropos') 
 
 function formatBusinessHours(hoursObj) {
   // Expecting an object like { monday: "08:00 - 18:00", ... }
+  const isFr = document.documentElement.lang === 'fr';
   const order = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
   const labels = {
-    monday: 'Mon',
-    tuesday: 'Tue',
-    wednesday: 'Wed',
-    thursday: 'Thu',
-    friday: 'Fri',
-    saturday: 'Sat',
-    sunday: 'Sun'
+    monday: isFr ? 'Lun' : 'Mon',
+    tuesday: isFr ? 'Mar' : 'Tue',
+    wednesday: isFr ? 'Mer' : 'Wed',
+    thursday: isFr ? 'Jeu' : 'Thu',
+    friday: isFr ? 'Ven' : 'Fri',
+    saturday: isFr ? 'Sam' : 'Sat',
+    sunday: isFr ? 'Dim' : 'Sun'
   };
+  const closedText = isFr ? 'Fermé' : 'Closed';
   return order.map(day => {
     const val = hoursObj[day];
     if (!val) return '';
-    return `<div class="bh-row"><span class="bh-day">${labels[day]}</span><span class="bh-time">${escapeHtml(val)}</span></div>`;
+    const displayVal = /closed/i.test(val) ? closedText : val;
+    return `<div class="bh-row"><span class="bh-day">${labels[day]}</span><span class="bh-time">${escapeHtml(displayVal)}</span></div>`;
   }).join('');
 }
 
