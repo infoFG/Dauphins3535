@@ -246,7 +246,6 @@ body {
   scrollbar-color: var(--orange) transparent;
   cursor: grab;
   user-select: none;
-  scroll-behavior: smooth;
 }
 
 /* Class added by JS to make dragging smooth */
@@ -317,9 +316,26 @@ body {
   .section:nth-of-type(odd) .content-box { transform: translateX(50px); }
   .section:nth-of-type(odd) .carousel-container { transform: translateX(-50px); }
 
-  /* Override initial offsets for #quartier to match Text Left layout */
+  /* Override for #quartier: First row side-by-side, rest stacked */
+  #quartier .section-inner {
+    flex-wrap: wrap;
+  }
+
+  /* Force children from the 3rd one onwards to take 100% width */
+  #quartier .section-inner > :nth-child(n+3) {
+    flex: 1 1 100% !important;
+    max-width: 100% !important;
+    transform: translateY(30px); /* Slide up for stacked items */
+  }
+
   #quartier .content-box:first-child { transform: translateX(-50px); }
   #quartier .carousel-container:nth-child(2) { transform: translateX(50px); }
+
+  /* Wide aspect ratio for full-width carousels (Events and extra galleries) */
+  #events-carousel .carousel-track img,
+  #quartier .carousel-container:nth-of-type(n+2) img {
+    aspect-ratio: 21 / 9 !important;
+  }
 }
 
 /* Ensure revealed elements always reset their transforms and opacity across all devices */

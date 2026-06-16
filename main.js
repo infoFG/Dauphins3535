@@ -133,6 +133,7 @@ async function initEventsCarousel() {
       track.innerHTML = '<p class="loading-msg">Aucun événement trouvé pour le moment.</p>';
       return;
     }
+    track.dataset.cloned = ""; // Reset clone flag to allow re-initialization of the loop
 
     track.innerHTML = events.map(event => `
       <a href="${event.link}" target="_blank" class="carousel-card">
@@ -197,8 +198,8 @@ function initEnhancedCarousels() {
       if (track.scrollWidth <= track.offsetWidth) return;
       
       container.autoPlayTimer = setInterval(() => {
-        navigate(track, 1);
-      }, 8000); 
+        navigate(track, 1, 4000); // 4s for ambient autoplay
+      }, 8000); // 12 second interval for longer pauses
     };
 
     const stopAutoPlay = () => {
@@ -215,13 +216,11 @@ function initEnhancedCarousels() {
 
     // 1. Navigation Arrows
     if (prevBtn) prevBtn.onclick = () => { 
-      track.isAnimationCanceled = true;
-      navigate(track, -1);
+      navigate(track, -1, 1000); // 1s for responsive manual clicks
       resetAutoPlay(); 
     };
     if (nextBtn) nextBtn.onclick = () => { 
-      track.isAnimationCanceled = true;
-      navigate(track, 1);
+      navigate(track, 1, 1000); // 1s for responsive manual clicks
       resetAutoPlay(); 
     };
 
@@ -243,17 +242,35 @@ function initEnhancedCarousels() {
     const stopDragging = () => {
       isDown = false;
       track.classList.remove('dragging');
+      resetAutoPlay(); // Reset autoplay timer after drag
       
-      // Check boundaries on mouse up for seamless dragging
+      // Find the nearest snap point (center of the closest image)
       const items = track.children;
-      const isAtEndClone = track.scrollLeft + track.offsetWidth >= track.scrollWidth - 20;
-      const isAtStartClone = track.scrollLeft <= 20;
+      const scrollCenter = track.scrollLeft + track.offsetWidth / 2;
+      
+      let closestIdx = 0;
+      let minDistance = Infinity;
+      items.forEach((item, idx) => {
+        const itemCenter = item.offsetLeft + item.offsetWidth / 2;
+        const dist = Math.abs(itemCenter - scrollCenter);
+        if (dist < minDistance) {
+          minDistance = dist;
+          closestIdx = idx;
+        }
+      });
 
-      if (isAtEndClone) {
-        track.scrollLeft = items[1].offsetLeft - (track.offsetWidth - items[1].offsetWidth) / 2;
-      } else if (isAtStartClone) {
-        track.scrollLeft = items[items.length - 2].offsetLeft - (track.offsetWidth - items[items.length - 2].offsetWidth) / 2;
+      let targetScroll = items[closestIdx].offsetLeft - (track.offsetWidth - items[closestIdx].offsetWidth) / 2;
+      let teleportTarget = null;
+
+      // If the closest item is a clone, set up teleportation
+      if (closestIdx === 0) { // If closest is the start clone
+        teleportTarget = items[items.length - 2].offsetLeft - (track.offsetWidth - items[items.length - 2].offsetWidth) / 2;
+      } else if (closestIdx === items.length - 1) { // If closest is the end clone
+        teleportTarget = items[1].offsetLeft - (track.offsetWidth - items[1].offsetWidth) / 2;
       }
+
+      // Animate to the nearest snap point
+      smoothScrollTo(track, targetScroll, 750, teleportTarget); // 750ms for drag snap
     };
 
     track.addEventListener('mouseleave', stopDragging);
@@ -324,8 +341,8 @@ function smoothScrollTo(el, target, duration, teleportTarget = null) {
     const elapsed = currentTime - startTime;
     const progress = Math.min(elapsed / duration, 1);
     
-    // easeOutQuart: smoother deceleration that avoids the "stalling" feel
-    const ease = 1 - Math.pow(1 - progress, 4);
+    // easeInOutQuad: soft start and soft finish
+    const ease = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
     
     el.scrollLeft = start + change * ease;
     if (progress < 1) {
@@ -341,8 +358,14 @@ function smoothScrollTo(el, target, duration, teleportTarget = null) {
 
 /**
  * Handles infinite carousel navigation logic
+ * @param {HTMLElement} track The scroll container
+ * @param {number} direction -1 for prev, 1 for next
+ * @param {number} duration Animation duration in ms
  */
-function navigate(track, direction) {
+function navigate(track, direction, duration = 4000) {
+  // Guard: Don't start a new movement if we are already animating
+  if (track.classList.contains('is-animating')) return;
+
   const items = Array.from(track.children);
   const scrollCenter = track.scrollLeft + track.offsetWidth / 2;
   
@@ -360,11 +383,15 @@ function navigate(track, direction) {
 
   // If we are currently sitting on a clone, jump to the real item instantly before animating
   if (currentIdx === 0 && direction < 0) {
+    // Jump from the start-clone to the real last item
+    const realLastItem = items[items.length - 2];
+    track.scrollLeft = realLastItem.offsetLeft - (track.offsetWidth - realLastItem.offsetWidth) / 2;
     currentIdx = items.length - 2;
-    track.scrollLeft = items[currentIdx].offsetLeft - (track.offsetWidth - items[currentIdx].offsetWidth) / 2;
   } else if (currentIdx === items.length - 1 && direction > 0) {
+    // Jump from the end-clone to the real first item
+    const realFirstItem = items[1];
+    track.scrollLeft = realFirstItem.offsetLeft - (track.offsetWidth - realFirstItem.offsetWidth) / 2;
     currentIdx = 1;
-    track.scrollLeft = items[currentIdx].offsetLeft - (track.offsetWidth - items[currentIdx].offsetWidth) / 2;
   }
 
   let nextIdx = currentIdx + direction;
@@ -379,7 +406,7 @@ function navigate(track, direction) {
 
   const targetItem = items[nextIdx];
   const targetScroll = targetItem.offsetLeft - (track.offsetWidth - targetItem.offsetWidth) / 2;
-  smoothScrollTo(track, targetScroll, 2500, teleportTo);
+  smoothScrollTo(track, targetScroll, duration, teleportTo);
 }
 
 /* ========== SCROLL REVEAL (Sliding into place) ========== */
