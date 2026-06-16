@@ -17,6 +17,7 @@ a:hover, a:active {
   color: #B8B09A;
 }
 
+/* ========== TRANSLATION TOGGLE ========== */
 /* ========== RESET ========== */
 *, *::before, *::after {
   margin: 0;
@@ -139,43 +140,328 @@ body {
 }
 
 .section {
-  padding: 4rem 0;
+  padding: 6rem 0;
+  position: relative;
+  background: #fff;
+  overflow: hidden;
 }
 
-.section:nth-child(even) {
-  background: var(--bleu-pale);
+/* Fixed Background Layer */
+.section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: var(--section-bg);
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.5;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .section-inner {
-  max-width: 900px;
+  max-width: 1600px; /* Increased to allow text room to breathe at 2:1 ratio */
   margin: 0 auto;
   padding: 0 3rem;
+  position: relative;
+  z-index: 1; /* Content stays above background */
+  display: flex;
+  flex-direction: row; /* Always row, but wraps on mobile */
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3rem;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ========== MOSAÏQUE D'IMAGES ========== */
-.gallery-mosaic {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 1.5rem;
+/* Desktop Alternating Layout */
+@media (min-width: 1100px) {
+  .section-inner {
+    gap: 5rem;
+    flex-wrap: nowrap; /* Side-by-side on desktop */
+  }
+
+  /* Standard zig-zag logic for all sections */
+  .section:nth-of-type(odd) .section-inner {
+    flex-direction: row-reverse;
+  }
+
+  .content-box {
+    flex: 1.2 1 40%; /* Proportional basis + room for gap */
+    margin-bottom: 0;
+  }
+
+  .carousel-container {
+    flex: 1.5 1 50%; /* Proportional basis + room for gap */
+    margin-top: 0;
+    min-width: 350px;
+  }
+
+  /* Specific logic for complex sections like #quartier */
+  #quartier .section-inner {
+    flex-wrap: wrap;
+    flex-direction: row; /* Intro text left, Gallery right */
+    align-items: flex-start;
+  }
+
+  /* Ensure Intro & Gallery take their 1.2:1.5 shares even in a wrapping container */
+  #quartier .section-inner > .content-box:first-child { flex: 1.2 1 40%; }
+  #quartier .section-inner > .carousel-container:nth-child(2) { flex: 1.5 1 50%; }
+
+  /* Sub-categories (3rd child onwards) occupy full width */
+  #quartier .section-inner > :nth-child(n+3) {
+    flex: 0 0 100%;
+    max-width: 100%;
+    transform: translateY(30px);
+  }
+
+  #quartier .section-inner > :nth-child(n+3).revealed {
+    transform: translateY(0);
+  }
 }
 
-.gallery-mosaic .gallery-item {
-  border-radius: 10px;
-  overflow: hidden;
+/* Content Boxes for Readability */
+.content-box {
+  background: var(--box-bg, rgba(255, 255, 255, 0.9));
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  backdrop-filter: blur(5px);
+  margin-bottom: 2rem;
+  flex: 1 1 100%; /* Flexible default */
+  
+  /* Initial state for reveal */
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Section Specific Backgrounds */
+#apropos { 
+  --section-bg: url('../assets/apropos-1.webp');
+  --box-bg: rgba(255, 253, 250, 0.92); /* Warm Marble */
+}
+#installations { 
+  --section-bg: url('../assets/install-1.webp');
+  --box-bg: rgba(240, 245, 248, 0.92); /* Pool Blue/Gray */
+}
+#galerie-commerciale { 
+  --section-bg: url('../assets/commerciale-1.webp');
+  --box-bg: rgba(253, 250, 245, 0.92); /* Warm Wood/Gallery */
+}
+#valeurs { 
+  --section-bg: url('../assets/hero-batiment.jpg');
+  --box-bg: rgba(245, 247, 250, 0.92); /* Sky/Exterior */
+}
+#condoweb { 
+  --section-bg: url('../assets/apropos-3.webp');
+  --box-bg: rgba(255, 252, 248, 0.92); /* Interior Warmth */
+}
+#quartier { 
+  --section-bg: url('../assets/quartier-parc.webp');
+  --box-bg: rgba(245, 252, 245, 0.92); /* Park Green */
+}
+
+/* ========== IMAGE CAROUSEL ========== */
+.carousel-container {
+  position: relative;
+  margin-top: 2rem;
+  flex: 1 1 100%; /* Flexible default */
+  
+  /* Initial state for reveal */
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out 0.2s, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s;
+}
+
+.image-carousel {
   width: 100%;
-  height: 200px;
+}
+
+.image-carousel .carousel-track {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--orange) transparent;
+  cursor: grab;
+  user-select: none;
+  scroll-behavior: smooth;
+}
+
+/* Class added by JS to make dragging smooth */
+.carousel-track.dragging,
+.carousel-track.is-animating {
+  scroll-snap-type: none;
+  scroll-behavior: auto;
+}
+
+.image-carousel .carousel-track:active {
+  cursor: grabbing;
+}
+
+.image-carousel img {
+  flex: 0 0 80%;
+  width: 100%; /* Forces image to fill the scaling container */
+  height: auto;
+  max-height: 520px; /* Prevents images from becoming overwhelming */
+  aspect-ratio: 1 / 1; /* Square or 4/3 works well for the 2:1 layout */
   object-fit: cover;
-  display: block;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 12px;
+  scroll-snap-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  background: var(--bleu-pale);
+  pointer-events: auto;
+  user-drag: none; /* Non-standard but helpful */
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
-.gallery-mosaic .gallery-item:hover {
-  transform: scale(1.02);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+/* ========== RESPONSIVE DESKTOP OVERRIDES ========== */
+@media (min-width: 1100px) {
+  .section-inner {
+    gap: 5rem;
+    flex-wrap: wrap; /* Side-by-side enabled with wrapping for multiple elements */
+  }
+
+  /* Zig-zag: Even sections (À propos) = Row. Odd = Reverse. */
+  .section:nth-of-type(odd) .section-inner {
+    flex-direction: row-reverse;
+  }
+
+  /* Force Vie de quartier to start with Text Left, breaking the zig-zag parity for this section */
+  #quartier .section-inner {
+    flex-direction: row;
+  }
+
+  .content-box {
+    flex: 1.2 1 0%; /* Reduced text priority */
+    margin-bottom: 0;
+  }
+
+  .carousel-container {
+    flex: 1.5 1 0%; /* Restored carousel prominence */
+    margin-top: 0;
+    min-width: 350px;
+  }
+
+  .image-carousel img {
+    flex: 0 0 100%;
+    aspect-ratio: 1 / 1; 
+    max-height: 450px;
+  }
+  
+  /* Slide-in animations */
+  .section:nth-of-type(even) .content-box { transform: translateX(-50px); }
+  .section:nth-of-type(even) .carousel-container { transform: translateX(50px); }
+  .section:nth-of-type(odd) .content-box { transform: translateX(50px); }
+  .section:nth-of-type(odd) .carousel-container { transform: translateX(-50px); }
+
+  /* Override initial offsets for #quartier to match Text Left layout */
+  #quartier .content-box:first-child { transform: translateX(-50px); }
+  #quartier .carousel-container:nth-child(2) { transform: translateX(50px); }
 }
 
-/* Petit format 2×2 pour les galettes */
+/* Ensure revealed elements always reset their transforms and opacity across all devices */
+.revealed {
+  transform: translate(0) !important;
+  opacity: 1 !important;
+}
+
+/* Carousel Controls */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--bleu-fonce);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.carousel-btn:hover {
+  background: var(--orange);
+  color: #fff;
+}
+
+.carousel-btn.prev { left: -20px; }
+.carousel-btn.next { right: -20px; }
+
+.carousel-pips {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 1rem;
+}
+
+.pip {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--bleu-pale);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.pip.active {
+  background: var(--orange);
+  transform: scale(1.2);
+}
+
+/* Lightbox */
+.lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 1000;
+  padding: 2rem;
+  cursor: zoom-out;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; cursor: default; }
+
+.lightbox-close {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease, transform 0.3s ease;
+  z-index: 1001;
+}
+
+.lightbox-close:hover {
+  background: var(--orange);
+  transform: scale(1.1);
+}
+
+/* Keep original grid for small footers if needed, otherwise replace */
 .gallery-grid-4 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -372,10 +658,19 @@ body {
   justify-content: center;
   text-align: center;
   padding: 2rem;
+  background: linear-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.4)), url('../assets/quartier-parc.webp');
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
 }
 
 .hero-content {
-  max-width: 500px;
+  max-width: 800px;
+  background: rgba(255, 252, 248, 0.85);
+  padding: 4rem;
+  border-radius: 24px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.12);
 }
 
 .hero-image {
@@ -450,4 +745,89 @@ body {
 .condo-card h3 {
   color: var(--bleu-fonce);
   margin-bottom: 0.5rem;
+}
+
+/* ========== CAROUSEL ========== */
+.carousel-container {
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 0.5rem 0 1.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bleu-moyen) transparent;
+}
+
+.carousel-track::-webkit-scrollbar {
+  height: 6px;
+}
+
+.carousel-track::-webkit-scrollbar-thumb {
+  background: var(--bleu-moyen);
+  border-radius: 10px;
+}
+
+.carousel-card {
+  flex: 0 0 260px;
+  scroll-snap-align: start;
+  background: #fff;
+  border: 1px solid var(--bleu-pale);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.carousel-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.carousel-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  background: var(--bleu-pale);
+}
+
+.card-content {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.card-date {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--orange);
+  letter-spacing: 0.05em;
+}
+
+.card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--bleu-fonce);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.loading-msg {
+  font-size: 0.9rem;
+  color: var(--bleu-moyen);
+  font-style: italic;
+  padding: 1rem 0;
 }

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Les Dauphins-sur-le Parc — Immeuble à condos &amp; galerie commerciale</title>
+  <link rel="icon" type="image/webp" href="assets/logo-menu.webp">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -24,12 +25,12 @@
     </div>
     <nav class="sidebar-nav">
       <ul>
-        <li><a href="#apropos">À propos</a></li>
-        <li><a href="#installations">Installations</a></li>
-        <li><a href="#galerie-commerciale">Galerie Commerciale</a></li>
-        <li><a href="#valeurs">Valeurs</a></li>
-        <li><a href="#condoweb">CondoWeb</a></li>
-        <li><a href="#quartier">Vie de quartier</a></li>
+        <li><a href="#apropos" data-i18n="nav_about">À propos</a></li>
+        <li><a href="#installations" data-i18n="nav_amenities">Installations</a></li>
+        <li><a href="#galerie-commerciale" data-i18n="nav_gallery">Galerie Commerciale</a></li>
+        <li><a href="#valeurs" data-i18n="nav_values">Valeurs</a></li>
+        <li><a href="#condoweb" data-i18n="nav_condoweb">CondoWeb</a></li>
+        <li><a href="#quartier" data-i18n="nav_neighborhood">Vie de quartier</a></li>
         <!-- <li><a href="#unites">Unités à vendre</a></li> -->
       </ul>
     </nav>
@@ -41,29 +42,36 @@
     <!-- ===== HERO ===== -->
     <section class="hero-section" id="accueil">
       <div class="hero-content">
-        <img src="assets/hero-batiment.jpg" alt="Les Dauphins-sur-le Parc — Façade de l'immeuble" class="hero-image">
+        <img src="assets/hero-batiment.jpg" alt="Les Dauphins-sur-le Parc" class="hero-image">
         <h1 class="hero-title">Les Dauphins-sur-le Parc</h1>
-        <p class="hero-subtitle">Immeuble à condos et galerie commerciale</p>
-        <p class="hero-tagline">Confort et communauté au cœur de votre quotidien</p>
-        <a href="#apropos" class="hero-cta">Découvrir</a>
+        <p class="hero-subtitle" data-i18n="hero_subtitle">Immeuble à condos et galerie commerciale</p>
+        <p class="hero-tagline" data-i18n="hero_tagline">Confort et communauté au cœur de votre quotidien</p>
+        <a href="#apropos" class="hero-cta" data-i18n="hero_cta">Découvrir</a>
       </div>
     </section>
 
     <!-- ===== À PROPOS ===== -->
     <section class="section" id="apropos">
       <div class="section-inner">
-        <h2 class="section-title">À propos</h2>
-        <div class="section-content">
-          <p>Bienvenue aux Dauphins-sur-le Parc, un immeuble à condos résidentiel où confort et communauté se rencontrent. Situé dans l'est du Plateau Mont-Royal à Montréal, face au Parc Lafontaine, notre immeuble offre un cadre de vie agréable à ses résidents et une qualité de vie exceptionnelle.</p>
-          <p>Nous avons 15 employés qui veillent au bon fonctionnement de l'immeuble et l'entretien des lieux communs. Cinq administrateurs font de même pour le Syndicat de copropriété.</p>
-          <p>Transparence, respect et qualité de vie sont au cœur de notre mission.</p>
+        <div class="content-box">
+          <h2 class="section-title" data-i18n="title_about">À propos</h2>
+          <div class="section-content">
+            <p data-i18n="about_p1">Bienvenue aux Dauphins-sur-le Parc, un immeuble à condos résidentiel...</p>
+            <p data-i18n="about_p2">Nous avons 15 employés qui veillent au bon fonctionnement...</p>
+            <p data-i18n="about_p3">Transparence, respect et qualité de vie sont au cœur de notre mission.</p>
+          </div>
         </div>
-        <div class="gallery-mosaic" id="gallery-apropos">
-          <img src="assets/apropos-1.webp" class="gallery-item gallery-wide" alt="Façade de l'immeuble Les Dauphins-sur-le Parc" loading="lazy" />
-          <img src="assets/apropos-2.webp" class="gallery-item" alt="Entrée principale" loading="lazy" />
-          <img src="assets/apropos-3.webp" class="gallery-item" alt="Hall d'entrée" loading="lazy" />
-          <img src="assets/apropos-4.webp" class="gallery-item" alt="Vue du quartier" loading="lazy" />
-          <img src="assets/apropos-5.webp" class="gallery-item" alt="Parc Lafontaine à proximité" loading="lazy" />
+        <div class="carousel-container image-carousel">
+          <button class="carousel-btn prev">❮</button>
+          <button class="carousel-btn next">❯</button>
+          <div class="carousel-track">
+            <img src="assets/apropos-1.webp" alt="Façade" loading="lazy" class="lightbox-trigger" draggable="false">
+            <img src="assets/apropos-2.webp" alt="Entrée" loading="lazy" class="lightbox-trigger" draggable="false">
+            <img src="assets/apropos-3.webp" alt="Hall" loading="lazy" class="lightbox-trigger" draggable="false">
+            <img src="assets/apropos-4.webp" alt="Quartier" loading="lazy" class="lightbox-trigger" draggable="false">
+            <img src="assets/apropos-5.webp" alt="Parc" loading="lazy" class="lightbox-trigger" draggable="false">
+          </div>
+          <div class="carousel-pips"></div>
         </div>
       </div>
     </section>
@@ -71,27 +79,34 @@
     <!-- ===== INSTALLATIONS ===== -->
     <section class="section" id="installations">
       <div class="section-inner">
-        <h2 class="section-title">Installations</h2>
-        <div class="section-content">
-          <p>Les résidents des Dauphins-sur-le Parc ont accès à plusieurs installations communes :</p>
-          <ul>
-            <li>Piscine intérieure chauffée</li>
-            <li>Sauna et hammam</li>
-            <li>Salle d'entraînement avec équipements de base</li>
-            <li>Salle communautaire pour rassemblements et fêtes</li>
-            <li>Terrasse sur le toit avec aires de repos</li>
-            <li>Rangement pour vélos et équipements saisonniers</li>
-          </ul>
+        <div class="content-box">
+          <h2 class="section-title" data-i18n="nav_amenities">Installations</h2>
+          <div class="section-content">
+            <p data-i18n="amenities_p1">Les résidents des Dauphins-sur-le Parc ont accès à plusieurs installations communes :</p>
+            <ul>
+              <li data-i18n="amenity_1">Piscine intérieure chauffée</li>
+              <li data-i18n="amenity_2">Sauna et hammam</li>
+              <li data-i18n="amenity_3">Salle d'entraînement avec équipements de base</li>
+              <li data-i18n="amenity_4">Salle communautaire pour rassemblements et fêtes</li>
+              <li data-i18n="amenity_5">Terrasse sur le toit avec aires de repos</li>
+              <li data-i18n="amenity_6">Rangement pour vélos et équipements saisonniers</li>
+            </ul>
+          </div>
         </div>
-        <div class="gallery-mosaic" id="gallery-installations">
-          <img src="assets/install-1.webp" class="gallery-item gallery-wide" alt="Piscine intérieure chauffée" loading="lazy" />
-          <img src="assets/install-2.webp" class="gallery-item" alt="Sauna" loading="lazy" />
-          <img src="assets/install-3.webp" class="gallery-item" alt="Salle communautaire" loading="lazy" />
-          <img src="assets/install-4.webp" class="gallery-item" alt="Salle d'entraînement" loading="lazy" />
-          <img src="assets/install-5.webp" class="gallery-item" alt="Terrasse sur le toit" loading="lazy" />
-          <img src="assets/install-6.webp" class="gallery-item gallery-wide" alt="Hammam" loading="lazy" />
-          <img src="assets/install-7.webp" class="gallery-item" alt="Rangement pour vélos" loading="lazy" />
-          <img src="assets/install-8.webp" class="gallery-item" alt="Vue depuis la terrasse" loading="lazy" />
+        <div class="carousel-container image-carousel">
+          <button class="carousel-btn prev">❮</button>
+          <button class="carousel-btn next">❯</button>
+          <div class="carousel-track">
+            <img src="assets/install-1.webp" alt="Piscine" loading="lazy" class="lightbox-trigger" draggable="false">
+            <img src="assets/install-2.webp" alt="Sauna" loading="lazy" class="lightbox-trigger" draggable="false">
+            <img src="assets/install-3.webp" alt="Salle" loading="lazy" class="lightbox-trigger" draggable="false">
+            <img src="assets/install-4.webp" alt="Gym" loading="lazy" class="lightbox-trigger" draggable="false">
+            <img src="assets/install-5.webp" alt="Terrasse" loading="lazy" class="lightbox-trigger" draggable="false">
+            <img src="assets/install-6.webp" alt="Hammam" loading="lazy" class="lightbox-trigger" draggable="false">
+            <img src="assets/install-7.webp" alt="Vélos" loading="lazy" class="lightbox-trigger" draggable="false">
+            <img src="assets/install-8.webp" alt="Vue" loading="lazy" class="lightbox-trigger" draggable="false">
+          </div>
+          <div class="carousel-pips"></div>
         </div>
       </div>
     </section>
@@ -99,25 +114,32 @@
     <!-- ===== GALERIE COMMERCIALE ===== -->
     <section class="section" id="galerie-commerciale">
       <div class="section-inner">
-        <h2 class="section-title">Galerie Commerciale</h2>
-        <div class="section-content">
-          <p>Notre galerie commerciale située au rez-de-chaussée du 3535 avenue Papineau regroupe plusieurs commerces et services pour répondre aux besoins des résidents et du quartier.</p>
-          <p>Voici les commerces présents dans notre galerie :</p>
-          <ul>
-            <li><strong>Stars Hair Collections</strong> — Salon de coiffure</li>
-            <li><strong>Maison Las Palmas</strong> — Services d'esthétique et bien-être — <a href="https://www.facebook.com/MaisonLasPalmas/" target="_blank" rel="noopener">facebook.com/MaisonLasPalmas</a></li>
-            <li><strong>JaJi santé clinique</strong> — Clinique de santé et bien-être — <a href="https://www.jajiheadspa.com/" target="_blank" rel="noopener">jajiheadspa.com</a></li>
-            <li><strong>Prosper Fitness</strong> — Entraînement personnel — <a href="https://prosperfitness.net/" target="_blank" rel="noopener">prosperfitness.net</a></li>
-            <li><strong>Sage Art Studio</strong> — Studio de tatouage — <a href="https://www.sagearttattoostudio.com/" target="_blank" rel="noopener">sagearttattoostudio.com</a></li>
-            <li><strong>Café Lafontaine</strong> — <a href="https://www.facebook.com/share/1GH7zBj9cu/" target="_blank" rel="noopener">facebook.com/CaféLafontaine</a></li>
-            <li><strong>Dépanneur Le 35</strong></li>
-          </ul>
+        <div class="content-box">
+          <h2 class="section-title" data-i18n="nav_gallery">Galerie Commerciale</h2>
+          <div class="section-content">
+            <p data-i18n="gallery_p1">Notre galerie commerciale située au rez-de-chaussée...</p>
+            <p data-i18n="gallery_p2">Voici les commerces présents dans notre galerie :</p>
+            <ul>
+              <li data-i18n="gallery_item_1"><strong>Stars Hair Collections</strong> — Salon de coiffure</li>
+              <li data-i18n="gallery_item_2"><strong>Maison Las Palmas</strong> — Services d'esthétique et bien-être</li>
+              <li data-i18n="gallery_item_3"><strong>JaJi santé clinique</strong> — Clinique de santé et bien-être</li>
+              <li data-i18n="gallery_item_4"><strong>Prosper Fitness</strong> — Entraînement personnel</li>
+              <li data-i18n="gallery_item_5"><strong>Sage Art Studio</strong> — Studio de tatouage</li>
+              <li data-i18n="gallery_item_6"><strong>Café Lafontaine</strong></li>
+              <li data-i18n="gallery_item_7"><strong>Dépanneur Le 35</strong></li>
+            </ul>
+          </div>
         </div>
-        <div class="gallery-mosaic" id="gallery-commerciale">
-          <img src="assets/commerciale-1.webp" class="gallery-item gallery-wide" alt="Galerie commerciale — vue d'ensemble" loading="lazy" />
-          <img src="assets/commerciale-2.webp" class="gallery-item" alt="Commerce Stars Hair Collections" loading="lazy" />
-          <img src="assets/commerciale-3.webp" class="gallery-item" alt="Café Lafontaine'Or" loading="lazy" />
-          <img src="assets/commerciale-5.webp" class="gallery-item" alt="Entrée des commerces" loading="lazy" />
+        <div class="carousel-container image-carousel">
+          <button class="carousel-btn prev">❮</button>
+          <button class="carousel-btn next">❯</button>
+          <div class="carousel-track">
+            <img src="assets/commerciale-1.webp" alt="Vue d'ensemble" loading="lazy" class="lightbox-trigger" draggable="false">
+            <img src="assets/commerciale-2.webp" alt="Salon" loading="lazy" class="lightbox-trigger" draggable="false">
+            <img src="assets/commerciale-3.webp" alt="Café" loading="lazy" class="lightbox-trigger" draggable="false">
+            <img src="assets/commerciale-5.webp" alt="Commerces" loading="lazy" class="lightbox-trigger" draggable="false">
+          </div>
+          <div class="carousel-pips"></div>
         </div>
       </div>
     </section>
@@ -125,107 +147,134 @@
     <!-- ===== VALEURS ===== -->
     <section class="section" id="valeurs">
       <div class="section-inner">
-        <h2 class="section-title">Valeurs</h2>
-        <div class="section-content">
-          <p>Pour assurer une cohabitation harmonieuse, certains règlements sont en vigueur dans l'immeuble :</p>
-          <ul>
-            <li>Respect des heures de silence entre 22 h et 7 h</li>
-            <li>Utilisation adéquate des aires communes</li>
-            <li>Gestion responsable des déchets et du recyclage</li>
-            <li>Animaux de compagnie autorisés sous conditions</li>
-          </ul>
-          <p style="margin-top:1rem;">Le règlement complet est disponible sur <a href="https://mon.condoweb.app/" target="_blank" rel="noopener"><strong>CondoWeb</strong></a>.</p>
+        <div class="content-box">
+          <h2 class="section-title" data-i18n="nav_values">Valeurs</h2>
+          <div class="section-content">
+            <p data-i18n="values_p1">Pour assurer une cohabitation harmonieuse...</p>
+            <ul>
+              <li data-i18n="value_1">Respect des heures de silence entre 22 h et 7 h</li>
+              <li data-i18n="value_2">Utilisation adéquate des aires communes</li>
+              <li data-i18n="value_3">Gestion responsable des déchets et du recyclage</li>
+              <li data-i18n="value_4">Animaux de compagnie autorisés sous conditions</li>
+            </ul>
+            <p style="margin-top:1rem;" data-i18n="values_rules">Le règlement complet est disponible sur CondoWeb.</p>
+          </div>
         </div>
-        <div class="gallery-mosaic" id="gallery-valeurs"></div>
       </div>
     </section>
 
     <!-- ===== CONDOWEB ===== -->
     <section class="section" id="condoweb">
       <div class="section-inner">
-        <h2 class="section-title">CondoWeb</h2>
-        <div class="section-content">
-          <p><strong>CondoWeb</strong> (i.e. CondoManager) est la plateforme de gestion utilisée par notre copropriété. Elle permet aux résidents de :</p>
-          <ul>
-            <li>Consulter les documents officiels (procès-verbaux, états financiers)</li>
-            <li>Recevoir les communications du conseil</li>
-            <li>Consulter le solde de votre compte de copropriété</li>
-          </ul>
-          <div class="condo-card">
-            <h3>Accès CondoWeb</h3>
+        <div class="content-box">
+          <h2 class="section-title" data-i18n="nav_condoweb">CondoWeb</h2>
+          <div class="section-content">
+            <p data-i18n="condoweb_p1"><strong>CondoWeb</strong> est la plateforme de gestion...</p>
             <ul>
-              <li>Accédez à CondoWeb <a href="https://mon.condoweb.app/" target="_blank" rel="noopener">ici</a>.</li>
-              <li>Contactez le bureau de l'administration pour créer votre compte</li>
+              <li data-i18n="condoweb_li_1">Consulter les documents officiels</li>
+              <li data-i18n="condoweb_li_2">Recevoir les communications du conseil</li>
+              <li data-i18n="condoweb_li_3">Consulter le solde de votre compte</li>
             </ul>
+            <div class="condo-card">
+              <h3 data-i18n="condoweb_card_title">Accès CondoWeb</h3>
+              <ul>
+                <li data-i18n="condoweb_card_li_1">Accédez à CondoWeb ici.</li>
+                <li data-i18n="condoweb_card_li_2">Contactez le bureau pour créer votre compte</li>
+              </ul>
+            </div>
           </div>
         </div>
-        <div class="gallery-mosaic" id="gallery-condoweb"></div>
       </div>
     </section>
 
     <!-- ===== VIE DE QUARTIER ===== -->
     <section class="section" id="quartier">
       <div class="section-inner">
-        <h2 class="section-title">Vie de quartier</h2>
-        <div class="section-content">
-          <p>Le parc La Fontaine, situé à deux pas de l'immeuble, est un véritable poumon vert au cœur du Plateau-Mont-Royal. Voici un aperçu de ce qu'il offre aux résidents.</p>
-
-          <div class="gallery-mosaic" style="margin:0;">
-            <img src="assets/quartier-parc.webp" class="gallery-item gallery-wide" alt="Vue du parc La Fontaine" loading="lazy" />
+        <!-- Intro Box -->
+        <div class="content-box">
+          <h2 class="section-title" data-i18n="nav_neighborhood">Vie de quartier</h2>
+          <div class="section-content">
+            <p data-i18n="neighborhood_p1">Le parc La Fontaine, situé à deux pas...</p>
           </div>
+        </div>
 
-          <h3 style="margin-top:1.5rem; color:var(--bleu-fonce); font-size:1.1rem;">☀️ Activités été</h3>
+        <!-- Main Park Gallery -->
+        <div class="carousel-container image-carousel">
+          <button class="carousel-btn prev">❮</button>
+          <button class="carousel-btn next">❯</button>
+          <div class="carousel-track">
+            <img src="assets/quartier-parc.webp" alt="Parc" loading="lazy" class="lightbox-trigger" draggable="false">
+            <img src="assets/quartier-theatre.webp" alt="Théâtre" loading="lazy" class="lightbox-trigger" draggable="false">
+          </div>
+          <div class="carousel-pips"></div>
+        </div>
+
+        <!-- Summer Box -->
+        <div class="content-box">
+          <h3 style="color:var(--bleu-fonce); font-size:1.1rem;" data-i18n="neighborhood_summer">☀️ Activités été</h3>
+          <div class="section-content">
+            <ul>
+              <li data-i18n="summer_li_1">Pédalo sur les deux bassins</li>
+              <li data-i18n="summer_li_2">Aires de pique-nique</li>
+              <li data-i18n="summer_li_3">Terrains de tennis</li>
+              <li data-i18n="summer_li_4">Terrains de baseball, soccer...</li>
+              <li data-i18n="summer_li_5">Terrain de pétanque</li>
+              <li data-i18n="summer_li_6">Aire de jeux</li>
+              <li data-i18n="summer_li_7">Piste cyclable</li>
+              <li data-i18n="summer_li_8">Théâtre de Verdure</li>
+              <li data-i18n="summer_li_9">Tables d'échecs</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Winter & Culture Box -->
+        <div class="content-box">
+          <h3 style="color:var(--bleu-fonce); font-size:1.1rem;" data-i18n="neighborhood_winter">❄️ Activités hiver</h3>
           <ul>
-            <li>Pédalo sur les deux bassins</li>
-            <li>Aires de pique-nique (tables, gazebos)</li>
-            <li>Terrains de tennis (plusieurs courts)</li>
-            <li>Terrains de baseball, soccer et volleyball de plage</li>
-            <li>Terrain de pétanque</li>
-            <li>Aire de jeux pour enfants</li>
-            <li>Piste cyclable et sentiers piétonniers</li>
-            <li>Théâtre de Verdure — spectacles en plein air gratuits</li>
-            <li>Tables d'échecs en plein air</li>
+            <li data-i18n="winter_li_1">Patinoire extérieure</li>
+            <li data-i18n="winter_li_2">Patinoires pour le hockey</li>
+            <li data-i18n="winter_li_3">Raquette et ski de fond</li>
+            <li data-i18n="winter_li_4">Butte de glisse</li>
           </ul>
 
-          <h3 style="margin-top:1.5rem; color:var(--bleu-fonce); font-size:1.1rem;">❄️ Activités hiver</h3>
-          <ul>
-            <li>Patinoire extérieure sur les bassins gelés</li>
-            <li>Multiples patinoires pour le hockey</li>
-            <li>Raquette et ski de fond (sentiers damés)</li>
-            <li>Butte de glisse pour enfants</li>
-          </ul>
-
-          <h3 style="margin-top:1.5rem; color:var(--bleu-fonce); font-size:1.1rem;">🎭 Culture &amp; événements</h3>
+          <h3 style="margin-top:1.5rem; color:var(--bleu-fonce); font-size:1.1rem;" data-i18n="neighborhood_culture">🎭 Culture &amp; événements</h3>
           <ul>
             <li><a href="https://www.ljbfestival.ca/" target="_blank" rel="noopener">Les Journées Brésiliennes</a></li>
             <li><a href="https://montreal.haitienfolie.com/" target="_blank" rel="noopener">Festival Haïti en Folie</a></li>
             <li><a href="https://montreal.ca/lieux/centre-culturel-calixa-lavallee" target="_blank" rel="noopener">Centre culturel Calixa-Lavallée</a> — expositions, ateliers</li>
           </ul>
 
-          <div style="margin-top:2rem; padding:1.25rem; background: #fff; border-radius:10px; border:1px solid var(--bleu-pale);">
-            <p style="margin-bottom:0.5rem;"><strong>Calendrier des activités de l'arrondissement</strong></p>
-            <p>L'arrondissement propose un grand nombre d'activités dont des balades à vélo, marchés fermiers et du cinéma en plein air. <a href="https://montreal.ca/evenements?dc_coverage.boroughs.code=PMR&amp;orderBy=dc_temporal.start" target="_blank" rel="noopener">Consulter la liste complète ici <span style="font-size:0.85em;">→</span></a></p>
+          <div style="margin-top:1.5rem; padding:1rem; background: rgba(255,255,255,0.5); border-radius:10px; border:1px solid var(--bleu-pale);">
+            <p style="margin-bottom:0.5rem;"><strong data-i18n="borough_calendar_title">Calendrier des activités de l'arrondissement</strong></p>
+            <p><span data-i18n="borough_calendar_p1">L'arrondissement propose un grand nombre d'activités...</span> <a href="https://montreal.ca/evenements?dc_coverage.boroughs.code=PMR&amp;orderBy=dc_temporal.start" target="_blank" rel="noopener"><span data-i18n="borough_calendar_link">Consulter la liste complète ici</span> <span style="font-size:0.85em;">→</span></a></p>
           </div>
 
-          <div style="margin-top:1rem; padding:1.25rem; background: #fff; border-radius:10px; border:1px solid var(--bleu-pale);">
-            <p style="margin-bottom:0.5rem;"><strong>Calendrier des activités culturelles de l'arrondissement</strong></p>
-            <p><span style="font-weight:500;">Le programme de soutien aux actions culturelles du Plateau (PSAC)</span> a une fois de plus cette année été riche en candidatures et de nombreux artistes ont répondu à l'appel de l'arrondissement. Il en résulte une programmation variée, festive, gratuite et qui saura ravir tous les publics. <a href="https://montreal.ca/articles/de-la-culture-partout-et-pour-tout-le-monde-sur-le-plateau-47212" target="_blank" rel="noopener">En voici un aperçu <span style="font-size:0.85em;">→</span></a></p>
+          <div style="margin-top:1rem; padding:1rem; background: rgba(255,255,255,0.5); border-radius:10px; border:1px solid var(--bleu-pale);">
+            <p style="margin-bottom:0.5rem;"><strong data-i18n="cultural_calendar_title">Calendrier des activités culturelles de l'arrondissement</strong></p>
+            <p><span data-i18n="cultural_calendar_p1">Le programme de soutien aux actions culturelles du Plateau (PSAC)...</span> <a href="https://montreal.ca/articles/de-la-culture-partout-et-pour-tout-le-monde-sur-le-plateau-47212" target="_blank" rel="noopener"><span data-i18n="cultural_calendar_link">En voici un aperçu</span> <span style="font-size:0.85em;">→</span></a></p>
           </div>
+        </div>
 
-          <div style="margin-top:1rem; padding:1.25rem; background: #fff; border-radius:10px; border:1px solid var(--bleu-pale);">
-            <p style="margin-bottom:0.5rem;"><strong>Calendrier du Théâtre de Verdure</strong></p>
-            <p>Situé au cœur du parc La Fontaine, le Théâtre de Verdure propose une programmation en plein air gratuite durant l'été. Des spectacles de musique, de danse, de cirque, de théâtre et des films sont présentés dans cet amphithéâtre de 2 000 places. <a href="https://montreal.ca/lieux/theatre-de-verdure" target="_blank" rel="noopener">Consultez la programmation <span style="font-size:0.85em;">→</span></a></p>
+        <!-- Theater Content Box -->
+        <div class="content-box">
+          <p style="margin-bottom:0.5rem;"><strong>Calendrier du Théâtre de Verdure</strong></p>
+          <p data-i18n="theater_p1">Situé au cœur du parc La Fontaine...</p>
+        </div>
+
+        <!-- Dynamic Theater Events Carousel (Outside the box) -->
+        <div id="events-carousel" class="carousel-container image-carousel">
+          <button class="carousel-btn prev">❮</button>
+          <button class="carousel-btn next">❯</button>
+          <div class="carousel-track" id="carousel-track">
+            <p class="loading-msg">Chargement des événements...</p>
           </div>
+          <div class="carousel-pips"></div>
+        </div>
 
-          <div class="gallery-mosaic" style="margin:1rem 0;">
-            <img src="assets/quartier-theatre.webp" class="gallery-item gallery-wide" alt="Théâtre de Verdure — Parc La Fontaine" loading="lazy" />
-          </div>
-
-          <div style="margin-top:1rem; padding:1.25rem; background: #fff; border-radius:10px; border:1px solid var(--bleu-pale);">
-            <p style="margin-bottom:0.5rem;"><strong>Calendrier du Robin des Bois (Chalet du Parc Lafontaine)</strong></p>
-            <p>Le Robin des Bois est un restaurant bienfaiteur fondé en 2006, qui soutient la réinsertion sociale, la lutte contre l'isolement et la pauvreté. Il est installé au Chalet du Parc Lafontaine depuis quelques années et offre, en plus des créations de sa cuisine, une programmation culturelle dynamique et diversifiée. <a href="https://robindesbois.ca/programmation/" target="_blank" rel="noopener">Voir la programmation <span style="font-size:0.85em;">→</span></a></p>
-          </div>
-
+        <!-- Robin des Bois Box -->
+        <div class="content-box">
+          <p style="margin-bottom:0.5rem;"><strong>Calendrier du Robin des Bois</strong></p>
+            <p data-i18n="robin_p1">Le Robin des Bois est un restaurant bienfaiteur...</p>
           <div class="gallery-grid-4">
             <img src="assets/robin-1.webp" alt="Robin des Bois — Chalet du Parc" loading="lazy" />
             <img src="assets/robin-2.webp" alt="Robin des Bois — terrasse" loading="lazy" />
@@ -233,7 +282,6 @@
             <img src="assets/robin-4.webp" alt="Robin des Bois — salle" loading="lazy" />
           </div>
         </div>
-        <div class="gallery-mosaic" id="gallery-quartier"></div>
       </div>
     </section>
 
@@ -256,42 +304,13 @@
     </div>
   </main>
 
-  <script>
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    const toggle = document.getElementById('menuToggle');
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox">
+    <img id="lightbox-img" src="" alt="View">
+    <button id="lightboxClose" class="lightbox-close" aria-label="Fermer">✕</button>
+  </div>
 
-    function closeMenu() {
-      sidebar.classList.remove('open');
-      overlay.classList.remove('open');
-      toggle.textContent = '☰';
-    }
-
-    function openMenu() {
-      sidebar.classList.add('open');
-      overlay.classList.add('open');
-      toggle.textContent = '✕';
-    }
-
-    toggle.addEventListener('click', () => {
-      if (sidebar.classList.contains('open')) closeMenu();
-      else openMenu();
-    });
-
-    overlay.addEventListener('click', closeMenu);
-
-    // Nav links — fermer le menu + scroll fluide
-    document.querySelectorAll('.sidebar-nav a').forEach(a => {
-      a.addEventListener('click', (e) => {
-        closeMenu();
-        // Le href="#..." gère le scroll natif
-      });
-    });
-
-    // Fermer le menu avec Échap
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeMenu();
-    });
-  </script>
+  <script src="translations.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
