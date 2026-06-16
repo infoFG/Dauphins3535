@@ -801,6 +801,23 @@ body {
   font-weight: 800;
 }
 
+.business-overlay .overlay-top {
+  /* Top area: name/title */
+}
+
+.business-overlay .overlay-mid {
+  /* Middle area: description */
+  margin-top: 0.5rem;
+  flex: 1 1 auto;
+}
+
+.business-overlay .overlay-bottom {
+  /* Bottom area: hours and social links */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .business-overlay p {
   font-size: 0.85rem;
   line-height: 1.4;
