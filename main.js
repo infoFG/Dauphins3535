@@ -71,7 +71,17 @@ function initMenu() {
   overlay.addEventListener('click', closeMenu);
 
   document.querySelectorAll('.sidebar-nav a').forEach(a => {
-    a.addEventListener('click', closeMenu);
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = a.getAttribute('href').substring(1);
+      const target = document.getElementById(targetId);
+      closeMenu();
+      if (target) {
+        setTimeout(() => {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 350);
+      }
+    });
   });
 
   document.addEventListener('keydown', (e) => {
