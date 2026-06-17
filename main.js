@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (track && track.updatePips) track.updatePips();
   });
   initScrollReveal();
+  initSectionHashObserver();
 });
 
 /* ========== LANGUAGE MANAGEMENT ========== */
@@ -94,12 +95,27 @@ function initMenu() {
       const target = document.getElementById(targetId);
       closeMenu();
       if (target) {
+        history.replaceState(null, '', '#' + targetId);
         setTimeout(() => {
           target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 350);
       }
     });
   });
+
+  // Hero "Découvrir" button
+  const heroCta = document.querySelector('.hero-cta');
+  if (heroCta) {
+    heroCta.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = heroCta.getAttribute('href').substring(1);
+      const target = document.getElementById(targetId);
+      if (target) {
+        history.replaceState(null, '', '#' + targetId);
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  }
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeMenu();
@@ -832,4 +848,38 @@ function initLightbox() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
   });
+}
+
+/* ========== DYNAMIC SECTION HASH (IntersectionObserver) ========== */
+function initSectionHashObserver() {
+  // Observe all main sections with IDs
+  const sections = document.querySelectorAll('section[id]');
+  if (sections.length === 0) return;
+
+  let currentSection = '';
+
+  const observer = new IntersectionObserver((entries) => {
+    let bestEntry = null;
+    entries.forEach(entry => {
+      if (entry.intersectionRatio > 0.3) {
+        if (!bestEntry || entry.intersectionRatio > bestEntry.intersectionRatio) {
+          bestEntry = entry;
+        }
+      }
+    });
+
+    if (bestEntry) {
+      const sectionId = bestEntry.target.id;
+      if (sectionId && sectionId !== currentSection) {
+        currentSection = sectionId;
+        const hash = sectionId === 'accueil' ? '' : '#' + sectionId;
+        history.replaceState(null, '', hash || window.location.pathname);
+      }
+    }
+  }, {
+    threshold: [0, 0.3, 0.6, 1],
+    rootMargin: '-80px 0px -40% 0px'
+  });
+
+  sections.forEach(section => observer.observe(section));
 }
