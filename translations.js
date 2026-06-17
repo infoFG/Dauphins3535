@@ -36,8 +36,8 @@ const translations = {
     "gallery_item_3": "<strong>Jaji Santé Clinique</strong> — <a href='https://jajiclinique.ca/' target='_blank' rel='noopener'>jajiclinique.ca</a>",
     "gallery_item_4": "<strong>Prosper Fitness</strong> — Entraînement personnel — <a href='https://prosperfitness.net/' target='_blank' rel='noopener'>prosperfitness.net</a>",
     "gallery_item_5": "<strong>Sage Art Studio</strong> — Studio de tatouage — <a href='https://www.sagearttattoostudio.com/' target='_blank' rel='noopener'>www.sagearttattoostudio.com</a>",
-    "gallery_item_6": "<strong>Café Lafontaine</strong> — <a href='https://www.facebook.com/cafelafontaine/' target='_blank' rel='noopener'>facebook.com/cafelafontaine</a>",
-    "gallery_item_7": "<strong>Dépanneur Le 35</strong>",
+    "gallery_item_6": "<strong>Café Lafontaine</strong> — Restaurant et café mexicain — <a href='https://www.facebook.com/cafelafontaine/' target='_blank' rel='noopener'>facebook.com/cafelafontaine</a>",
+    "gallery_item_7": "<strong>Le 35</strong> — Dépanneur",
     "gallery_item_8": "<strong>Le Délice glacé</strong> — Crèmerie — <a href='https://www.facebook.com/61589163615629' target='_blank' rel='noopener'>facebook.com/LeDéliceGlacé</a>",
     "gallery_item_9": "<strong>Lave Toutou</strong> — Buanderie et lavage pour chiens — <a href='https://www.lavetoutou.ca/' target='_blank' rel='noopener'>lavetoutou.ca</a>",
 
@@ -127,8 +127,8 @@ const translations = {
     "gallery_item_3": "<strong>Jaji Santé Clinique</strong> — <a href='https://jajiclinique.ca/' target='_blank' rel='noopener'>jajiclinique.ca</a>",
     "gallery_item_4": "<strong>Prosper Fitness</strong> — Personal training — <a href='https://prosperfitness.net/' target='_blank' rel='noopener'>prosperfitness.net</a>",
     "gallery_item_5": "<strong>Sage Art Studio</strong> — Tattoo studio — <a href='https://www.sagearttattoostudio.com/' target='_blank' rel='noopener'>www.sagearttattoostudio.com</a>",
-    "gallery_item_6": "<strong>Café Lafontaine</strong> — <a href='https://www.facebook.com/cafelafontaine/' target='_blank' rel='noopener'>facebook.com/cafelafontaine</a>",
-    "gallery_item_7": "<strong>Dépanneur Le 35</strong>",
+    "gallery_item_6": "<strong>Café Lafontaine</strong> — Mexican restaurant and cafe — <a href='https://www.facebook.com/cafelafontaine/' target='_blank' rel='noopener'>facebook.com/cafelafontaine</a>",
+    "gallery_item_7": "<strong>Le 35</strong> — Convenience store",
     "gallery_item_8": "<strong>Le Délice glacé</strong> — Ice cream parlor — <a href='https://www.facebook.com/61589163615629' target='_blank' rel='noopener'>facebook.com/LeDéliceGlacé</a>",
     "gallery_item_9": "<strong>Lave Toutou</strong> — Laundromat and dog wash — <a href='https://www.lavetoutou.ca/' target='_blank' rel='noopener'>lavetoutou.ca</a>",
 
