@@ -10,17 +10,17 @@ const translations = {
 
     // Hero
     "hero_subtitle": "Immeuble à condos et galerie commerciale",
-    "hero_tagline": "Confort et communauté au cœur de votre quotidien.<br>Ressources pour résidents et copropriétaires.",
+    "hero_tagline": "Confort et communauté au cœur de votre quotidien.<br>Ressources pour copropriétaires.",
     "hero_cta": "Découvrir",
 
     // Sections
     "title_about": "À propos",
-    "about_p1": "Bienvenue aux Dauphins-sur-le-Parc, un immeuble à condos résidentiel où confort et communauté se rencontrent. Situé dans l'est du Plateau Mont-Royal à Montréal, face au Parc Lafontaine, notre immeuble offre un cadre de vie agréable à ses résidents et une qualité de vie exceptionnelle.",
+    "about_p1": "Bienvenue aux Dauphins-sur-le-Parc, un immeuble à condos résidentiel où confort et communauté se rencontrent. Situé dans l'est du Plateau Mont-Royal à Montréal, face au Parc Lafontaine, notre immeuble offre un cadre de vie agréable à ses copropriétaires et une qualité de vie exceptionnelle.",
     "about_p2": "Notre équipe d'intendants, de portiers, de concierges et de gestionnaires veille au bon fonctionnement de l'immeuble et à l'entretien des lieux communs. Cinq administrateurs siègent au conseil du Syndicat de copropriété.",
     "about_p3": "Transparence, respect et qualité de vie sont au cœur de notre mission.",
 
     "title_amenities": "Installations",
-    "amenities_p1": "Les résidents des Dauphins-sur-le-Parc ont accès à plusieurs installations communes :",
+    "amenities_p1": "Les copropriétaires des Dauphins-sur-le-Parc ont accès à plusieurs installations communes :",
     "amenity_1": "Piscine intérieure chauffée",
     "amenity_2": "Sauna et hammam",
     "amenity_3": "Salle d'entraînement avec équipements de base",
@@ -29,7 +29,7 @@ const translations = {
     "amenity_6": "Rangement pour vélos et équipements saisonniers",
 
     "title_gallery": "Galerie Commerciale",
-    "gallery_p1": "Notre galerie commerciale située au rez-de-chaussée du 3535 avenue Papineau regroupe plusieurs commerces et services pour répondre aux besoins des résidents et du quartier.",
+    "gallery_p1": "Notre galerie commerciale située au rez-de-chaussée du 3535 avenue Papineau regroupe plusieurs commerces et services pour répondre aux besoins des copropriétaires et du quartier.",
     "gallery_p2": "Voici les commerces présents dans notre galerie :",
     "gallery_item_1": "<strong>Salon Splendide Coiffure</strong> — Salon de coiffure",
     "gallery_item_2": "<strong>Aime-toi</strong> — Centre esthétique — <a href='https://www.m-toi.com/' target='_blank' rel='noopener'>m-toi.com</a>",
@@ -50,7 +50,7 @@ const translations = {
     "values_rules": "Le règlement complet est disponible sur <strong>CondoWeb</strong>.",
 
     "title_condoweb": "CondoWeb",
-    "condoweb_p1": "<strong>CondoWeb</strong> (i.e. CondoManager) est la plateforme de gestion utilisée par notre copropriété. Elle permet aux résidents de :",
+    "condoweb_p1": "<strong>CondoWeb</strong> (i.e. CondoManager) est la plateforme de gestion utilisée par notre copropriété. Elle permet aux copropriétaires de :",
     "condoweb_li_1": "Consulter les documents officiels (procès-verbaux, états financiers)",
     "condoweb_li_2": "Recevoir les communications du conseil",
     "condoweb_li_3": "Consulter le solde de votre compte de copropriété",
@@ -59,7 +59,8 @@ const translations = {
     "condoweb_card_li_2": "Contactez le bureau de l'administration pour créer votre compte",
 
     "title_neighborhood": "Vie de quartier",
-    "neighborhood_p1": "Le parc La Fontaine, situé à deux pas de l'immeuble, est un véritable poumon vert au cœur du Plateau-Mont-Royal. Voici un aperçu de ce qu'il offre aux résidents.",
+    "neighborhood_intro": "Le Plateau-Mont-Royal est un quartier dynamique avec une variété d'espaces verts, de commerces de proximité et une offre culturelle variée. Les Dauphins sont à distance de marche des artères commerciales de la rue Ontario et de l'avenue du Mont-Royal, et la piétonisation de cette dernière de juin à septembre ajoute à la qualité de vie du quartier. Sur la rue Gauthier juste à côté, on trouve une épicerie, une boutique de produits pour animaux de compagnie, une boulangerie et un restaurant.",
+    "neighborhood_p1": "Le parc La Fontaine, situé en face de l'immeuble, est un véritable poumon vert au cœur du Plateau-Mont-Royal. Voici un aperçu de ce qu'il offre aux copropriétaires.",
     "neighborhood_summer": "☀️ Activités été",
     "summer_li_1": "Aires de pique-nique (tables, gazebos)",
     "summer_li_2": "Terrains de tennis (plusieurs courts)",
@@ -98,7 +99,7 @@ const translations = {
 
     // Hero
     "hero_subtitle": "Condo building and commercial gallery",
-    "hero_tagline": "Comfort and community at the heart of your daily life.<br>Resources for residents and condominium owners.",
+    "hero_tagline": "Comfort and community at the heart of your daily life.<br>Resources for condominium owners.",
     "hero_cta": "Discover",
 
     // Sections
@@ -108,7 +109,7 @@ const translations = {
     "about_p3": "Transparency, respect, and quality of life are at the heart of our mission.",
 
     "title_amenities": "Amenities",
-    "amenities_p1": "Residents of Les Dauphins-sur-le-Parc have access to several common amenities:",
+    "amenities_p1": "Condominium owners at Les Dauphins-sur-le-Parc have access to several common amenities:",
     "amenity_1": "Heated indoor pool",
     "amenity_2": "Sauna and steam room",
     "amenity_3": "Fitness room with basic equipment",
@@ -117,7 +118,7 @@ const translations = {
     "amenity_6": "Bicycle and seasonal equipment storage",
 
     "title_gallery": "Commercial Gallery",
-    "gallery_p1": "Our commercial gallery located on the ground floor of 3535 Papineau Avenue brings together several businesses and services to meet the needs of residents and the neighborhood.",
+    "gallery_p1": "Our commercial gallery located on the ground floor of 3535 Papineau Avenue brings together several businesses and services to meet the needs of condominium owners and the neighborhood.",
     "gallery_p2": "Here are the businesses in our gallery:",
     "gallery_item_1": "<strong>Salon Splendide Coiffure</strong> — Hair salon",
     "gallery_item_2": "<strong>Aime-toi</strong> — Esthetics centre — <a href='https://www.m-toi.com/' target='_blank' rel='noopener'>m-toi.com</a>",
@@ -138,7 +139,7 @@ const translations = {
     "values_rules": "The complete rules are available on <strong>CondoWeb</strong>.",
 
     "title_condoweb": "CondoWeb",
-    "condoweb_p1": "<strong>CondoWeb</strong> (a.k.a. CondoManager) is the management platform used by our condominium. It allows residents to:",
+    "condoweb_p1": "<strong>CondoWeb</strong> (a.k.a. CondoManager) is the management platform used by our condominium. It allows condominium owners to:",
     "condoweb_li_1": "View official documents (minutes, financial statements)",
     "condoweb_li_2": "Receive communications from the board",
     "condoweb_li_3": "Check your condo account balance",
@@ -147,7 +148,8 @@ const translations = {
     "condoweb_card_li_2": "Contact the administration office to create your account",
 
     "title_neighborhood": "Neighborhood Life",
-    "neighborhood_p1": "La Fontaine Park, just steps from the building, is a green lung at the heart of Plateau-Mont-Royal. Here is an overview of what it offers residents.",
+    "neighborhood_intro": "The Plateau-Mont-Royal is a dynamic neighborhood with a variety of green spaces, local shops, and a diverse cultural offering. Les Dauphins is within walking distance of the commercial arteries of Ontario Street and Mont-Royal Avenue, and the pedestrianization of the latter from June to September adds to the quality of life in the neighborhood. On Gauthier Street right next door, you'll find a grocery store, a pet supplies shop, a bakery, and a restaurant.",
+    "neighborhood_p1": "La Fontaine Park, located across from the building, is a true green lung at the heart of Plateau-Mont-Royal. Here is an overview of what it offers condominium owners.",
     "neighborhood_summer": "☀️ Summer activities",
     "summer_li_1": "Picnic areas (tables, gazebos)",
     "summer_li_2": "Tennis courts",
