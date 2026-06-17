@@ -826,7 +826,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  max-height: 35%; /* Reduced max-height as description moved to header */
+  max-height: 50%; /* Increased space to ensure hours and links fit */
   overflow: auto;
 }
 
@@ -881,7 +881,7 @@ body {
 .business-links {
   margin-top: 0.5rem;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start; /* Aligned left, opposite the right-aligned hours */
   flex-wrap: wrap; /* Allow links to wrap if many */
   gap: 0.5rem;
 }

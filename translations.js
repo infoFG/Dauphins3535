@@ -16,7 +16,7 @@ const translations = {
     // Sections
     "title_about": "À propos",
     "about_p1": "Bienvenue aux Dauphins-sur-le-Parc, un immeuble à condos résidentiel où confort et communauté se rencontrent. Situé dans l'est du Plateau Mont-Royal à Montréal, face au Parc Lafontaine, notre immeuble offre un cadre de vie agréable à ses résidents et une qualité de vie exceptionnelle.",
-    "about_p2": "Nous avons 15 employés qui veillent au bon fonctionnement de l'immeuble et l'entretien des lieux communs. Cinq administrateurs font de même pour le Syndicat de copropriété.",
+    "about_p2": "Notre équipe d'intendants, de portiers, de concierges et de gestionnaires veille au bon fonctionnement de l'immeuble et à l'entretien des lieux communs. Cinq administrateurs siègent au conseil du Syndicat de copropriété.",
     "about_p3": "Transparence, respect et qualité de vie sont au cœur de notre mission.",
 
     "title_amenities": "Installations",
@@ -104,7 +104,7 @@ const translations = {
     // Sections
     "title_about": "About",
     "about_p1": "Welcome to Les Dauphins-sur-le-Parc, a residential condo building where comfort and community meet. Located in the eastern Plateau Mont-Royal in Montreal, facing Parc Lafontaine, our building offers a pleasant living environment and exceptional quality of life.",
-    "about_p2": "We have 15 employees who ensure the smooth running of the building and the maintenance of common areas. Five board members manage the owners' association.",
+    "about_p2": "Our team of caretakers, porters, concierges, and managers ensures the smooth running of the building and the maintenance of common areas. Five board members sit on the owners' association board.",
     "about_p3": "Transparency, respect, and quality of life are at the heart of our mission.",
 
     "title_amenities": "Amenities",
