@@ -59,6 +59,7 @@ const translations = {
     "condoweb_card_li_2": "Contactez le bureau de l'administration pour créer votre compte",
 
     "title_neighborhood": "Vie de quartier",
+    "park_title": "Parc La Fontaine",
     "neighborhood_intro": "Le Plateau-Mont-Royal est un quartier dynamique avec une variété d'espaces verts, de commerces de proximité et une offre culturelle variée. Les Dauphins sont à distance de marche des artères commerciales de la rue Ontario et de l'avenue du Mont-Royal, et la piétonisation de cette dernière de juin à septembre ajoute à la qualité de vie du quartier. Sur la rue Gauthier juste à côté, on trouve une épicerie, une boutique de produits pour animaux de compagnie, une boulangerie et un restaurant.",
     "neighborhood_p1": "Le parc La Fontaine, situé en face de l'immeuble, est un véritable poumon vert au cœur du Plateau-Mont-Royal. Voici un aperçu de ce qu'il offre aux copropriétaires.",
     "neighborhood_summer": "☀️ Activités été",
@@ -147,6 +148,7 @@ const translations = {
     "condoweb_card_li_2": "Contact the administration office to create your account",
 
     "title_neighborhood": "Neighborhood Life",
+    "park_title": "La Fontaine Park",
     "neighborhood_intro": "The Plateau-Mont-Royal is a dynamic neighborhood with a variety of green spaces, local shops, and a diverse cultural offering. Les Dauphins is within walking distance of the commercial arteries of Ontario Street and Mont-Royal Avenue, and the pedestrianization of the latter from June to September adds to the quality of life in the neighborhood. On Gauthier Street right next door, you'll find a grocery store, a pet supplies shop, a bakery, and a restaurant.",
     "neighborhood_p1": "La Fontaine Park, located across from the building, is a true green lung at the heart of Plateau-Mont-Royal. Here is an overview of what it offers condominium owners.",
     "neighborhood_summer": "☀️ Summer activities",
