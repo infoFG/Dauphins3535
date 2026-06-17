@@ -1,31 +1,33 @@
-/**
- * Logic for Les Dauphins-sur-le Parc
- */
+import { initMenu, initLanguage, initLightbox, initScrollReveal } from './js/ui.js';
+import { initEventsCarousel, initBusinessGallery } from './js/api.js';
+import { initEnhancedCarousels, loadStaticCarouselImages, loadSectionBackground } from './js/carousel.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // 1. Initialize core UI
   initMenu();
-  await initEventsCarousel();
   initLanguage();
-  await initBusinessGallery();
   initLightbox();
 
-  // Load static carousels after dynamic ones, before initializing enhanced carousels
+  // 2. Load dynamic data
+  await initEventsCarousel();
+  await initBusinessGallery();
+
+  // 3. Load static assets
   await loadStaticCarouselImages('apropos-carousel-track', '/assets/Apropos');
   await loadStaticCarouselImages('installations-carousel-track', '/assets/Installations');
   await loadStaticCarouselImages('quartier-park-carousel-track', '/assets/Quartier');
-
-  // Load backgrounds for sections without carousels
   await loadSectionBackground('valeurs');
   await loadSectionBackground('condoweb');
 
-  // Initialize the carousel logic
+  // 4. Initialize carousel engine & animations
   initEnhancedCarousels();
+  initScrollReveal();
 
-  // Now that carousels are initialized, force a pips update
   document.querySelectorAll('.carousel-pips').forEach(pipsContainer => {
     const track = pipsContainer.closest('.carousel-container')?.querySelector('.carousel-track');
     if (track && track.updatePips) track.updatePips();
   });
+<<<<<<< HEAD
   initScrollReveal();
   initSectionHashObserver();
 });
@@ -883,3 +885,6 @@ function initSectionHashObserver() {
 
   sections.forEach(section => observer.observe(section));
 }
+=======
+});
+>>>>>>> 60e59cf (Refactor: Modularize JS, standardize business data schema, and optimize carousel engine)

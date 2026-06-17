@@ -953,6 +953,13 @@ body {
   overflow: hidden;
 }
 
+.card-location {
+  font-size: 0.8rem;
+  color: var(--bleu-fonce);
+  opacity: 0.7;
+  margin-top: 0.2rem;
+}
+
 .loading-msg {
   font-size: 0.9rem;
   color: var(--bleu-moyen);
