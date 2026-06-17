@@ -97,7 +97,7 @@ const translations = {
     "nav_gallery": "Commercial Gallery",
     "nav_values": "Values",
     "nav_condoweb": "CondoWeb",
-    "nav_neighborhood": "Neighborhood Life",
+    "nav_neighborhood": "Neighbourhood Life",
 
     // Hero
     "hero_subtitle": "Condo building and commercial gallery",
@@ -107,7 +107,7 @@ const translations = {
     // Sections
     "title_about": "About",
     "about_p1": "Welcome to Les Dauphins-sur-le-Parc, a residential condo building where comfort and community meet. Located in the eastern Plateau-Mont-Royal in Montreal, facing Parc Lafontaine, our building offers a pleasant living environment and exceptional quality of life.",
-    "about_p2": "Our team of caretakers, porters, concierges, and managers ensures the smooth running of the building and the maintenance of common areas. Five board members sit on the owners' association board.",
+    "about_p2": "Our team of caretakers, doormen, custodians, and managers ensures the smooth running of the building and the maintenance of common areas. Five board members sit on the owners' association board.",
     "about_p3": "Transparency, respect, and quality of life are at the heart of our mission.",
 
     "title_amenities": "Amenities",
@@ -120,10 +120,10 @@ const translations = {
     "amenity_6": "Bicycle and seasonal equipment storage",
 
     "title_gallery": "Commercial Gallery",
-    "gallery_p1": "Our commercial gallery located on the ground floor of 3535 Papineau Avenue brings together several businesses and services to meet the needs of condominium owners and the neighborhood.",
+    "gallery_p1": "Our commercial gallery located on the ground floor of 3535 Papineau Avenue brings together several businesses and services to meet the needs of condominium owners and the neighbourhood.",
     "gallery_p2": "Here are the businesses in our gallery:",
     "gallery_item_1": "<strong>Salon Splendide Coiffure</strong> — Hair salon",
-    "gallery_item_2": "<strong>Aime-toi</strong> — Esthetics centre — <a href='https://www.m-toi.com/' target='_blank' rel='noopener'>m-toi.com</a>",
+    "gallery_item_2": "<strong>Aime-toi</strong> — Beauty centre — <a href='https://www.m-toi.com/' target='_blank' rel='noopener'>m-toi.com</a>",
     "gallery_item_3": "<strong>Jaji Santé Clinique</strong> — <a href='https://jajiclinique.ca/' target='_blank' rel='noopener'>jajiclinique.ca</a>",
     "gallery_item_4": "<strong>Prosper Fitness</strong> — Personal training — <a href='https://prosperfitness.net/' target='_blank' rel='noopener'>prosperfitness.net</a>",
     "gallery_item_5": "<strong>Sage Art Studio</strong> — Tattoo studio — <a href='https://www.sagearttattoostudio.com/' target='_blank' rel='noopener'>www.sagearttattoostudio.com</a>",
@@ -149,9 +149,9 @@ const translations = {
     "condoweb_card_li_1": "Access CondoWeb <a href=\"https://mon.condoweb.app/\" target=\"_blank\" rel=\"noopener\">here</a>.",
     "condoweb_card_li_2": "Contact the administration office to create your account",
 
-    "title_neighborhood": "Neighborhood Life",
+    "title_neighborhood": "Neighbourhood Life",
     "park_title": "La Fontaine Park",
-    "neighborhood_intro": "The Plateau-Mont-Royal is a dynamic neighborhood with a variety of green spaces, local shops, and a diverse cultural offering. Les Dauphins is within walking distance of the commercial arteries of Ontario Street and Mont-Royal Avenue, and the pedestrianization of the latter from June to September adds to the quality of life in the neighborhood. On Gauthier Street right next door, you'll find a grocery store, a pet supplies shop, a bakery, and a restaurant.",
+    "neighborhood_intro": "The Plateau-Mont-Royal is a dynamic neighbourhood with a variety of green spaces, local shops, and a diverse cultural offering. Les Dauphins is within walking distance of the commercial arteries of Ontario Street and Mont-Royal Avenue, and the pedestrianization of the latter from June to September adds to the quality of life in the neighbourhood. On Gauthier Street right next door, you'll find a grocery store, a pet supplies shop, a bakery, and a restaurant.",
     "neighborhood_p1": "La Fontaine Park, located across from the building, is a true green lung at the heart of Plateau-Mont-Royal. It is a haven for abundant urban wildlife, home to colonies of ducks and bats along its two ponds, as well as an army of generally harmless squirrels. It occasionally receives visits from great herons, cormorants and birds of prey.<br><br>Here is an overview of what the park offers visitors.",
     "neighborhood_summer": "☀️ Summer activities",
     "summer_li_1": "Picnic areas",
@@ -168,15 +168,15 @@ const translations = {
     "winter_li_4": "Sledding hill for children",
     "neighborhood_culture": "🎭 Culture & events",
     "borough_title": "Borough Activities",
-    "borough_intro": "The Plateau-Mont-Royal is a dynamic neighborhood with a wide variety of activities, from the summit of Mount Royal in the west to Baldwin Park in the east. Many of these are organized by the borough administration.",
+    "borough_intro": "The Plateau-Mont-Royal is a dynamic neighbourhood with a wide variety of activities, from the summit of Mount Royal in the west to Baldwin Park in the east. Many of these are organized by the borough administration.",
     "borough_calendar_title": "Activities Calendar",
     "borough_calendar_p1": "The borough offers a wide range of activities including bike rides, farmers' markets, and outdoor cinema. <a href='https://montreal.ca/evenements?dc_coverage.boroughs.code=PMR&amp;orderBy=dc_temporal.start' target='_blank' rel='noopener'>View the full list here <span style='font-size:0.85em;'>→</span></a>",
     "borough_calendar_link": "View the full list here",
     "cultural_calendar_title": "Cultural Calendar",
-    "cultural_calendar_p1": "The Plateau's Cultural Action Support Program (PSAC) has once again received many applications and many artists responded to the borough's call. The result is a varied, festive, and free program that will delight all audiences. <a href='https://montreal.ca/articles/de-la-culture-partout-et-pour-tout-le-monde-sur-le-plateau-47212' target='_blank' rel='noopener'>Get a preview <span style='font-size:0.85em;'>→</span></a>",
+    "cultural_calendar_p1": "The Plateau's Cultural Action Support Programme (PSAC) has once again received many applications and many artists responded to the borough's call. The result is a varied, festive, and free programme that will delight all audiences. <a href='https://montreal.ca/articles/de-la-culture-partout-et-pour-tout-le-monde-sur-le-plateau-47212' target='_blank' rel='noopener'>Get a preview <span style='font-size:0.85em;'>→</span></a>",
     "cultural_calendar_link": "Get a preview",
-    "theater_p1": "Located in the heart of La Fontaine Park, Théâtre de Verdure offers a free outdoor program throughout the summer. Music, dance, circus, theater, and film are presented in this 2,000-seat amphitheater. <a href='https://montreal.ca/lieux/theatre-de-verdure' target='_blank' rel='noopener'>Check the program <span style='font-size:0.85em;'>→</span></a>",
-    "robin_p1": "Robin des Bois is a charitable restaurant founded in 2006 that supports social reintegration and the fight against isolation and poverty. It has been located in the Chalet du Parc Lafontaine for several years and offers, in addition to its culinary creations, a dynamic and diverse cultural program. <a href='https://robindesbois.ca/programmation/' target='_blank' rel='noopener'>View the program <span style='font-size:0.85em;'>→</span></a>",
+    "theater_p1": "Located in the heart of La Fontaine Park, Théâtre de Verdure offers a free outdoor programme throughout the summer. Music, dance, circus, theatre, and film are presented in this 2,000-seat amphitheatre. <a href='https://montreal.ca/lieux/theatre-de-verdure' target='_blank' rel='noopener'>Check the programme <span style='font-size:0.85em;'>→</span></a>",
+    "robin_p1": "Robin des Bois is a charitable restaurant founded in 2006 that supports social reintegration and the fight against isolation and poverty. It has been located in the Chalet du Parc Lafontaine for several years and offers, in addition to its culinary creations, a dynamic and diverse cultural programme. <a href='https://robindesbois.ca/programmation/' target='_blank' rel='noopener'>View the programme <span style='font-size:0.85em;'>→</span></a>",
 
     "carousel_loading": "Loading events...",
     "carousel_empty": "No events found at the moment."
