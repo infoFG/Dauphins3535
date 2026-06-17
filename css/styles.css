@@ -337,9 +337,14 @@ body {
   #quartier .carousel-container:nth-child(2) { transform: translateX(50px); }
 
   /* Wide aspect ratio for full-width carousels (Events and extra galleries) */
-  #events-carousel .carousel-track img,
-  #quartier .carousel-container:nth-of-type(n+2) img {
+  #events-carousel .carousel-track img {
     aspect-ratio: 21 / 9 !important;
+  }
+
+  /* Quartier park carousel: match Installations carousel size */
+  #quartier-park-carousel-track img {
+    aspect-ratio: 1 / 1 !important;
+    max-height: 450px;
   }
 }
 
