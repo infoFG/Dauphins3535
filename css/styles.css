@@ -478,9 +478,22 @@ body {
   }
 }
 
+.gallery-mosaic {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.gallery-mosaic img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
 .gallery-mosaic .gallery-wide {
   grid-column: span 2;
-  height: 260px;
 }
 
 .gallery-mosaic .gallery-tall {
@@ -493,12 +506,11 @@ body {
   .gallery-mosaic {
     grid-template-columns: 1fr;
   }
-  .gallery-mosaic .gallery-wide {
-    grid-column: span 1;
+  .gallery-mosaic img {
     height: 200px;
   }
-  .gallery-mosaic .gallery-item {
-    height: 200px;
+  .gallery-mosaic .gallery-wide {
+    grid-column: span 1;
   }
 }
 
