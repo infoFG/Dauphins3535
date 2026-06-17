@@ -859,26 +859,19 @@ function initSectionHashObserver() {
   let currentSection = '';
 
   const observer = new IntersectionObserver((entries) => {
-    let bestEntry = null;
     entries.forEach(entry => {
-      if (entry.intersectionRatio > 0.3) {
-        if (!bestEntry || entry.intersectionRatio > bestEntry.intersectionRatio) {
-          bestEntry = entry;
+      if (entry.isIntersecting) {
+        const sectionId = entry.target.id;
+        if (sectionId && sectionId !== currentSection) {
+          currentSection = sectionId;
+          const hash = sectionId === 'accueil' ? '' : '#' + sectionId;
+          history.replaceState(null, '', hash || window.location.pathname);
         }
       }
     });
-
-    if (bestEntry) {
-      const sectionId = bestEntry.target.id;
-      if (sectionId && sectionId !== currentSection) {
-        currentSection = sectionId;
-        const hash = sectionId === 'accueil' ? '' : '#' + sectionId;
-        history.replaceState(null, '', hash || window.location.pathname);
-      }
-    }
   }, {
-    threshold: [0, 0.3, 0.6, 1],
-    rootMargin: '-80px 0px -40% 0px'
+    threshold: 0,
+    rootMargin: '-80px 0px -80% 0px'
   });
 
   sections.forEach(section => observer.observe(section));
