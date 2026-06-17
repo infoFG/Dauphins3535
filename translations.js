@@ -3,7 +3,7 @@ const translations = {
     // Navigation
     "nav_about": "À propos",
     "nav_amenities": "Installations",
-    "nav_gallery": "Galerie Commerciale",
+    "nav_gallery": "Galerie commerciale",
     "nav_values": "Valeurs",
     "nav_condoweb": "CondoWeb",
     "nav_neighborhood": "Vie de quartier",
@@ -28,7 +28,7 @@ const translations = {
     "amenity_5": "Terrasse sur le toit avec aires de repos",
     "amenity_6": "Rangement pour vélos et équipements saisonniers",
 
-    "title_gallery": "Galerie Commerciale",
+    "title_gallery": "Galerie commerciale",
     "gallery_p1": "Notre galerie commerciale située au rez-de-chaussée du 3535 avenue Papineau regroupe plusieurs commerces et services pour répondre aux besoins des copropriétaires et du quartier.",
     "gallery_p2": "Voici les commerces présents dans notre galerie :",
     "gallery_item_1": "<strong>Salon Splendide Coiffure</strong> — Salon de coiffure",
