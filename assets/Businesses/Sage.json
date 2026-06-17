@@ -1,13 +1,13 @@
 {
   "name": "Sage Art Studio",
-  "description": "A brief description of what the business does, its history, or its mission statement.",
+  "description": "Studio de tatouage proposant une grande diversité de styles : réalisme, fine line, blackwork et bien plus.",
   "business_hours": {
-    "monday": "08:00 AM - 06:00 PM",
-    "tuesday": "08:00 AM - 03:00 PM",
-    "wednesday": "08:00 AM - 03:00 PM",
-    "thursday": "08:00 AM - 06:00 PM",
-    "friday": "08:00 AM - 06:00 PM",
-    "saturday": "09:00 AM - 06:00 PM",
+    "monday": "11:00 AM - 07:00 PM",
+    "tuesday": "11:00 AM - 07:00 PM",
+    "wednesday": "11:00 AM - 07:00 PM",
+    "thursday": "11:00 AM - 07:00 PM",
+    "friday": "11:00 AM - 07:00 PM",
+    "saturday": "11:00 AM - 07:00 PM",
     "sunday": "Closed"
   },
   "images": [
@@ -15,8 +15,8 @@
   ],
   "website": "https://www.sagearttattoostudio.com/",
   "social_media": {
-    "instagram": "https://instagram.com/examplebusiness",
-    "facebook": "https://facebook.com/examplebusiness",
+    "instagram": "http://www.instagram.com/sage.art_studio",
+    "facebook": null,
     "twitter": null,
     "linkedin": null
   }

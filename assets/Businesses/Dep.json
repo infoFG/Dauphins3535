@@ -1,6 +1,6 @@
 {
   "name": "Dépanneur Le 35",
-  "description": "A brief description of what the business does, its history, or its mission statement.",
+  "description": "Dépanneur proposant tout ce qu'il faut pour dépanner!",
   "business_hours": {
     "monday": "08:00 AM - 06:00 PM",
     "tuesday": "08:00 AM - 03:00 PM",
@@ -10,7 +10,7 @@
     "saturday": "09:00 AM - 06:00 PM",
     "sunday": "Closed"
   },
-    "images": [
+  "images": [
     "Dep_01.jpg"
   ],
   "website": null,

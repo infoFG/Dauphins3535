@@ -1,6 +1,6 @@
 {
   "name": "Salon Splendide Coiffure",
-  "description": "A brief description of what the business does, its history, or its mission statement.",
+  "description": "Salon de coiffure pour elle et lui.",
   "business_hours": {
     "monday": "08:00 AM - 06:00 PM",
     "tuesday": "08:00 AM - 03:00 PM",
@@ -10,13 +10,13 @@
     "saturday": "09:00 AM - 06:00 PM",
     "sunday": "Closed"
   },
-    "images": [
+  "images": [
     "HairSalon_01.jpg"
   ],
   "website": null,
   "social_media": {
-    "instagram": "https://instagram.com/examplebusiness",
-    "facebook": "https://facebook.com/examplebusiness",
+    "instagram": null,
+    "facebook": null,
     "twitter": null,
     "linkedin": null
   }

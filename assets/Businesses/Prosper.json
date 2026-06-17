@@ -1,22 +1,22 @@
 {
   "name": "Prosper Fitness",
-  "description": "A brief description of what the business does, its history, or its mission statement.",
+  "description": "Studio d'entraînement semi-privé spécialisé en musculation, situé en face du Parc La Fontaine.",
   "business_hours": {
-    "monday": "08:00 AM - 06:00 PM",
-    "tuesday": "08:00 AM - 03:00 PM",
-    "wednesday": "08:00 AM - 03:00 PM",
-    "thursday": "08:00 AM - 06:00 PM",
-    "friday": "08:00 AM - 06:00 PM",
-    "saturday": "09:00 AM - 06:00 PM",
+    "monday": "07:00 AM - 08:00 PM",
+    "tuesday": "07:00 AM - 08:00 PM",
+    "wednesday": "07:00 AM - 08:00 PM",
+    "thursday": "07:00 AM - 08:00 PM",
+    "friday": "07:00 AM - 08:00 PM",
+    "saturday": "09:00 AM - 04:00 PM",
     "sunday": "Closed"
   },
-    "images": [
+  "images": [
     "Prosper_01.jpg"
   ],
-  "website": "prosperfitness.net",
+  "website": "https://prosperfitness.net",
   "social_media": {
-    "instagram": "https://instagram.com/examplebusiness",
-    "facebook": "https://facebook.com/examplebusiness",
+    "instagram": null,
+    "facebook": null,
     "twitter": null,
     "linkedin": null
   }
