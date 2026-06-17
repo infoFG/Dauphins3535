@@ -1,0 +1,11 @@
+{
+  "business_hours": {
+    "monday": "06:00 AM - 22:00 PM",
+    "tuesday": "06:00 AM - 22:00 PM",
+    "wednesday": "06:00 AM - 22:00 PM",
+    "thursday": "06:00 AM - 22:00 PM",
+    "friday": "06:00 AM - 22:00 PM",
+    "saturday": "06:00 AM - 22:00 PM",
+    "sunday": "06:00 AM - 22:00 PM"
+  }
+}

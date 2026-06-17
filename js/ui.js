@@ -1,3 +1,5 @@
+import { formatBusinessHours, escapeHtml } from './utils.js';
+
 /* ========== SIDEBAR MENU ========== */
 export function initMenu() {
   const sidebar = document.getElementById('sidebar');
@@ -26,14 +28,17 @@ export function initMenu() {
 
   document.querySelectorAll('.sidebar-nav a').forEach(a => {
     a.addEventListener('click', (e) => {
-      e.preventDefault();
-      const targetId = a.getAttribute('href').substring(1);
-      const target = document.getElementById(targetId);
-      closeMenu();
-      if (target) {
-        setTimeout(() => {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 350);
+      const href = a.getAttribute('href');
+      if (href.startsWith('#')) {
+        e.preventDefault();
+        const targetId = href.substring(1);
+        const target = document.getElementById(targetId);
+        closeMenu();
+        if (target) {
+          setTimeout(() => {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 350);
+        }
       }
     });
   });
@@ -143,4 +148,139 @@ export function initScrollReveal() {
   document.querySelectorAll('.content-box, .carousel-container').forEach(el => {
     observer.observe(el);
   });
+}
+
+/* Helper to parse "08:00 AM - 06:00 PM" into { open: 8, close: 18 } */
+function parseTimeRange(rangeStr) {
+  if (!rangeStr || rangeStr.toLowerCase() === 'closed') return null;
+  const parts = rangeStr.split(' - ');
+  if (parts.length !== 2) return null;
+
+  const parse = (timeStr) => {
+    const [time, period] = timeStr.split(' ');
+    let [h, m] = time.split(':').map(Number);
+    if (period === 'PM' && h !== 12) h += 12;
+    if (period === 'AM' && h === 12) h = 0;
+    return h + (m / 60);
+  };
+  return { open: parse(parts[0]), close: parse(parts[1]) };
+}
+
+/* Helper for Day Planner Axis */
+function generateTimeAxisHtml(start, end) {
+  let html = '<div class="time-axis">';
+  let grid = '';
+  const step = (end - start) / 4;
+  for (let i = 0; i <= 4; i++) {
+    const h = start + (step * i);
+    const top = (i / 4) * 100;
+    html += `<div class="time-axis-label" style="top: ${top}%">${Math.round(h)}h</div>`;
+    if (i < 4) grid += `<div class="grid-line" style="top: ${top}%"></div>`;
+  }
+  return { axis: html + '</div>', grid };
+}
+
+export function initDayPlanners(faqData = {}) {
+  const planners = document.querySelectorAll('.day-planner');
+  const now = new Date();
+  const currentDay = (now.getDay() + 6) % 7; 
+  const currentTime = now.getHours() + now.getMinutes() / 60;
+  const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  const lang = document.documentElement.lang || 'fr';
+
+  const configs = {
+    admin: { start: 6, end: 18 },
+    pool: { start: 0, end: 24 }
+  };
+
+  const labels = lang === 'en' ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] : ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+
+  planners.forEach(planner => {
+    const type = planner.dataset.config;
+    const config = configs[type];
+    const hoursData = faqData[type]?.business_hours;
+    if (!config || !hoursData) return;
+
+    // Update the text info list on the left to match JSON data
+    const infoBox = planner.closest('.content-box')?.querySelector('.faq-info');
+    if (infoBox) {
+      infoBox.innerHTML = `<div class="hours-list">${formatBusinessHours(hoursData, lang)}</div>`;
+    }
+
+    const { axis, grid } = generateTimeAxisHtml(config.start, config.end);
+    const range = config.end - config.start;
+
+    const columnsHtml = labels.map((label, idx) => {
+      const times = parseTimeRange(hoursData[dayKeys[idx]]);
+      const isToday = idx === currentDay;
+      const nowPos = ((currentTime - config.start) / range) * 100;
+      
+      let barHtml = ''; 
+      if (times) {
+        const barTop = Math.max(0, ((times.open - config.start) / range) * 100);
+        const barBottom = Math.min(100, ((times.close - config.start) / range) * 100);
+        const barHeight = barBottom - barTop;
+        if (barHeight > 0) {
+          barHtml = `<div class="time-bar" style="top:${barTop}%; height:${barHeight}%"></div>`;
+        }
+      }
+
+      return `
+        <div class="planner-column">
+          <div class="time-track">
+            ${barHtml}
+            ${isToday && nowPos >= 0 && nowPos <= 100 ? `<div class="now-indicator" style="top:${nowPos}%"></div>` : ''}
+          </div>
+          <div class="day-label">${label}</div>
+        </div>`;
+    }).join('');
+
+    planner.innerHTML = axis + `<div class="columns-container">${grid + columnsHtml}</div>`;
+  });
+}
+
+export function initWasteCalendar() {
+  const container = document.getElementById('waste-calendar');
+  if (!container) return;
+
+  const now = new Date();
+  const month = now.getMonth(); // Mois actuel (0-11)
+  const year = now.getFullYear();
+  const lang = document.documentElement.lang || 'fr';
+  const t = (key) => window.translations?.[lang]?.[key] || key;
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  
+  // Simplified rules: Fri=Garbage, Tue=Compost, Wed=Recycling, 1st Wed=Large
+  const getIcons = (dayNum, dayOfWeek) => {
+    let icons = '';
+    if (dayOfWeek === 5) icons += '🗑️'; // Fri
+    if (dayOfWeek === 2) icons += '♻️'; // Tue
+    if (dayOfWeek === 3) {
+      icons += '📦'; // Wed Recycling
+      if (dayNum <= 7) icons += '🛋️'; // 1st Wed Large Items
+    }
+    return icons;
+  };
+
+  const dayNames = lang === 'en' ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  const monthName = t(`calendar_month_${month}`);
+
+  let html = `<div class="calendar-header">${monthName} ${year}</div><div class="calendar-grid">`;
+  html += dayNames.map(d => `<div class="calendar-day-name">${d}</div>`).join('');
+
+  for(let i=0; i < firstDay; i++) html += `<div class="calendar-day empty"></div>`;
+
+  for(let d=1; d <= daysInMonth; d++) {
+    const date = new Date(year, month, d);
+    const isToday = d === now.getDate();
+    const icons = getIcons(d, date.getDay());
+    html += `
+      <div class="calendar-day ${isToday ? 'is-today' : ''}">
+        <div class="day-num">${d}</div>
+        <div class="day-icons">${icons}</div>
+      </div>`;
+  }
+  container.innerHTML = html + '</div>';
 }

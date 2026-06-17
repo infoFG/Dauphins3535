@@ -1,4 +1,4 @@
-const translations = {
+window.translations = {
   fr: {
     // Navigation
     "nav_about": "À propos",
@@ -7,6 +7,7 @@ const translations = {
     "nav_events": "Événements",
     "nav_values": "Valeurs",
     "nav_condoweb": "CondoWeb",
+    "nav_faq": "FAQ",
     "nav_neighborhood": "Vie de quartier",
 
     // Hero
@@ -61,6 +62,20 @@ const translations = {
     "condoweb_card_li_1": "Accédez à CondoWeb <a href=\"https://mon.condoweb.app/\" target=\"_blank\" rel=\"noopener\">ici</a>.",
     "condoweb_card_li_2": "Contactez le bureau de l'administration pour créer votre compte",
 
+    "title_faq": "Foire aux questions",
+    "faq_admin_title": "Bureau de l'administration",
+    "faq_admin_hours": "Lundi au vendredi : 9h00 à 17h00",
+    "faq_pool_title": "Piscine & Gym",
+    "faq_pool_hours": "Tous les jours : 6h00 à 22h00",
+    "faq_waste_title": "Gestion des déchets",
+    "faq_garbage": "Ordures ménagères : Vendredi matin",
+    "faq_compost": "Compostage : Mardi matin",
+    "faq_recycling": "Recyclage : Mercredi matin",
+    "faq_large_items": "Gros objets : 1er mercredi du mois",
+    "calendar_month_0": "Janvier", "calendar_month_1": "Février", "calendar_month_2": "Mars",
+    "calendar_month_3": "Avril", "calendar_month_4": "Mai", "calendar_month_5": "Juin",
+    "calendar_month_6": "Juillet", "calendar_month_7": "Août", "calendar_month_8": "Septembre",
+    "calendar_month_9": "Octobre", "calendar_month_10": "Novembre", "calendar_month_11": "Décembre",
     "title_neighborhood": "Vie de quartier",
     "park_title": "Parc La Fontaine",
     "neighborhood_intro": "Le Plateau-Mont-Royal est un quartier dynamique avec une variété d'espaces verts, de commerces de proximité et une offre culturelle variée. Les Dauphins sont à distance de marche des artères commerciales de la rue Ontario et de l'avenue du Mont-Royal, et la piétonisation de cette dernière de juin à septembre ajoute à la qualité de vie du quartier. Sur la rue Gauthier juste à côté, on trouve une épicerie, une boutique de produits pour animaux de compagnie, une boulangerie et un restaurant.",
@@ -99,6 +114,7 @@ const translations = {
     "nav_events": "Events",
     "nav_values": "Values",
     "nav_condoweb": "CondoWeb",
+    "nav_faq": "FAQ",
     "nav_neighborhood": "Neighborhood Life",
 
     // Hero
@@ -152,6 +168,31 @@ const translations = {
     "condoweb_card_title": "CondoWeb Access",
     "condoweb_card_li_1": "Access CondoWeb <a href=\"https://mon.condoweb.app/\" target=\"_blank\" rel=\"noopener\">here</a>.",
     "condoweb_card_li_2": "Contact the administration office to create your account",
+
+    "title_faq": "Frequently Asked Questions",
+    "faq_admin_title": "Administration Office",
+    "faq_admin_hours": "Monday to Friday: 9:00 AM to 5:00 PM",
+    "faq_pool_title": "Pool & Gym",
+    "faq_pool_hours": "Daily: 6:00 AM to 10:00 PM",
+    "faq_waste_title": "Waste Management",
+    "faq_garbage": "Garbage: Friday morning",
+    "faq_compost": "Compost: Tuesday morning",
+    "faq_recycling": "Recycling: Wednesday morning",
+    "faq_large_items": "Large items: 1st Wednesday of the month",
+
+    // Calendar specific
+    "calendar_month_0": "January", "calendar_month_1": "February", "calendar_month_2": "March",
+    "calendar_month_3": "April", "calendar_month_4": "May", "calendar_month_5": "June",
+    "calendar_month_6": "July", "calendar_month_7": "August", "calendar_month_8": "September",
+    "calendar_month_9": "October", "calendar_month_10": "November", "calendar_month_11": "December",
+    "calendar_day_0": "Sun", "calendar_day_1": "Mon", "calendar_day_2": "Tue", 
+    "calendar_day_3": "Wed", "calendar_day_4": "Thu", "calendar_day_5": "Fri",
+    "calendar_day_6": "Sat",
+    "icon_garbage": "Garbage",
+    "icon_compost": "Compost",
+    "icon_recycling": "Recycling",
+    "icon_large_items": "Large Items",
+
 
     "title_neighborhood": "Neighborhood Life",
     "park_title": "La Fontaine Park",

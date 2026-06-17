@@ -1,4 +1,4 @@
-import { initMenu, initLanguage, initLightbox, initScrollReveal } from './js/ui.js';
+import { initMenu, initLanguage, initLightbox, initScrollReveal, initDayPlanners, initWasteCalendar } from './js/ui.js';
 import { initEventsCarousel, initBusinessGallery } from './js/api.js';
 import { initEnhancedCarousels, loadStaticCarouselImages, loadSectionBackground } from './js/carousel.js';
 
@@ -8,14 +8,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   initLanguage();
   initLightbox();
 
-  // 2. Load dynamic data
-  await initEventsCarousel();
-  await initBusinessGallery();
-
-  // We use individual try/catch or await them all to ensure one failure doesn't block the UI reveal
+  // 2 & 3. Load dynamic data and static assets
+  let faqData = {};
   try {
     await initEventsCarousel();
     await initBusinessGallery();
+
+    // Fetch FAQ Hours
+    const [adminRes, poolRes] = await Promise.all([
+      fetch('assets/FAQ/OfficeHours.json').then(r => r.json()).catch(() => null),
+      fetch('assets/FAQ/PoolHours.json').then(r => r.json()).catch(() => null)
+    ]);
+
+    faqData = { admin: adminRes, pool: poolRes };
 
     // 3. Load static assets - removed leading slashes for better portability
     await loadStaticCarouselImages('apropos-carousel-track', 'assets/Apropos');
@@ -23,12 +28,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadStaticCarouselImages('quartier-park-carousel-track', 'assets/Quartier');
     await loadSectionBackground('valeurs');
     await loadSectionBackground('condoweb');
+    await loadSectionBackground('faq-admin');
+    await loadSectionBackground('faq-pool');
+    await loadSectionBackground('faq-waste');
   } catch (error) {
     console.error("Asset loading failed:", error);
   }
   // 4. Initialize carousel engine & animations
   initEnhancedCarousels();
   initScrollReveal();
+  initDayPlanners(faqData);
+  initWasteCalendar();
 
   document.querySelectorAll('.carousel-pips').forEach(pipsContainer => {
     const track = pipsContainer.closest('.carousel-container')?.querySelector('.carousel-track');

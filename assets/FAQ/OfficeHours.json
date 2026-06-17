@@ -1,0 +1,11 @@
+{
+  "business_hours": {
+    "monday": "08:00 AM - 05:00 PM",
+    "tuesday": "08:00 AM - 05:00 PM",
+    "wednesday": "08:00 AM - 05:00 PM",
+    "thursday": "08:00 AM - 05:00 PM",
+    "friday": "08:00 AM - 05:00 PM",
+    "saturday": "Closed",
+    "sunday": "Closed"
+  }
+}
