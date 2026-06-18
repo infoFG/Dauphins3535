@@ -77,7 +77,7 @@ const translations = {
     "winter_li_4": "Butte de glisse pour enfants",
     "neighborhood_culture": "🎭 Culture & événements",
     "borough_title": "Activités de l'arrondissement",
-    "borough_intro": "Le Plateau-Mont-Royal est un quartier dynamique qui a une grande diversité d'activités, du sommet du Mont-Royal à l'ouest au Parc Baldwin à l'est. Plusieurs de celles-ci sont encadrées par l'administration de l'arrondissement.",
+    "borough_intro": "Le Plateau-Mont-Royal a une grande diversité d'activités, du sommet du Mont-Royal à l'ouest au Parc Baldwin à l'est. Plusieurs sont encadrées par l'administration de l'arrondissement.",
     "borough_calendar_title": "Calendrier des activités",
     "borough_calendar_p1": "L'arrondissement propose un grand nombre d'activités dont des balades à vélo, marchés fermiers et du cinéma en plein air. <a href='https://montreal.ca/evenements?dc_coverage.boroughs.code=PMR&amp;orderBy=dc_temporal.start' target='_blank' rel='noopener'>Consulter la liste complète ici <span style='font-size:0.85em;'>→</span></a>",
     "borough_calendar_link": "Consulter la liste complète ici",
