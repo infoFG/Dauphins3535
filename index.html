@@ -28,7 +28,6 @@
         <li><a href="#apropos" data-i18n="nav_about">À propos</a></li>
         <li><a href="#installations" data-i18n="nav_amenities">Installations</a></li>
         <li><a href="#galerie-commerciale" data-i18n="nav_gallery">Galerie Commerciale</a></li>
-        <li><a href="#evenements" data-i18n="nav_events">Événements</a></li>
         <li><a href="#valeurs" data-i18n="nav_values">Valeurs</a></li>
         <li><a href="#condoweb" data-i18n="nav_condoweb">CondoWeb</a></li>
         <li><a href="faq.html" data-i18n="nav_faq">FAQ</a></li>
@@ -128,22 +127,6 @@
       </div>
     </section>
 
-    <!-- ===== ÉVÉNEMENTS ===== -->
-    <section class="section" id="evenements" style="display: none;">
-      <div class="section-inner">
-        <div class="content-box">
-          <h2 class="section-title" data-i18n="title_events">Événements</h2>
-          <div class="section-content">
-            <p data-i18n="events_p1">Découvrez la programmation culturelle et les activités gratuites se déroulant à proximité, notamment au Théâtre de Verdure et au Centre culturel Calixa-Lavallée.</p>
-          </div>
-        </div>
-        <div class="carousel-container image-carousel">
-          <div class="carousel-track" id="events-carousel-track"></div>
-          <div class="carousel-pips"></div>
-        </div>
-      </div>
-    </section>
-
     <!-- ===== VALEURS ===== -->
     <section class="section" id="valeurs">
       <div class="section-inner">
@@ -204,6 +187,12 @@
           <button class="carousel-btn prev">❮</button>
           <button class="carousel-btn next">❯</button>
           <div class="carousel-track" id="quartier-park-carousel-track"></div>
+          <div class="carousel-pips"></div>
+        </div>
+
+        <!-- Events Carousel -->
+        <div class="carousel-container image-carousel" style="margin-top: 2rem;">
+          <div class="carousel-track" id="events-carousel-track" data-no-clone></div>
           <div class="carousel-pips"></div>
         </div>
 

@@ -56,10 +56,12 @@ function smoothScrollTo(el, target, duration, teleportTarget = null, onFinish = 
   const startTime = performance.now();
   el.isAnimationCanceled = false;
   el.classList.add('is-animating');
+  el.style.scrollSnapType = 'none';
 
   function animate(currentTime) {
     if (el.isAnimationCanceled) {
       el.classList.remove('is-animating');
+      el.style.scrollSnapType = '';
       return;
     }
     const elapsed = currentTime - startTime;
@@ -70,12 +72,32 @@ function smoothScrollTo(el, target, duration, teleportTarget = null, onFinish = 
       el.scrollRequestID = requestAnimationFrame(animate);
     } else {
       el.classList.remove('is-animating');
-      if (teleportTarget !== null) el.scrollLeft = teleportTarget;
-      el.scrollRequestID = null;
-      if (onFinish) onFinish();
+      if (teleportTarget !== null) {
+        el.scrollLeft = teleportTarget;
+        // Defer snap restoration so teleport position sticks
+        requestAnimationFrame(() => {
+          el.style.scrollSnapType = '';
+          el.scrollRequestID = null;
+          if (onFinish) onFinish();
+        });
+      } else {
+        el.style.scrollSnapType = '';
+        el.scrollRequestID = null;
+        if (onFinish) onFinish();
+      }
     }
   }
   el.scrollRequestID = requestAnimationFrame(animate);
+}
+
+// Get the snap-aligned scroll position for an item based on its CSS scroll-snap-align
+function getSnapPosition(track, item) {
+  const align = getComputedStyle(item).scrollSnapAlign;
+  if (align === 'start' || align.startsWith('start')) {
+    return item.offsetLeft;
+  }
+  // Default: center alignment
+  return item.offsetLeft - (track.offsetWidth - item.offsetWidth) / 2;
 }
 
 function navigate(track, direction, duration = 1000) {
@@ -97,17 +119,28 @@ function navigate(track, direction, duration = 1000) {
   let teleportTo = null;
 
   if (isInfinite) {
-    if (nextIdx === items.length - 1) teleportTo = items[1].offsetLeft - (track.offsetWidth - items[1].offsetWidth) / 2;
-    else if (nextIdx === 0) teleportTo = items[items.length - 2].offsetLeft - (track.offsetWidth - items[items.length - 2].offsetWidth) / 2;
+    if (nextIdx === items.length - 1) teleportTo = getSnapPosition(track, items[1]);
+    else if (nextIdx === 0) teleportTo = getSnapPosition(track, items[items.length - 2]);
   } else {
-    if (nextIdx < 0) nextIdx = 0;
-    if (nextIdx >= items.length) nextIdx = items.length - 1;
+    // Simple loop: wrap around at ends
+    if (nextIdx < 0) nextIdx = items.length - 1;
+    if (nextIdx >= items.length) nextIdx = 0;
   }
+
+  // For non-infinite: detect end-stall and force loop back
+  const maxScroll = track.scrollWidth - track.offsetWidth;
+  const atEnd = !isInfinite && direction > 0 && track.scrollLeft >= maxScroll - 20;
+  const atStart = !isInfinite && direction < 0 && track.scrollLeft <= 20;
+  const loopWrap = atEnd || atStart;
+
+  if (atEnd) nextIdx = 0;
+  if (atStart) nextIdx = items.length - 1;
+
+  const animDuration = loopWrap ? 1500 : duration;
 
   const targetItem = items[nextIdx];
   if (targetItem) {
-    const targetScroll = targetItem.offsetLeft - (track.offsetWidth - targetItem.offsetWidth) / 2;
-    smoothScrollTo(track, targetScroll, duration, teleportTo);
+    smoothScrollTo(track, getSnapPosition(track, targetItem), animDuration, teleportTo);
   }
 }
 
@@ -120,19 +153,18 @@ export function initEnhancedCarousels() {
     const nextBtn = container.querySelector('.carousel-btn.next');
     const pipsContainer = container.querySelector('.carousel-pips');
 
-    // Clones pour l'infini
-    if (track.children.length > 1 && !track.dataset.cloned) {
+    // Clones pour l'infini (skip if track has data-no-clone attribute)
+    if (track.children.length > 1 && !track.dataset.cloned && !track.hasAttribute('data-no-clone')) {
       const first = track.children[0].cloneNode(true);
       const last = track.children[track.children.length - 1].cloneNode(true);
       track.appendChild(first);
       track.insertBefore(last, track.children[0]);
-      const initial = track.children[1];
-      track.scrollLeft = initial.offsetLeft - (track.offsetWidth - initial.offsetWidth) / 2;
+      track.scrollLeft = getSnapPosition(track, track.children[1]);
       track.dataset.cloned = "true";
     }
 
-    track.querySelectorAll('img').forEach(img => {
-      img.setAttribute('draggable', 'false');
+    track.querySelectorAll('img, a').forEach(el => {
+      el.setAttribute('draggable', 'false');
     });
 
     // Autoplay logic
@@ -154,6 +186,10 @@ export function initEnhancedCarousels() {
 
     track.addEventListener('pointerdown', (e) => {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
+      // Prevent link drag behavior when dragging on cards
+      if (e.target.closest('a')) {
+        e.preventDefault();
+      }
       isDown = true;
       activePointerId = e.pointerId;
       stopAutoPlay();
@@ -190,22 +226,38 @@ export function initEnhancedCarousels() {
       
       const items = track.children;
       if (items.length === 0) return;
-      const scrollCenter = track.scrollLeft + track.offsetWidth / 2;
-      let closestIdx = 0, minDistance = Infinity;
-      for (let i = 0; i < items.length; i++) {
-        const dist = Math.abs((items[i].offsetLeft + items[i].offsetWidth / 2) - scrollCenter);
-        if (dist < minDistance) { minDistance = dist; closestIdx = i; }
-      }
 
-      const targetScroll = items[closestIdx].offsetLeft - (track.offsetWidth - items[closestIdx].offsetWidth) / 2;
+      const isInfinite = track.dataset.cloned === "true";
+      const maxScroll = track.scrollWidth - track.offsetWidth;
       let teleport = null;
-      if (track.dataset.cloned === "true") {
-        if (closestIdx === 0) teleport = items[items.length - 2].offsetLeft - (track.offsetWidth - items[items.length - 2].offsetWidth) / 2;
-        else if (closestIdx === items.length - 1) teleport = items[1].offsetLeft - (track.offsetWidth - items[1].offsetWidth) / 2;
+      let targetScroll;
+
+      if (isInfinite && track.scrollLeft <= 10) {
+        // Near start — animate to 0 then jump to real last item
+        const realLast = items[items.length - 2];
+        targetScroll = 0;
+        teleport = getSnapPosition(track, realLast);
+      } else if (isInfinite && track.scrollLeft >= maxScroll - 10) {
+        // Near end — animate to max then jump to real first item
+        const realFirst = items[1];
+        targetScroll = maxScroll;
+        teleport = getSnapPosition(track, realFirst);
+      } else {
+        // Normal snap to closest
+        const scrollCenter = track.scrollLeft + track.offsetWidth / 2;
+        let closestIdx = 0, minDistance = Infinity;
+        for (let i = 0; i < items.length; i++) {
+          const dist = Math.abs((items[i].offsetLeft + items[i].offsetWidth / 2) - scrollCenter);
+          if (dist < minDistance) { minDistance = dist; closestIdx = i; }
+        }
+        targetScroll = getSnapPosition(track, items[closestIdx]);
+        if (isInfinite) {
+          if (closestIdx === 0) teleport = getSnapPosition(track, items[items.length - 2]);
+          else if (closestIdx === items.length - 1) teleport = getSnapPosition(track, items[1]);
+        }
       }
 
-      smoothScrollTo(track, targetScroll, 750, teleport, () => {
-        track.style.scrollSnapType = '';
+      smoothScrollTo(track, targetScroll, 500, teleport, () => {
         startAutoPlay();
       });
     };

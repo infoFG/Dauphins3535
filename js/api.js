@@ -1,25 +1,299 @@
 import { escapeHtml, formatBusinessHours } from './utils.js';
 
+const EVENTS_CACHE_KEY = 'dauphins_events_cache';
+const CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+
+function getCachedEvents() {
+  try {
+    const raw = localStorage.getItem(EVENTS_CACHE_KEY);
+    if (!raw) return null;
+    const cached = JSON.parse(raw);
+    if (Date.now() - cached.timestamp > CACHE_TTL) {
+      localStorage.removeItem(EVENTS_CACHE_KEY);
+      return null;
+    }
+    return cached.events;
+  } catch (e) { return null; }
+}
+
+function setCachedEvents(events) {
+  try {
+    localStorage.setItem(EVENTS_CACHE_KEY, JSON.stringify({
+      timestamp: Date.now(),
+      events: events
+    }));
+  } catch (e) { /* storage full, ignore */ }
+}
+
 export async function initEventsCarousel() {
   const track = document.getElementById('events-carousel-track');
   if (!track) return;
 
-  const CACHE_KEY = 'dauphins_events_data';
-  const CACHE_TIME_KEY = 'dauphins_events_timestamp';
-  // Persistent metadata URL for the Public Events dataset
-  const DATASET_METADATA_API = 'https://donnees.montreal.ca/api/3/action/package_show?id=evenements-publics';
+  const lang = document.documentElement.lang || 'fr';
 
-  // Helper to parse CSV lines correctly handling quoted values
-  const parseCSV = (text) => {
-    const lines = text.split(/\r?\n/);
-    if (lines.length < 2) return [];
+  const render = (events) => {
+    if (!events || events.length === 0) {
+      const emptyMsg = window.translations?.[lang]?.events_empty || 'Aucun événement trouvé pour le moment.';
+      track.innerHTML = `<p class="loading-msg">${emptyMsg}</p>`;
+      return null;
+    }
+
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    // Deduplicate, filter past, sort chronologically
+    const seen = new Set();
+    const allUpcoming = events
+      .filter(e => new Date(e.date) >= now)
+      .filter(e => {
+        const key = (e.link || '').trim();
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // Show next 7 days first, then fill up to 12 with later events
+    const nextWeek = new Date(now);
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    const withinWeek = allUpcoming.filter(e => new Date(e.date) <= nextWeek);
+    const later = allUpcoming.filter(e => new Date(e.date) > nextWeek);
+    const upcoming = [...withinWeek, ...later].slice(0, 12);
+
+    if (upcoming.length === 0) {
+      const emptyMsg = window.translations?.[lang]?.events_empty || 'Aucun événement trouvé pour le moment.';
+      track.innerHTML = `<p class="loading-msg">${emptyMsg}</p>`;
+      return null;
+    }
+
+    const loadingMsg = window.translations?.[lang]?.carousel_loading || 'Chargement…';
+
+    track.innerHTML = upcoming.map(event => {
+      const title = lang === 'en' && event.title_en ? event.title_en : event.title;
+      const location = lang === 'en' && event.location_en ? event.location_en : event.location;
+      const source = lang === 'en' && event.source_en ? event.source_en : event.source;
+      const dateStr = new Date(event.date + 'T00:00:00').toLocaleDateString(
+        lang === 'en' ? 'en-CA' : 'fr-CA',
+        { weekday: 'long', month: 'long', day: 'numeric' }
+      );
+      const timeStr = event.time ? ` — ${event.time}` : '';
+      const primary = getPrimaryImage(event);
+
+      return `
+      <a href="${escapeHtml(event.link)}" target="_blank" rel="noopener" class="carousel-card" draggable="false">
+        <img src="${escapeHtml(primary)}" alt="${escapeHtml(title)}" loading="lazy">
+        <div class="card-content">
+          <div class="card-date">${dateStr}${timeStr}</div>
+          <h4 class="card-title">${escapeHtml(title)}</h4>
+          <div class="card-location">📍 ${escapeHtml(location)}</div>
+          <div class="card-source">${escapeHtml(source)}</div>
+        </div>
+      </a>`;
+    }).join('');
+    return upcoming;
+  };
+
+  // Check cache first (7-day TTL)
+  let events = getCachedEvents();
+
+  if (!events) {
+    // Cache miss or expired — fetch fresh data
+    try {
+      const [staticEvents, dynamicEvents] = await Promise.all([
+        fetchStaticEvents(),
+        fetchMontrealEvents()
+      ]);
+      events = [...(staticEvents || []), ...(dynamicEvents || [])];
+      setCachedEvents(events);
+    } catch (e) {
+      console.warn('Could not load events:', e);
+      events = null;
+    }
+  }
+
+  const displayed = render(events);
+  if (displayed) {
+    // Store for language-switch re-renders
+    track._events = displayed;
+    fetchDynamicThumbnails(displayed);
+  }
+}
+
+export function reRenderEvents() {
+  const track = document.getElementById('events-carousel-track');
+  if (track && track._events) {
+    // Re-render with current language but don't re-fetch thumbnails
+    const lang = document.documentElement.lang || 'fr';
+    track.innerHTML = track._events.map(event => {
+      const title = lang === 'en' && event.title_en ? event.title_en : event.title;
+      const location = lang === 'en' && event.location_en ? event.location_en : event.location;
+      const source = lang === 'en' && event.source_en ? event.source_en : event.source;
+      const dateStr = new Date(event.date + 'T00:00:00').toLocaleDateString(
+        lang === 'en' ? 'en-CA' : 'fr-CA',
+        { weekday: 'long', month: 'long', day: 'numeric' }
+      );
+      const timeStr = event.time ? ` — ${event.time}` : '';
+      const primary = getPrimaryImage(event);
+      return `
+      <a href="${escapeHtml(event.link)}" target="_blank" rel="noopener" class="carousel-card" draggable="false">
+        <img src="${escapeHtml(primary)}" alt="${escapeHtml(title)}" loading="lazy">
+        <div class="card-content">
+          <div class="card-date">${dateStr}${timeStr}</div>
+          <h4 class="card-title">${escapeHtml(title)}</h4>
+          <div class="card-location">📍 ${escapeHtml(location)}</div>
+          <div class="card-source">${escapeHtml(source)}</div>
+        </div>
+      </a>`;
+    }).join('');
+  }
+}
+
+// ---- Image strategy: try remote thumbnails, fallback to local ----
+const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+
+const FALLBACK_THEATRE = [
+  'assets/Quartier/quartier-theatre.webp',
+  'assets/Quartier/quartier-plateau.webp',
+  'assets/Quartier/quartier-user-3.webp'
+];
+const FALLBACK_PARC = [
+  'assets/Quartier/quartier-parc.webp',
+  'assets/Quartier/quartier-parc-lafontaine.webp',
+  'assets/Quartier/quartier-user-1.webp'
+];
+const FALLBACK_GENERAL = [
+  'assets/Quartier/quartier-plateau.webp',
+  'assets/Quartier/quartier-user-2.webp',
+  'assets/Quartier/quartier-user-4.webp'
+];
+
+function getPrimaryImage(event) {
+  // Use Cloudinary URL if explicitly set in events.json
+  if (event.image) return event.image;
+  // Default: local fallback
+  return getFallbackLocal(event);
+}
+
+function getFallbackLocal(event) {
+  const loc = (event.location || '').toLowerCase();
+  let pool = FALLBACK_GENERAL;
+  if (loc.includes('verdure') || loc.includes('théâtre') || loc.includes('theatre')) {
+    pool = FALLBACK_THEATRE;
+  } else if (loc.includes('parc') || loc.includes('fontaine') || loc.includes('park')) {
+    pool = FALLBACK_PARC;
+  }
+  if (pool.length > 0) {
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  return '';
+}
+
+// ---- Thumbnail cache (persistent, not tied to event cache TTL) ----
+const THUMB_CACHE_KEY = 'dauphins_thumb_cache';
+
+function getThumbCache() {
+  try {
+    const raw = localStorage.getItem(THUMB_CACHE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) { return {}; }
+}
+
+function setThumbCache(link, imageUrl) {
+  try {
+    const cache = getThumbCache();
+    cache[link] = imageUrl;
+    // Keep cache under ~1000 entries
+    const keys = Object.keys(cache);
+    if (keys.length > 1000) {
+      const oldest = keys.slice(0, keys.length - 900);
+      oldest.forEach(k => delete cache[k]);
+    }
+    localStorage.setItem(THUMB_CACHE_KEY, JSON.stringify(cache));
+  } catch (e) { /* storage full */ }
+}
+
+// After render, batch-fetch thumbnails for displayed events that lack them
+async function fetchDynamicThumbnails(events) {
+  const track = document.getElementById('events-carousel-track');
+  if (!track) return;
+
+  const thumbCache = getThumbCache();
+  const cards = track.querySelectorAll('.carousel-card');
+  const toFetch = [];
+
+  cards.forEach((card, i) => {
+    const event = events[i];
+    if (!event || event.image) return;
+    if (!event.link || !event.link.includes('montreal.ca/evenements/')) return;
+
+    // Check persistent thumbnail cache
+    if (thumbCache[event.link]) {
+      applyThumbToCard(card, thumbCache[event.link]);
+      return;
+    }
+
+    const img = card.querySelector('img');
+    if (img && img.complete && img.naturalWidth > 0) return; // local fallback loaded fine
+    toFetch.push({ card, event });
+  });
+
+  // Fetch in batches of 3 to avoid overwhelming the proxy
+  for (let i = 0; i < toFetch.length; i += 3) {
+    const batch = toFetch.slice(i, i + 3);
+    await Promise.allSettled(batch.map(async ({ card, event }) => {
+      try {
+        const proxyUrl = CORS_PROXY + encodeURIComponent(event.link);
+        const response = await fetch(proxyUrl);
+        const html = await response.text();
+        const match = html.match(/<meta\s+property="og:image"\s+content="([^"]+)"/i);
+        if (match && match[1]) {
+          const thumbUrl = match[1].replace(/w_\d+,h_\d+/g, 'w_400,c_fill');
+          setThumbCache(event.link, thumbUrl);
+          applyThumbToCard(card, thumbUrl);
+        }
+      } catch (e) { /* keep local fallback */ }
+    }));
+  }
+}
+
+function applyThumbToCard(card, url) {
+  const img = card.querySelector('img');
+  if (img) {
+    img.src = url;
+  }
+}
+
+async function fetchStaticEvents() {
+  try {
+    const response = await fetch('assets/Events/events.json');
+    if (!response.ok) return [];
+    return await response.json();
+  } catch (e) { return []; }
+}
+
+async function fetchMontrealEvents() {
+  const DATASET_API = 'https://donnees.montreal.ca/api/3/action/package_show?id=evenements-publics';
+  try {
+    const metaResponse = await fetch(DATASET_API);
+    if (!metaResponse.ok) return [];
+    const metaData = await metaResponse.json();
     
+    const csvResource = metaData.result.resources.find(r => r.format.toUpperCase() === 'CSV');
+    if (!csvResource?.url) return [];
+
+    const csvResponse = await fetch(csvResource.url);
+    if (!csvResponse.ok) return [];
+    const csvText = await csvResponse.text();
+
+    // Parse CSV
+    const lines = csvText.split(/\r?\n/);
+    if (lines.length < 2) return [];
     const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-    return lines.slice(1).filter(line => line.trim()).map(line => {
+
+    const records = lines.slice(1).filter(line => line.trim()).map(line => {
       const values = [];
       let current = '';
       let inQuotes = false;
-      
       for (let i = 0; i < line.length; i++) {
         const char = line[i];
         if (char === '"' && (i === 0 || line[i - 1] !== '\\')) inQuotes = !inQuotes;
@@ -29,67 +303,30 @@ export async function initEventsCarousel() {
         } else current += char;
       }
       values.push(current.trim().replace(/^"|"$/g, ''));
-
       const obj = {};
-      headers.forEach((header, i) => { obj[header] = values[i] || ''; });
+      headers.forEach((h, i) => { obj[h] = values[i] || ''; });
       return obj;
     });
-  };
 
-  const fetchAndParse = async () => {
-    const lang = document.documentElement.lang || 'fr';
-    try {
-      // Step 1: Discover the current CSV Resource URL dynamically
-      const metaResponse = await fetch(DATASET_METADATA_API);
-      if (!metaResponse.ok) throw new Error('Could not fetch dataset metadata');
-      const metaData = await metaResponse.json();
-      
-      const csvResource = metaData.result.resources.find(r => r.format.toUpperCase() === 'CSV');
-      if (!csvResource || !csvResource.url) throw new Error('CSV Resource URL not found');
-
-      // Step 2: Fetch the actual CSV data using the discovered URL
-      const response = await fetch(csvResource.url);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      
-      const csvText = await response.text();
-      const records = parseCSV(csvText);
-      
-      const targetKeywords = ["verdure", "calixa"]; // Using keywords as per Step 2 of the test
-      
-      return records
-        .filter(record => record.emplacement && targetKeywords.some(k => record.emplacement.toLowerCase().includes(k)))
-        .map(record => ({
-          title: record.titre || 'Événement',
-          location: record.emplacement || '',
-          date: new Date(record.date_debut).toLocaleDateString(document.documentElement.lang === 'en' ? 'en-CA' : 'fr-CA', { month: 'long', day: 'numeric', year: 'numeric' }),
-          image: record.url_image || '',
-          link: record.url_fiche || '#'
-        }));
-    } catch (e) { console.error(e); return null; }
-  };
-
-  const render = (events) => {
-    const lang = document.documentElement.lang || 'fr';
-    if (!events || events.length === 0) {
-      const emptyMsg = window.translations?.[lang]?.carousel_empty || 'Aucun événement trouvé pour le moment.';
-      track.innerHTML = `<p class="loading-msg">${emptyMsg}</p>`;
-      return;
-    }
-    
-    track.innerHTML = events.map(event => `
-      <a href="${escapeHtml(event.link)}" target="_blank" class="carousel-card">
-        ${event.image ? `<img src="${escapeHtml(event.image)}" alt="${escapeHtml(event.title)}" loading="lazy">` : '<div style="height:140px; background:var(--bleu-pale);"></div>'}
-        <div class="card-content">
-          <div class="card-date">${escapeHtml(event.date)}</div>
-          <h4 class="card-title">${escapeHtml(event.title)}</h4>
-          ${event.location ? `<div class="card-location">${escapeHtml(event.location)}</div>` : ''}
-        </div>
-      </a>`).join('');
-  };
-
-  // Events API fetch on hold for now.
-  // Rendering the empty state defined in translations.
-  render(null);
+    // Filter: Plateau-Mont-Royal borough (code PMR or name match)
+    return records
+      .filter(r => {
+        const arr = (r.arrondissement || '').toLowerCase();
+        return arr === 'le plateau-mont-royal' || arr === 'pmr';
+      })
+      .map(r => ({
+        title: r.titre || 'Événement',
+        title_en: r.titre || 'Event',
+        date: r.date_debut || '',
+        time: '',
+        location: r.emplacement || 'Plateau-Mont-Royal',
+        location_en: r.emplacement || 'Plateau-Mont-Royal',
+        source: r.emplacement || '',
+        source_en: r.emplacement || '',
+        link: r.url_fiche || '#',
+        image: ''
+      }));
+  } catch (e) { console.warn('Montreal events fetch failed:', e); return []; }
 }
 
 export async function initBusinessGallery() {

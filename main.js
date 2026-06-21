@@ -1,5 +1,5 @@
 import { initMenu, initLanguage, initLightbox, initScrollReveal, initDayPlanners, initWasteCalendar } from './js/ui.js';
-import { initEventsCarousel, initBusinessGallery } from './js/api.js';
+import { initEventsCarousel, initBusinessGallery, reRenderEvents } from './js/api.js';
 import { initEnhancedCarousels, loadStaticCarouselImages, loadSectionBackground } from './js/carousel.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initDayPlanners(faqData);
     initWasteCalendar();
     initBusinessGallery();
+    reRenderEvents();
   });
 
   document.querySelectorAll('.carousel-pips').forEach(pipsContainer => {
