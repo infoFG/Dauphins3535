@@ -29,8 +29,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadSectionBackground('valeurs');
     await loadSectionBackground('condoweb');
     await loadSectionBackground('faq-admin');
-    await loadSectionBackground('faq-pool');
+    await loadSectionBackground('faq-pool', 'assets/Installations');
     await loadSectionBackground('faq-waste');
+    await loadSectionBackground('galerie-commerciale', 'assets/Commereciale');
   } catch (error) {
     console.error("Asset loading failed:", error);
   }
@@ -39,6 +40,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   initScrollReveal();
   initDayPlanners(faqData);
   initWasteCalendar();
+
+  // Re-render dynamic content when language changes
+  document.addEventListener('languagechanged', () => {
+    initDayPlanners(faqData);
+    initWasteCalendar();
+    initBusinessGallery();
+  });
 
   document.querySelectorAll('.carousel-pips').forEach(pipsContainer => {
     const track = pipsContainer.closest('.carousel-container')?.querySelector('.carousel-track');

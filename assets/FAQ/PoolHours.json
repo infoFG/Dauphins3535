@@ -7,5 +7,14 @@
     "friday": "06:00 AM - 22:00 PM",
     "saturday": "06:00 AM - 22:00 PM",
     "sunday": "06:00 AM - 22:00 PM"
-  }
+  },
+  "closures": {
+    "monday": "09:30 AM - 12:00 PM",
+    "tuesday": "10:00 AM - 11:30 AM",
+    "wednesday": "10:00 AM - 11:30 AM",
+    "thursday": "10:00 AM - 11:30 AM",
+    "friday": "10:00 AM - 11:30 AM"
+  },
+  "cleaning_note_fr": "Nettoyage : lundi 9h30–12h00, mar–ven 10h00–11h30",
+  "cleaning_note_en": "Cleaning: Monday 9:30–12:00, Tue–Fri 10:00–11:30"
 }

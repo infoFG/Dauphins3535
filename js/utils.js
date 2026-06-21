@@ -7,12 +7,19 @@ export function escapeHtml(value) {
     .replace(/'/g, '&#039;');
 }
 
-export function formatBusinessHours(hoursObj) {
-  const order = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
-  const labels = { monday: 'Mon', tuesday: 'Tue', wednesday: 'Wed', thursday: 'Thu', friday: 'Fri', saturday: 'Sat', sunday: 'Sun' };
-  return order.map(day => {
+const DAY_KEYS = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+
+export function getDayLabels(lang = 'fr') {
+  const t = (key) => window.translations?.[lang]?.[key] || window.translations?.fr?.[key] || key;
+  return DAY_KEYS.map(k => t(`day_${k}`));
+}
+
+export function formatBusinessHours(hoursObj, lang = 'fr') {
+  const labels = getDayLabels(lang);
+  return DAY_KEYS.map((day, i) => {
     const val = hoursObj[day];
     if (!val) return '';
-    return `<div class="bh-row"><span class="bh-day">${labels[day]}</span><span class="bh-time">${escapeHtml(val)}</span></div>`;
+    const display = Array.isArray(val) ? val.join(' & ') : val;
+    return `<div class="bh-row"><span class="bh-day">${labels[i]}</span><span class="bh-time">${escapeHtml(display)}</span></div>`;
   }).join('');
 }

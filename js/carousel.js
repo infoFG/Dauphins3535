@@ -42,7 +42,8 @@ export async function loadSectionBackground(sectionId, folderPath = 'assets/Apro
     const response = await fetch(`${folderPath}/images.json`);
     const images = await response.json();
     if (images.length > 0) {
-      section.style.setProperty('--section-bg', `url("../${folderPath}/${images[0]}")`);
+      const randomImage = images[Math.floor(Math.random() * images.length)];
+      section.style.setProperty('--section-bg', `url("../${folderPath}/${randomImage}")`);
     }
   } catch (e) { await setSectionBackgroundFromApropos(section); }
 }

@@ -1,4 +1,4 @@
-import { formatBusinessHours, escapeHtml } from './utils.js';
+import { formatBusinessHours, escapeHtml, getDayLabels } from './utils.js';
 
 /* ========== SIDEBAR MENU ========== */
 export function initMenu() {
@@ -67,6 +67,7 @@ export function initLanguage() {
     btnEn.classList.toggle('active', lang === 'en');
     document.documentElement.lang = lang;
     localStorage.setItem('preferred-lang', lang);
+    document.dispatchEvent(new CustomEvent('languagechanged', { detail: { lang } }));
   };
 
   btnEn.addEventListener('click', () => updateDOM('en'));
@@ -151,19 +152,25 @@ export function initScrollReveal() {
 }
 
 /* Helper to parse "08:00 AM - 06:00 PM" into { open: 8, close: 18 } */
-function parseTimeRange(rangeStr) {
-  if (!rangeStr || rangeStr.toLowerCase() === 'closed') return null;
-  const parts = rangeStr.split(' - ');
-  if (parts.length !== 2) return null;
+function parseTimeRanges(value) {
+  if (!value) return null;
+  // Accept both a single string and an array of strings
+  const rangeStrings = Array.isArray(value) ? value : [value];
+  const ranges = rangeStrings.map(rangeStr => {
+    if (!rangeStr || rangeStr.toLowerCase() === 'closed') return null;
+    const parts = rangeStr.split(' - ');
+    if (parts.length !== 2) return null;
 
-  const parse = (timeStr) => {
-    const [time, period] = timeStr.split(' ');
-    let [h, m] = time.split(':').map(Number);
-    if (period === 'PM' && h !== 12) h += 12;
-    if (period === 'AM' && h === 12) h = 0;
-    return h + (m / 60);
-  };
-  return { open: parse(parts[0]), close: parse(parts[1]) };
+    const parse = (timeStr) => {
+      const [time, period] = timeStr.split(' ');
+      let [h, m] = time.split(':').map(Number);
+      if (period === 'PM' && h !== 12) h += 12;
+      if (period === 'AM' && h === 12) h = 0;
+      return h + (m / 60);
+    };
+    return { open: parse(parts[0]), close: parse(parts[1]) };
+  }).filter(Boolean);
+  return ranges.length > 0 ? ranges : null;
 }
 
 /* Helper for Day Planner Axis */
@@ -193,40 +200,62 @@ export function initDayPlanners(faqData = {}) {
     pool: { start: 0, end: 24 }
   };
 
-  const labels = lang === 'en' ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] : ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+  const labels = getDayLabels(lang);
 
   planners.forEach(planner => {
     const type = planner.dataset.config;
     const config = configs[type];
-    const hoursData = faqData[type]?.business_hours;
+    const data = faqData[type];
+    const hoursData = data?.business_hours;
+    const closuresData = data?.closures;
     if (!config || !hoursData) return;
 
     // Update the text info list on the left to match JSON data
     const infoBox = planner.closest('.content-box')?.querySelector('.faq-info');
     if (infoBox) {
-      infoBox.innerHTML = `<div class="hours-list">${formatBusinessHours(hoursData, lang)}</div>`;
+      let noteHtml = '';
+      const noteKey = `cleaning_note_${lang}`;
+      if (data?.[noteKey]) {
+        noteHtml = `<p class="cleaning-note">${escapeHtml(data[noteKey])}</p>`;
+      }
+      infoBox.innerHTML = `<div class="hours-list">${formatBusinessHours(hoursData, lang)}</div>${noteHtml}`;
     }
 
     const { axis, grid } = generateTimeAxisHtml(config.start, config.end);
     const range = config.end - config.start;
 
     const columnsHtml = labels.map((label, idx) => {
-      const times = parseTimeRange(hoursData[dayKeys[idx]]);
+      const ranges = parseTimeRanges(hoursData[dayKeys[idx]]);
+      const closures = closuresData ? parseTimeRanges(closuresData[dayKeys[idx]]) : null;
       const isToday = idx === currentDay;
       const nowPos = ((currentTime - config.start) / range) * 100;
       
       let barHtml = ''; 
-      if (times) {
-        const barTop = Math.max(0, ((times.open - config.start) / range) * 100);
-        const barBottom = Math.min(100, ((times.close - config.start) / range) * 100);
-        const barHeight = barBottom - barTop;
-        if (barHeight > 0) {
-          barHtml = `<div class="time-bar" style="top:${barTop}%; height:${barHeight}%"></div>`;
-        }
+      if (ranges) {
+        barHtml = ranges.map(r => {
+          const barTop = Math.max(0, ((r.open - config.start) / range) * 100);
+          const barBottom = Math.min(100, ((r.close - config.start) / range) * 100);
+          const barHeight = barBottom - barTop;
+          if (barHeight > 0) {
+            return `<div class="time-bar" style="top:${barTop}%; height:${barHeight}%"></div>`;
+          }
+          return '';
+        }).join('');
+      }
+      if (closures) {
+        barHtml += closures.map(c => {
+          const barTop = Math.max(0, ((c.open - config.start) / range) * 100);
+          const barBottom = Math.min(100, ((c.close - config.start) / range) * 100);
+          const barHeight = barBottom - barTop;
+          if (barHeight > 0) {
+            return `<div class="time-bar closure" style="top:${barTop}%; height:${barHeight}%"></div>`;
+          }
+          return '';
+        }).join('');
       }
 
       return `
-        <div class="planner-column">
+        <div class="planner-column${isToday ? ' is-today' : ''}">
           <div class="time-track">
             ${barHtml}
             ${isToday && nowPos >= 0 && nowPos <= 100 ? `<div class="now-indicator" style="top:${nowPos}%"></div>` : ''}
@@ -236,6 +265,19 @@ export function initDayPlanners(faqData = {}) {
     }).join('');
 
     planner.innerHTML = axis + `<div class="columns-container">${grid + columnsHtml}</div>`;
+
+    // Add cleaning legend if closures exist
+    if (closuresData && Object.values(closuresData).some(v => v)) {
+      const legendKey = `planner_legend_cleaning`;
+      const legendText = window.translations?.[lang]?.[legendKey] || '■ Cleaning time';
+      const existingLegend = planner.parentElement.querySelector('.planner-legend');
+      if (!existingLegend) {
+        const legend = document.createElement('div');
+        legend.className = 'planner-legend';
+        legend.textContent = legendText;
+        planner.parentElement.appendChild(legend);
+      }
+    }
   });
 }
 
@@ -252,19 +294,26 @@ export function initWasteCalendar() {
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   
-  // Simplified rules: Fri=Garbage, Tue=Compost, Wed=Recycling, 1st Wed=Large
+  // Collection rules: Tue=Garbage+Recycling, Fri=Organic+Green, 2nd&4th Mon=Bulky
   const getIcons = (dayNum, dayOfWeek) => {
-    let icons = '';
-    if (dayOfWeek === 5) icons += '🗑️'; // Fri
-    if (dayOfWeek === 2) icons += '♻️'; // Tue
-    if (dayOfWeek === 3) {
-      icons += '📦'; // Wed Recycling
-      if (dayNum <= 7) icons += '🛋️'; // 1st Wed Large Items
+    const items = [];
+    if (dayOfWeek === 2) {
+      items.push({ emoji: '🗑️', label: t('icon_garbage') });
+      items.push({ emoji: '♻️', label: t('icon_recycling') });
     }
-    return icons;
+    if (dayOfWeek === 5) {
+      items.push({ emoji: '🌿', label: t('icon_organic') });
+    }
+    if (dayOfWeek === 1) {
+      const weekOfMonth = Math.ceil(dayNum / 7);
+      if (weekOfMonth === 2 || weekOfMonth === 4) {
+        items.push({ emoji: '🛋️', label: t('icon_bulky') });
+      }
+    }
+    return items.map(i => `<span class="calendar-icon" title="${escapeHtml(i.label)}">${i.emoji}</span>`).join('');
   };
 
-  const dayNames = lang === 'en' ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  const dayNames = Array.from({length: 7}, (_, i) => t(`calendar_day_${i}`));
   const monthName = t(`calendar_month_${month}`);
 
   let html = `<div class="calendar-header">${monthName} ${year}</div><div class="calendar-grid">`;

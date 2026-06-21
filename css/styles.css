@@ -206,7 +206,6 @@ body {
   --box-bg: rgba(240, 245, 248, 0.92); /* Pool Blue/Gray */
 }
 #galerie-commerciale { 
-  background-color: #fff;
   --box-bg: rgba(253, 250, 245, 0.92); /* Warm Wood/Gallery */
 }
 #evenements {
@@ -220,7 +219,7 @@ body {
   background-color: #fff;
   --box-bg: rgba(255, 252, 248, 0.92); /* Interior Warmth */
 }
-#faq-admin, #faq-pool, #faq-waste {
+#faq-admin, #faq-waste {
   background-color: #f8f9fa;
   --box-bg: rgba(248, 249, 250, 0.92);
 }
@@ -228,10 +227,54 @@ body {
 /* ========== FAQ LAYOUT (Text + Graph) ========== */
 .faq-flex-wrapper {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: 2.5rem;
   margin-top: 1.5rem;
-  align-items: center; /* Centrage horizontal des blocs */
+  align-items: center;
+  justify-content: center;
+}
+
+.faq-info {
+  flex: 1 1 280px;
+  max-width: 400px;
+  text-align: left;
+}
+
+.faq-info ul {
+  padding-left: 1.2rem;
+  line-height: 1.8;
+}
+
+.waste-hours-note {
+  font-size: 0.85rem;
+  color: var(--bleu-fonce);
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--bleu-pale);
+  line-height: 1.5;
+}
+
+.waste-list {
+  list-style: none;
+  padding-left: 0;
+  line-height: 1.8;
+}
+
+.waste-list li {
+  margin-bottom: 0.3rem;
+}
+
+.waste-sub {
+  font-size: 0.8rem;
+  color: var(--bleu-moyen);
+}
+
+.waste-sub-item {
+  font-size: 0.82rem;
+  color: var(--bleu-moyen);
+  padding-left: 1.2rem;
+  font-style: italic;
 }
 
 /* Réduction de la largeur des sections FAQ de 33% et centrage du texte */
@@ -247,25 +290,48 @@ body {
 
 /* Centrage de la liste des heures */
 .hours-list .bh-row {
-  justify-content: center;
+  display: flex;
+  justify-content: flex-start;
   font-weight: 500;
   margin-bottom: 4px;
+  gap: 0.5rem;
 }
 
 .hours-list .bh-day {
-  width: 40px;
+  width: 80px;
   color: var(--bleu-fonce);
 }
 
 /* ========== DAY PLANNER GRAPH ========== */
 .planner-wrapper {
+  flex: 1 1 320px;
+  max-width: 600px;
   padding: 1.5rem;
   background: #fff;
-  width: 100%;
-  max-width: 600px; /* Taille optimale pour la lisibilité */
   border-radius: 16px;
   border: 1px solid rgba(0,0,0,0.08);
   box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+/* ========== MOBILE: stack FAQ vertically ========== */
+@media (max-width: 768px) {
+  .faq-flex-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .faq-info {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .hours-list .bh-row {
+    justify-content: center;
+  }
+
+  .planner-wrapper {
+    max-width: 100%;
+  }
 }
 
 .day-planner {
@@ -318,19 +384,30 @@ body {
 
 .planner-column:last-child { border-right: none; }
 
+.planner-column.is-today {
+  background: rgba(161, 155, 128, 0.15);
+  border-radius: 8px;
+}
+
+.planner-column.is-today .day-label {
+  color: var(--orange);
+  font-weight: 800;
+}
+
 .day-label {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 700;
   color: var(--bleu-moyen);
   margin-top: auto;
   padding-top: 10px;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .time-track {
   position: absolute;
   top: 0; bottom: 30px;
   width: 12px;
-  background: #f0f0f0;
   border-radius: 6px;
 }
 
@@ -341,6 +418,25 @@ body {
   border-radius: 6px;
   opacity: 0.9;
   z-index: 2;
+}
+
+.time-bar.closure {
+  background: #5b9bd5;
+  opacity: 0.75;
+}
+
+.cleaning-note {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  color: #5b9bd5;
+  font-style: italic;
+}
+
+.planner-legend {
+  margin-top: 0.5rem;
+  font-size: 0.72rem;
+  color: #5b9bd5;
+  text-align: center;
 }
 
 .now-indicator {
@@ -358,7 +454,6 @@ body {
   width: 100%;
   max-width: 700px;
   margin: 0 auto;
-  aspect-ratio: 1.4 / 1; /* Ratio d'aspect standard de calendrier paysage */
   background: #fff;
   border-radius: 12px;
   border: 1px solid var(--bleu-pale);
@@ -369,25 +464,27 @@ body {
 .calendar-header {
   background: var(--bleu-fonce);
   color: #fff;
-  padding: 1rem;
+  padding: 0.75rem;
   text-align: center;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 600;
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  background-color: var(--bleu-pale); /* Grid lines color */
-  gap: 1px; /* The grid lines */
+  grid-auto-rows: 1fr;
+  background-color: var(--bleu-pale);
+  gap: 1px;
   border-bottom: 1px solid var(--bleu-pale);
+  aspect-ratio: 7 / 5;
 }
 
 .calendar-day-name {
   background: #f8f9fa;
-  padding: 0.75rem 0.25rem;
+  padding: 0.5rem 0.25rem;
   text-align: center;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--bleu-fonce);
@@ -395,10 +492,10 @@ body {
 
 .calendar-day {
   background: #fff;
-  min-height: 80px;
-  padding: 0.5rem;
+  padding: 0.35rem;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   transition: background 0.2s ease;
 }
 
@@ -425,16 +522,15 @@ body {
 .day-num {
   font-size: 0.85rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   color: var(--bleu-fonce);
 }
 
 .day-icons {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  font-size: 1.4rem;
-  justify-content: center;
+  flex-direction: row;
+  gap: 2px;
+  font-size: 1rem;
   margin-top: auto;
 }
 
