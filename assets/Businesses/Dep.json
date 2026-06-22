@@ -1,0 +1,23 @@
+{
+  "name": "Le 35",
+  "description": "Dépanneur",
+  "business_hours": {
+    "monday": "08:00 AM - 10:00 PM",
+    "tuesday": "08:00 AM - 10:00 PM",
+    "wednesday": "08:00 AM - 10:00 PM",
+    "thursday": "08:00 AM - 10:00 PM",
+    "friday": "08:00 AM - 10:00 PM",
+    "saturday": "08:00 AM - 10:00 PM",
+    "sunday": "08:00 AM - 10:00 PM"
+  },
+  "images": [
+    "Dep_01.jpg"
+  ],
+  "website": null,
+  "social_media": {
+    "instagram": null,
+    "facebook": null,
+    "twitter": null,
+    "linkedin": null
+  }
+}
