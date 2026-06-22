@@ -519,6 +519,13 @@ async function fetchMontrealEvents() {
 export async function initBusinessGallery() {
   const galleryTrack = document.getElementById('business-gallery-track');
   if (!galleryTrack) return;
+  // Reset carousel state so initEnhancedCarousels will re-clone after rebuild
+  const container = galleryTrack.closest('.carousel-container');
+  if (container) {
+    delete container.dataset.listenersAttached;
+    clearTimeout(container.autoPlayTimeout);
+    clearInterval(container.autoPlayTimer);
+  }
   const lang = document.documentElement.lang || 'fr';
 
   try {
