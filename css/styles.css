@@ -173,7 +173,7 @@ body {
   background: var(--bleu-pale);
   overflow: hidden;
   scroll-margin-top: 5rem;
-  contain: layout style;
+  box-shadow: inset 0 8px 24px rgba(0,0,0,0.08), inset 0 -8px 24px rgba(0,0,0,0.08);
 }
 
 /* Fixed Background Layer */
@@ -185,7 +185,7 @@ body {
   width: 100%;
   height: 100%;
   background-image: var(--section-bg);
-  background-attachment: scroll;
+  background-attachment: fixed;
   background-size: cover;
   background-position: center;
   opacity: 0.45;
@@ -1146,7 +1146,7 @@ body {
   text-align: center;
   padding: 2rem;
   background: linear-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.4)), url('../assets/Quartier/quartier-parc.webp');
-  background-attachment: scroll;
+  background-attachment: fixed;
   background-size: cover;
   background-position: center;
 }
