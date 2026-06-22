@@ -1,0 +1,24 @@
+name: Deploy main to root
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-root:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Deploy to gh-pages root
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
+          keep_files: true
+          commit_message: "Deploy main to root [skip ci]"
