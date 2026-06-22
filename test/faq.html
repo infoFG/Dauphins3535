@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQ — Les Dauphins-sur-le-Parc</title>
+  <link rel="icon" type="image/webp" href="assets/logo-menu.webp">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="js/password-gate.js"></script>
+</head>
+<body class="content-page">
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
+  <div class="lang-switch">
+    <button id="lang-fr" class="active">FR</button>
+    <button id="lang-en">EN</button>
+  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="assets/logo-menu.webp" alt="Les Dauphins-sur-le-Parc">
+      <h1>Les Dauphins-sur-le-Parc</h1>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li><a href="index.html#apropos" data-i18n="nav_about">À propos</a></li>
+        <li><a href="index.html#installations" data-i18n="nav_amenities">Installations</a></li>
+        <li><a href="index.html#galerie-commerciale" data-i18n="nav_gallery">Galerie Commerciale</a></li>
+        <li class="nav-sub"><a href="businesses.html" class="nav-page-link">Liste complète</a></li>
+        <li><a href="index.html#communaute" data-i18n="nav_community">Événements</a></li>
+        <li class="nav-sub"><a href="events.html" class="nav-page-link">Communauté</a></li>
+        <li><a href="index.html#valeurs" data-i18n="nav_values">Valeurs</a></li>
+        <li class="nav-sub"><a href="faq.html" data-i18n="nav_faq" class="nav-page-link active">FAQ</a></li>
+        <li><a href="index.html#condoweb" data-i18n="nav_condoweb">CondoWeb</a></li>
+        <li><a href="index.html#quartier" data-i18n="nav_neighborhood">Vie de quartier</a></li>
+        <li class="nav-sub"><a href="events-list.html" class="nav-page-link">Événements à venir</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <!-- SECTION: Administration - 6am to 6pm -->
+    <section class="section" id="faq-admin">
+      <div class="section-inner">
+        <div class="content-box">
+          <h2 class="section-title" data-i18n="faq_admin_title">Bureau de l'administration</h2>
+          <div class="section-content faq-flex-wrapper">
+            <div class="faq-info">
+              <p data-i18n="faq_admin_hours">Lundi au vendredi : 9h00 à 17h00</p>
+            </div>
+            <div class="planner-wrapper">
+              <div id="planner-admin" class="day-planner" data-config="admin"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: Piscine & Gym - Full Day -->
+    <section class="section" id="faq-pool">
+      <div class="section-inner">
+        <div class="content-box">
+          <h2 class="section-title" data-i18n="faq_pool_title">Piscine & Gym</h2>
+          <div class="section-content faq-flex-wrapper">
+            <div class="faq-info">
+              <p data-i18n="faq_pool_hours">Tous les jours : 6h00 à 22h00</p>
+            </div>
+            <div class="planner-wrapper">
+              <div id="planner-pool" class="day-planner" data-config="pool"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: Collectes - Detailed Info + Calendar -->
+    <section class="section" id="faq-waste">
+      <div class="section-inner">
+        <div class="content-box">
+          <h2 class="section-title" data-i18n="faq_waste_title">Collectes des matières résiduelles</h2>
+          <div class="section-content faq-flex-wrapper">
+            <div class="faq-info">
+              <p class="waste-hours-note" data-i18n="waste_hours_note">Toutes les collectes : entre 19h la veille et 7h le jour de la collecte. Déposer les contenants devant l'immeuble au plus près de la voie publique, en gardant le trottoir libre.</p>
+              <ul class="waste-list">
+                <li><strong data-i18n="waste_household_title">Ordures ménagères</strong> — <span data-i18n="waste_household_day">Mardi</span></li>
+                <li><strong data-i18n="waste_recycling_title">Recyclage</strong> — <span data-i18n="waste_recycling_day">Mardi</span></li>
+                <li><strong data-i18n="waste_organic_title">Matières organiques</strong> <span class="waste-sub" data-i18n="waste_organic_sub">(inclut résidus alimentaires et résidus verts)</span> — <span data-i18n="waste_organic_day">Vendredi</span></li>
+                <li><strong data-i18n="waste_bulky_title">Objets encombrants et résidus de construction</strong> — <span data-i18n="waste_bulky_day">2e et 4e lundis du mois</span></li>
+                <li class="waste-sub-item" data-i18n="waste_bulky_moving">+ collecte supplémentaire : lundi 6 juillet 2026</li>
+                <li><strong data-i18n="waste_xmas_trees_label">Arbres de Noël naturels</strong> — <span data-i18n="waste_xmas_trees_dates">Lundis 12 et 19 janvier 2026</span></li>
+              </ul>
+            </div>
+            <div class="planner-wrapper">
+              <div id="waste-calendar"></div>
+            </div>
+          </div>
+          <div style="margin-top: 2rem;">
+            <a href="index.html" class="hero-cta" style="padding: 0.6rem 1.5rem; font-size: 0.8rem;">← Retour Accueil</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div style="text-align:center; padding:2rem 1rem 3rem;">
+      <img src="assets/logo-menu.webp" alt="Les Dauphins-sur-le-Parc" style="width:60px; height:auto; opacity:0.5;" />
+    </div>
+  </main>
+
+  <div id="lightbox" class="lightbox">
+    <img id="lightbox-img" src="" alt="View">
+    <div id="lightbox-caption" class="lightbox-caption"></div>
+    <button id="lightboxClose" class="lightbox-close" aria-label="Fermer">✕</button>
+  </div>
+
+  <script src="translations.js"></script>
+  <script type="module" src="main.js"></script>
+</body>
+</html>

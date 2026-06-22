@@ -1,0 +1,23 @@
+{
+  "name": "JaJi santé clinique",
+  "description": "Soins des pieds, orthoplastie, ongles incarnés et soins à domicile par une infirmière auxiliaire certifiée.",
+  "business_hours": {
+    "monday": "08:00 AM - 06:00 PM",
+    "tuesday": "08:00 AM - 03:00 PM",
+    "wednesday": "08:00 AM - 03:00 PM",
+    "thursday": "08:00 AM - 06:00 PM",
+    "friday": "08:00 AM - 06:00 PM",
+    "saturday": "09:00 AM - 06:00 PM",
+    "sunday": "Closed"
+  },
+  "images": [
+    "Jaji_01.jpg"
+  ],
+  "website": "https://jajiclinique.ca/",
+  "social_media": {
+    "instagram": null,
+    "facebook": null,
+    "twitter": null,
+    "linkedin": null
+  }
+}

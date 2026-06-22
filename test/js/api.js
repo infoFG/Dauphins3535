@@ -1,0 +1,660 @@
+import { escapeHtml, formatBusinessHours, isCurrentlyOpen } from './utils.js';
+
+const EVENTS_CACHE_KEY = 'dauphins_events_cache';
+const CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // Refresh from API weekly
+const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+
+function formatTimeForDisplay(raw) {
+  if (!raw || !raw.trim()) return '';
+  const t = raw.trim();
+  const parsed = new Date('2000-01-01 ' + t);
+  if (isNaN(parsed.getTime())) return t;
+  const lang = document.documentElement.lang || 'fr';
+  if (lang === 'fr') {
+    return parsed.getHours().toString().padStart(2, '0') + 'h' + parsed.getMinutes().toString().padStart(2, '0');
+  }
+  return parsed.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+}
+
+const TIMES_CACHE_KEY = 'dauphins_event_times';
+
+function loadTimeCache() {
+  try { return JSON.parse(localStorage.getItem(TIMES_CACHE_KEY) || '{}'); }
+  catch { return {}; }
+}
+
+function saveTimeCache(cache) {
+  try { localStorage.setItem(TIMES_CACHE_KEY, JSON.stringify(cache)); }
+  catch { /* storage full */ }
+}
+
+async function fetchEventTime(url) {
+  if (!url || url === '#') return '';
+  const cache = loadTimeCache();
+  if (cache[url] !== undefined) return cache[url];
+
+  try {
+    const resp = await fetch(CORS_PROXY + encodeURIComponent(url));
+    if (!resp.ok) return '';
+    const html = await resp.text();
+    // Try JSON-LD startDate first
+    let match = html.match(/"startDate"\s*:\s*"([^"]+)"/);
+    if (!match) match = html.match(/datetime="(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})/);
+    if (match) {
+      const dt = new Date(match[1]);
+      if (!isNaN(dt.getTime())) {
+        const h = dt.getHours().toString().padStart(2, '0');
+        const m = dt.getMinutes().toString().padStart(2, '0');
+        const result = h + ':' + m; // Store as HH:MM, format at display time
+        cache[url] = result;
+        saveTimeCache(cache);
+        return result;
+      }
+    }
+    cache[url] = ''; // Cache negative result too
+    saveTimeCache(cache);
+    return '';
+  } catch { return ''; }
+}
+
+export { fetchEventTime };
+
+// ---- Thumbnail helpers exported for events-list ----
+export { getThumbCache };
+
+async function fetchEventThumbnail(url) {
+  if (!url || !url.includes('montreal.ca/evenements/')) return '';
+  const cache = getThumbCache();
+  if (cache[url]) return cache[url];
+  try {
+    const resp = await fetch(CORS_PROXY + encodeURIComponent(url));
+    const html = await resp.text();
+    const match = html.match(/<meta\s+property="og:image"\s+content="([^"]+)"/i);
+    if (match && match[1]) {
+      const thumbUrl = match[1].replace(/w_\d+,h_\d+/g, 'w_400,c_fill');
+      setThumbCache(url, thumbUrl);
+      return thumbUrl;
+    }
+  } catch { /* keep fallback */ }
+  return '';
+}
+
+export { fetchEventThumbnail };
+
+function loadCachedEvents() {
+  try {
+    const raw = localStorage.getItem(EVENTS_CACHE_KEY);
+    if (!raw) return [];
+    const cached = JSON.parse(raw);
+    // Clean past events, keep future ones
+    const now = new Date(); now.setHours(0,0,0,0);
+    const future = (cached.events || []).filter(e => new Date(e.date + 'T00:00:00') >= now);
+    return future;
+  } catch (e) { return []; }
+}
+
+function saveCachedEvents(events) {
+  try {
+    localStorage.setItem(EVENTS_CACHE_KEY, JSON.stringify({
+      timestamp: Date.now(),
+      events: events
+    }));
+  } catch (e) { /* storage full */ }
+}
+
+async function refreshEventsFromAPI(cached) {
+  // Build map of cached events by link for merging
+  const cachedByLink = {};
+  cached.forEach(e => { if (e.link) cachedByLink[e.link] = e; });
+
+  const needsRefresh = !cached.length || Date.now() - (JSON.parse(localStorage.getItem(EVENTS_CACHE_KEY) || '{}').timestamp || 0) > CACHE_TTL;
+  
+  if (!needsRefresh) return cached;
+
+  try {
+    const [staticEvents, dynamicEvents] = await Promise.all([
+      fetchStaticEvents(),
+      fetchMontrealEvents()
+    ]);
+
+    // Merge: keep cached thumbnails, add new events
+    const fresh = [...(staticEvents || []), ...(dynamicEvents || [])];
+    const merged = fresh.map(e => {
+      // If we already have this event cached, preserve its image/thumbnail
+      if (e.link && cachedByLink[e.link]) {
+        return { ...e, image: cachedByLink[e.link].image || e.image };
+      }
+      return e;
+    });
+
+    // Also keep any cached events not in the fresh list (community events from sheets)
+    const freshLinks = new Set(fresh.map(e => e.link));
+    const uncached = Object.values(cachedByLink).filter(e => !freshLinks.has(e.link));
+
+    return [...merged, ...uncached];
+  } catch (e) { return cached; }
+}
+
+export async function initEventsCarousel() {
+  const track = document.getElementById('events-carousel-track');
+  if (!track) return;
+
+  const lang = document.documentElement.lang || 'fr';
+
+  const render = (events) => {
+    if (!events || events.length === 0) {
+      const emptyMsg = window.translations?.[lang]?.events_empty || 'Aucun événement trouvé pour le moment.';
+      track.innerHTML = `<p class="loading-msg">${emptyMsg}</p>`;
+      return null;
+    }
+
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    // Deduplicate, filter past, sort chronologically
+    const seen = new Set();
+    const allUpcoming = events
+      .filter(e => new Date(e.date + 'T00:00:00') >= now)
+      .filter(e => {
+        const key = (e.link || '').trim();
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .sort((a, b) => new Date(a.date + 'T00:00:00') - new Date(b.date + 'T00:00:00'));
+
+    // Show next 7 days first, then fill up to 12 with later events
+    const nextWeek = new Date(now);
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    const withinWeek = allUpcoming.filter(e => new Date(e.date + 'T00:00:00') <= nextWeek);
+    const later = allUpcoming.filter(e => new Date(e.date + 'T00:00:00') > nextWeek);
+    const upcoming = [...withinWeek, ...later].slice(0, 12);
+
+    if (upcoming.length === 0) {
+      const emptyMsg = window.translations?.[lang]?.events_empty || 'Aucun événement trouvé pour le moment.';
+      track.innerHTML = `<p class="loading-msg">${emptyMsg}</p>`;
+      return null;
+    }
+
+    const loadingMsg = window.translations?.[lang]?.carousel_loading || 'Chargement…';
+
+    track.innerHTML = upcoming.map(event => {
+      const title = lang === 'en' && event.title_en ? event.title_en : event.title;
+      const location = lang === 'en' && event.location_en ? event.location_en : event.location;
+      const source = lang === 'en' && event.source_en ? event.source_en : event.source;
+      const dateStr = new Date(event.date + 'T00:00:00').toLocaleDateString(
+        lang === 'en' ? 'en-CA' : 'fr-CA',
+        { weekday: 'long', month: 'long', day: 'numeric' }
+      );
+      const timeStr = event.time ? ` — ${formatTimeForDisplay(event.time)}` : '';
+      const primary = getPrimaryImage(event);
+
+      return `
+      <a href="${escapeHtml(event.link)}" target="_blank" rel="noopener" class="carousel-card" draggable="false">
+        <img src="${escapeHtml(primary)}" alt="${escapeHtml(title)}" loading="lazy">
+        <div class="card-content">
+          <div class="card-date">${dateStr}${timeStr}</div>
+          <h4 class="card-title">${escapeHtml(title)}</h4>
+          <div class="card-location">📍 ${escapeHtml(location)}</div>
+          <div class="card-source">${escapeHtml(source)}</div>
+        </div>
+      </a>`;
+    }).join('');
+    return upcoming;
+  };
+
+  // Smart cache: clean past events, merge fresh data preserving thumbnails
+  let cachedEvents = loadCachedEvents();
+  const events = await refreshEventsFromAPI(cachedEvents);
+  saveCachedEvents(events);
+
+  // Always fetch community events (separate cache)
+  const communityEvents = await fetchCommunityEvents();
+  window._communityEvents = communityEvents;
+
+  const displayed = render(events);
+  if (displayed) {
+    // Store for language-switch re-renders
+    track._events = displayed;
+    fetchDynamicThumbnails(displayed);
+  }
+}
+
+export function reRenderEvents() {
+  const track = document.getElementById('events-carousel-track');
+  if (track && track._events) {
+    // Re-render with current language but don't re-fetch thumbnails
+    const lang = document.documentElement.lang || 'fr';
+    track.innerHTML = track._events.map(event => {
+      const title = lang === 'en' && event.title_en ? event.title_en : event.title;
+      const location = lang === 'en' && event.location_en ? event.location_en : event.location;
+      const source = lang === 'en' && event.source_en ? event.source_en : event.source;
+      const dateStr = new Date(event.date + 'T00:00:00').toLocaleDateString(
+        lang === 'en' ? 'en-CA' : 'fr-CA',
+        { weekday: 'long', month: 'long', day: 'numeric' }
+      );
+      const timeStr = event.time ? ` — ${formatTimeForDisplay(event.time)}` : '';
+      const primary = getPrimaryImage(event);
+      return `
+      <a href="${escapeHtml(event.link)}" target="_blank" rel="noopener" class="carousel-card" draggable="false">
+        <img src="${escapeHtml(primary)}" alt="${escapeHtml(title)}" loading="lazy">
+        <div class="card-content">
+          <div class="card-date">${dateStr}${timeStr}</div>
+          <h4 class="card-title">${escapeHtml(title)}</h4>
+          <div class="card-location">📍 ${escapeHtml(location)}</div>
+          <div class="card-source">${escapeHtml(source)}</div>
+        </div>
+      </a>`;
+    }).join('');
+  }
+}
+
+// ---- Image strategy: try remote thumbnails, fallback to local ----
+
+const FALLBACK_THEATRE = [
+  'assets/Quartier/quartier-theatre.webp',
+  'assets/Quartier/quartier-plateau.webp',
+  'assets/Quartier/quartier-user-3.webp'
+];
+const FALLBACK_PARC = [
+  'assets/Quartier/quartier-parc.webp',
+  'assets/Quartier/quartier-parc-lafontaine.webp',
+  'assets/Quartier/quartier-user-1.webp'
+];
+const FALLBACK_GENERAL = [
+  'assets/Quartier/quartier-plateau.webp',
+  'assets/Quartier/quartier-user-2.webp',
+  'assets/Quartier/quartier-user-4.webp'
+];
+
+export function getPrimaryImage(event) {
+  // 1. Explicit image (community events, static events)
+  if (event.image) return event.image;
+  // 2. Check persistent thumbnail cache (og:image scraped from event page)
+  if (event.link) {
+    const thumbCache = getThumbCache();
+    if (thumbCache[event.link]) return thumbCache[event.link];
+  }
+  // 3. Deterministic local fallback based on event link
+  return getFallbackLocal(event);
+}
+
+function getFallbackLocal(event) {
+  const loc = (event.location || '').toLowerCase();
+  let pool = FALLBACK_GENERAL;
+  if (loc.includes('verdure') || loc.includes('théâtre') || loc.includes('theatre')) {
+    pool = FALLBACK_THEATRE;
+  } else if (loc.includes('parc') || loc.includes('fontaine') || loc.includes('park')) {
+    pool = FALLBACK_PARC;
+  }
+  // Deterministic: hash the link so same event always gets same image
+  const key = event.link || event.title || '';
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) hash = ((hash << 5) - hash) + key.charCodeAt(i);
+  const idx = Math.abs(hash) % pool.length;
+  return pool[idx] || '';
+}
+
+// ---- Thumbnail cache (persistent, not tied to event cache TTL) ----
+const THUMB_CACHE_KEY = 'dauphins_thumb_cache';
+
+function getThumbCache() {
+  try {
+    const raw = localStorage.getItem(THUMB_CACHE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) { return {}; }
+}
+
+function setThumbCache(link, imageUrl) {
+  try {
+    const cache = getThumbCache();
+    cache[link] = imageUrl;
+    // Keep cache under ~1000 entries
+    const keys = Object.keys(cache);
+    if (keys.length > 1000) {
+      const oldest = keys.slice(0, keys.length - 900);
+      oldest.forEach(k => delete cache[k]);
+    }
+    localStorage.setItem(THUMB_CACHE_KEY, JSON.stringify(cache));
+  } catch (e) { /* storage full */ }
+}
+
+// After render, batch-fetch thumbnails for displayed events that lack them
+async function fetchDynamicThumbnails(events) {
+  const track = document.getElementById('events-carousel-track');
+  if (!track) return;
+
+  const thumbCache = getThumbCache();
+  const cards = track.querySelectorAll('.carousel-card');
+  const toFetch = [];
+
+  cards.forEach((card, i) => {
+    const event = events[i];
+    if (!event || event.image) return;
+    if (!event.link || !event.link.includes('montreal.ca/evenements/')) return;
+
+    // Check persistent thumbnail cache
+    if (thumbCache[event.link]) {
+      applyThumbToCard(card, thumbCache[event.link]);
+      return;
+    }
+
+    const img = card.querySelector('img');
+    if (img && img.complete && img.naturalWidth > 0) return; // local fallback loaded fine
+    toFetch.push({ card, event });
+  });
+
+  // Fetch in batches of 3 to avoid overwhelming the proxy
+  for (let i = 0; i < toFetch.length; i += 3) {
+    const batch = toFetch.slice(i, i + 3);
+    await Promise.allSettled(batch.map(async ({ card, event }) => {
+      try {
+        const proxyUrl = CORS_PROXY + encodeURIComponent(event.link);
+        const response = await fetch(proxyUrl);
+        const html = await response.text();
+        const match = html.match(/<meta\s+property="og:image"\s+content="([^"]+)"/i);
+        if (match && match[1]) {
+          const thumbUrl = match[1].replace(/w_\d+,h_\d+/g, 'w_400,c_fill');
+          setThumbCache(event.link, thumbUrl);
+          applyThumbToCard(card, thumbUrl);
+        }
+      } catch (e) { /* keep local fallback */ }
+    }));
+  }
+}
+
+function applyThumbToCard(card, url) {
+  const img = card.querySelector('img');
+  if (img) {
+    img.src = url;
+  }
+}
+
+async function fetchCommunityEvents() {
+  const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTns1Hpe-TBIjKUM7yjP_wI4cm75iy3R6Plfo7YR7r7TCA6H154T61O_B2sTV3Wj8V8Vf6ToslfSfKR/pub?gid=447995773&single=true&output=csv';
+  try {
+    const response = await fetch(SHEET_CSV);
+    if (!response.ok) return [];
+    const csvText = await response.text();
+    const lines = csvText.split(/\r?\n/);
+    if (lines.length < 2) return [];
+
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_'));
+    const dateIdx = headers.indexOf('event_date');
+    const titleIdx = headers.indexOf('event_name');
+    const timeIdx = headers.indexOf('start_time');
+    const endTimeIdx = headers.indexOf('end_time');
+    const imageIdx = headers.indexOf('image');
+    const approvedIdx = headers.indexOf('approved');
+    const urlIdx = headers.indexOf('event_url');
+    const locIdx = headers.indexOf('event_location');
+
+    return lines.slice(1).filter(l => l.trim()).map(line => {
+      // Proper CSV parsing with quote handling
+      const vals = [];
+      let cur = '', inQ = false;
+      for (const ch of line) {
+        if (ch === '"') { inQ = !inQ; }
+        else if (ch === ',' && !inQ) { vals.push(cur.trim().replace(/^"|"$/g, '')); cur = ''; }
+        else { cur += ch; }
+      }
+      vals.push(cur.trim().replace(/^"|"$/g, ''));
+      
+      const approved = (vals[approvedIdx] || '').toUpperCase();
+      if (approved !== 'TRUE' && approved !== 'YES') return null;
+
+      const dateStr = vals[dateIdx] || '';
+      const parsed = new Date(dateStr);
+      if (isNaN(parsed.getTime())) return null;
+
+      const timeVal = vals[timeIdx] || '';
+      const endVal = vals[endTimeIdx] || '';
+      const displayTime = timeVal ? formatDisplayTime(timeVal, endVal) : '';
+      const rawImg = vals[imageIdx] || '';
+      const eventUrl = vals[urlIdx] || '';
+      const eventLoc = vals[locIdx] || '';
+
+      // Convert Google Drive links to embeddable images
+      let imgUrl = '';
+      if (rawImg) {
+        const driveMatch = rawImg.match(/[?&]id=([a-zA-Z0-9_-]+)/) || rawImg.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (driveMatch) {
+          imgUrl = `https://lh3.googleusercontent.com/d/${driveMatch[1]}=w400`;
+        } else {
+          imgUrl = rawImg;
+        }
+      }
+
+      return {
+        title: vals[titleIdx] || 'Événement communautaire',
+        title_en: vals[titleIdx] || 'Community Event',
+        date: parsed.toISOString().split('T')[0],
+        time: displayTime,
+        location: eventLoc || 'Immeuble',
+        location_en: eventLoc || 'Building',
+        source: 'Communauté',
+        source_en: 'Community',
+        link: eventUrl || '#',
+        description: (vals[headers.indexOf('description')] || '').substring(0, 200),
+        image: imgUrl
+      };
+    }).filter(Boolean);
+  } catch (e) { console.warn('Community events fetch failed:', e); return []; }
+}
+
+function formatDisplayTime(start, end) {
+  const s = formatTimeForDisplay(start);
+  const e = formatTimeForDisplay(end);
+  if (s && e) return s + '–' + e;
+  return s || e;
+}
+
+async function fetchStaticEvents() {
+  try {
+    const response = await fetch('assets/Events/events.json');
+    if (!response.ok) return [];
+    return await response.json();
+  } catch (e) { return []; }
+}
+
+async function fetchMontrealEvents() {
+  const DATASET_API = 'https://donnees.montreal.ca/api/3/action/package_show?id=evenements-publics';
+  try {
+    const metaResponse = await fetch(DATASET_API);
+    if (!metaResponse.ok) return [];
+    const metaData = await metaResponse.json();
+    
+    const csvResource = metaData.result.resources.find(r => r.format.toUpperCase() === 'CSV');
+    if (!csvResource?.url) return [];
+
+    const csvResponse = await fetch(csvResource.url);
+    if (!csvResponse.ok) return [];
+    const csvText = await csvResponse.text();
+
+    // Parse CSV
+    const lines = csvText.split(/\r?\n/);
+    if (lines.length < 2) return [];
+    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+
+    const records = lines.slice(1).filter(line => line.trim()).map(line => {
+      const values = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"' && (i === 0 || line[i - 1] !== '\\')) inQuotes = !inQuotes;
+        else if (char === ',' && !inQuotes) {
+          values.push(current.trim().replace(/^"|"$/g, ''));
+          current = '';
+        } else current += char;
+      }
+      values.push(current.trim().replace(/^"|"$/g, ''));
+      const obj = {};
+      headers.forEach((h, i) => { obj[h] = values[i] || ''; });
+      return obj;
+    });
+
+    // Filter: Plateau-Mont-Royal borough (code PMR or name match)
+    return records
+      .filter(r => {
+        const arr = (r.arrondissement || '').toLowerCase();
+        return arr === 'le plateau-mont-royal' || arr === 'pmr';
+      })
+      .map(r => ({
+        title: r.titre || 'Événement',
+        title_en: r.titre || 'Event',
+        date: r.date_debut || '',
+        time: '',
+        location: r.emplacement || 'Plateau-Mont-Royal',
+        location_en: r.emplacement || 'Plateau-Mont-Royal',
+        source: r.emplacement || '',
+        source_en: r.emplacement || '',
+        link: r.url_fiche || '#',
+        description: (r.description || '').replace(/<[^>]*>/g, '').substring(0, 200),
+        image: ''
+      }));
+  } catch (e) { console.warn('Montreal events fetch failed:', e); return []; }
+}
+
+export async function initBusinessGallery() {
+  const galleryTrack = document.getElementById('business-gallery-track');
+  if (!galleryTrack) return;
+  const lang = document.documentElement.lang || 'fr';
+
+  try {
+    const registryResponse = await fetch('assets/Businesses/Registery.json');
+    if (!registryResponse.ok) {
+      console.warn('Business registry not found.');
+      galleryTrack.innerHTML = '<p class="loading-msg">Galerie temporairement indisponible.</p>';
+      return;
+    }
+    const registry = await registryResponse.json();
+    const businessFiles = registry?.Businesses || [];
+
+    const businessData = await Promise.all(businessFiles.map(async (filename) => {
+      const response = await fetch(`assets/Businesses/${filename}`);
+      if (!response.ok) return null;
+      const data = await response.json();
+      return { ...data, folder: filename.replace('.json', '') };
+    }));
+
+    const firstValidBusiness = businessData.find(b => b && b.images && b.images.length > 0);
+    if (firstValidBusiness) {
+      const section = galleryTrack.closest('.section');
+      if (section) {
+        // We use ../ here because relative paths in CSS variables used in a stylesheet 
+        // are resolved relative to the stylesheet's location (/css/styles.css)
+        section.style.setProperty('--section-bg', `url("../assets/Businesses/${firstValidBusiness.images[0]}")`);
+      }
+    }
+
+    const cards = businessData.filter(Boolean).flatMap((business) => {
+      return (business.images || []).map((image) => {
+        const imageUrl = `assets/Businesses/${image}`;
+        const fallbackImageUrl = `assets/Businesses/${business.folder}/${image}`;
+        const hoursHtml = business.business_hours ? formatBusinessHours(business.business_hours, lang) : '';
+        
+        const status = business.business_hours ? isCurrentlyOpen(business.business_hours) : '';
+        const statusKey = 'status_' + status;
+        const statusText = status ? (window.translations?.[lang]?.[statusKey] || status) : '';
+        const statusBadge = status ? `<p class="status-badge status-${status}">${statusText}</p>` : '';
+        
+        const ensureProtocol = (url) => (url && !url.startsWith('http')) ? `https://${url}` : url;
+
+        let linksHtml = '';
+        if (business.website) {
+          const siteUrl = ensureProtocol(business.website);
+          linksHtml += `<a href="${escapeHtml(siteUrl)}" target="_blank" rel="noopener"><span class="icon">🌐</span> Site web</a>`;
+        }
+        if (business.social_media) {
+          const platforms = {
+            facebook: { icon: '📘', label: 'Facebook' },
+            instagram: { icon: '📸', label: 'Instagram' },
+            twitter: { icon: '🐦', label: 'Twitter' },
+            linkedin: { icon: '💼', label: 'LinkedIn' }
+          };
+          Object.entries(business.social_media).forEach(([key, url]) => {
+            if (url && platforms[key] && typeof url === 'string') {
+              const socialUrl = ensureProtocol(url);
+              linksHtml += `<a href="${escapeHtml(socialUrl)}" target="_blank" rel="noopener"><span class="icon">${platforms[key].icon}</span> ${platforms[key].label}</a>`;
+            }
+          });
+        }
+
+        return `
+          <div class="business-carousel-card lightbox-trigger" aria-label="${escapeHtml(business.name)}">
+            <div class="business-header">
+              <div class="business-name">${escapeHtml(business.name)}</div>
+              <div class="business-desc">${escapeHtml(business.description || '')}</div>
+              ${statusBadge}
+            </div>
+            <img src="${imageUrl}" alt="${escapeHtml(business.name)}" loading="lazy" draggable="false" class="lightbox-trigger" onerror="if (this.src !== '${fallbackImageUrl}') this.src='${fallbackImageUrl}'" />
+            <div class="business-overlay">
+              <div class="business-hours">${hoursHtml}</div>
+              <div class="business-links">
+                ${linksHtml}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    });
+
+    if (cards.length === 0) {
+      galleryTrack.innerHTML = '<p class="loading-msg">Aucune image disponible.</p>';
+    } else {
+      galleryTrack.innerHTML = cards.join('');
+    }
+  } catch (error) {
+    console.error('Erreur galerie:', error);
+  }
+}
+
+// ---- Community Events Carousel (separate from main events) ----
+export function initCommunityCarousel() {
+  const track = document.getElementById('community-carousel-track');
+  const section = document.getElementById('communaute');
+  if (!track || !section) return;
+
+  const events = window._communityEvents || [];
+  if (events.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = '';
+  const lang = document.documentElement.lang || 'fr';
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+
+  const upcoming = events
+    .filter(e => new Date(e.date + 'T00:00:00') >= now)
+    .sort((a, b) => new Date(a.date + 'T00:00:00') - new Date(b.date + 'T00:00:00'));
+
+  // Show all upcoming community events (no 12-item cap)
+
+  if (upcoming.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  track.innerHTML = upcoming.map(event => {
+    const title = lang === 'en' && event.title_en ? event.title_en : event.title;
+    const dateStr = new Date(event.date + 'T00:00:00').toLocaleDateString(
+      lang === 'en' ? 'en-CA' : 'fr-CA',
+      { weekday: 'long', month: 'long', day: 'numeric' }
+    );
+    const img = event.image || getFallbackLocal(event);
+    const fallback = img !== getFallbackLocal(event) ? ` onerror="this.src='${escapeHtml(getFallbackLocal(event))}';this.onerror=null"` : '';
+    const hasLink = event.link && event.link !== '#';
+    return `
+    <a href="${escapeHtml(event.link)}" ${hasLink ? 'target="_blank" rel="noopener"' : ''} class="carousel-card" draggable="false">
+      <img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" loading="lazy"${fallback}>
+      <div class="card-content">
+        <div class="card-date">${dateStr}${event.time ? ` — ${formatTimeForDisplay(event.time)}` : ''}</div>
+        <h4 class="card-title">${escapeHtml(title)}</h4>
+        <div class="card-location">📍 ${escapeHtml(event.location_en && lang === 'en' ? event.location_en : event.location)}</div>
+      </div>
+    </a>`;
+  }).join('');
+}
