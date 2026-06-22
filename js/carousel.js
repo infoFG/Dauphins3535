@@ -186,7 +186,13 @@ export function initEnhancedCarousels() {
 
     track.addEventListener('pointerdown', (e) => {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
-      // Prevent link drag behavior when dragging on cards
+      // On touch: let the browser handle native scrolling
+      if (e.pointerType === 'touch') {
+        stopAutoPlay();
+        track.isAnimationCanceled = true;
+        return;
+      }
+      // Mouse: prevent link drag behavior
       if (e.target.closest('a')) {
         e.preventDefault();
       }

@@ -1276,7 +1276,6 @@ body {
   color: inherit;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: pan-y;
 }
 
 .carousel-card:hover {
