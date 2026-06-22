@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events at Le Dauphin — Les Dauphins-sur-le-Parc</title>
+  <link rel="icon" type="image/webp" href="assets/logo-menu.webp">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body { font-family: 'Segoe UI', system-ui, sans-serif; color: #3A2404; background: #fafafa; }
+    .content-box { opacity: 1 !important; transform: none !important; }
+    .main-content { min-height: auto !important; display: flex; flex-direction: column; min-height: 100vh; }
+    #events-page { flex: 1; padding: 4rem 1rem 1rem !important; }
+    .events-footer { flex-shrink: 0; height: 80px; display: flex; align-items: center; justify-content: center; }
+  </style>
+</head>
+<body class="content-page">
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
+  <div class="lang-switch">
+    <button id="lang-fr" class="active">FR</button>
+    <button id="lang-en">EN</button>
+  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="assets/logo-menu.webp" alt="Les Dauphins-sur-le-Parc">
+      <h1>Les Dauphins-sur-le-Parc</h1>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li><a href="index.html#apropos" data-i18n="nav_about">À propos</a></li>
+        <li><a href="index.html#installations" data-i18n="nav_amenities">Installations</a></li>
+        <li><a href="index.html#galerie-commerciale" data-i18n="nav_gallery">Galerie Commerciale</a></li>
+        <li><a href="index.html#valeurs" data-i18n="nav_values">Valeurs</a></li>
+        <li class="nav-sub"><a href="faq.html" data-i18n="nav_faq" class="nav-page-link">FAQ</a></li>
+        <li><a href="index.html#condoweb" data-i18n="nav_condoweb">CondoWeb</a></li>
+        <li><a href="index.html#quartier" data-i18n="nav_neighborhood">Vie de quartier</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <section class="section" id="events-page">
+      <div class="section-inner">
+        <div class="content-box">
+          <h1 class="section-title">Événements communautaires</h1>
+          <p style="margin-bottom:2rem;">Événements soumis par les résidents de l'immeuble.</p>
+          <div id="events-list" class="events-list">
+            <p class="loading-msg">Chargement des événements…</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="events-footer" style="text-align:center;">
+      <img src="assets/logo-menu.webp" alt="Les Dauphins-sur-le-Parc" style="width:60px; height:auto; opacity:0.5;" />
+    </div>
+  </main>
+
+  <script src="translations.js"></script>
+  <script type="module">
+    import { initMenu, initLanguage } from './js/ui.js';
+    initMenu();
+    initLanguage();
+  </script>
+  <script>
+    // Wait for UI module to initialize, then load community events
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Set random background from Commereciale images
+      try {
+        const res = await fetch('assets/Commereciale/images.json');
+        const images = await res.json();
+        const bg = images[Math.floor(Math.random() * images.length)];
+        document.getElementById('events-page').style.setProperty('--section-bg', 'url("../assets/Commereciale/' + bg + '")');
+      } catch(e) {}
+      
+      setTimeout(loadCommunityEvents, 100);
+    });
+
+    const lang = () => document.documentElement.lang || 'fr';
+    const list = () => document.getElementById('events-list');
+    const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTns1Hpe-TBIjKUM7yjP_wI4cm75iy3R6Plfo7YR7r7TCA6H154T61O_B2sTV3Wj8V8Vf6ToslfSfKR/pub?gid=447995773&single=true&output=csv';
+
+    function renderEvents(events) {
+      const l = list();
+      if (!events.length) {
+        l.innerHTML = '<p style="color:#3A2404;padding:2rem;">Aucun événement communautaire à venir.</p>';
+        return;
+      }
+      const currentLang = lang();
+      l.innerHTML = events.map(e => {
+        const title = currentLang === 'en' && e.title_en ? e.title_en : e.title;
+        const dateStr = new Date(e.date + 'T00:00:00').toLocaleDateString(
+          currentLang === 'en' ? 'en-CA' : 'fr-CA',
+          { weekday: 'long', month: 'long', day: 'numeric' }
+        );
+        const hasLink = e.link && e.link !== '#';
+        const imgHtml = e.image ? '<a href="' + (e.link || '#') + '" ' + (hasLink ? 'target="_blank" rel="noopener"' : '') + ' style="flex-shrink:0;width:240px;aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:#f0f0f0;"><img src="' + e.image + '" alt="" style="width:100%;height:100%;object-fit:contain;" loading="lazy" onerror="this.parentElement.style.display=\'none\'"></a>' : '';
+        const descHtml = e.description ? '<p style="font-size:0.9rem;color:#606059;margin:0.5rem 0;line-height:1.5;">' + e.description + '</p>' : '';
+        const contactHtml = e.contact ? '<div style="font-size:0.8rem;color:#B8B09A;margin-top:0.5rem;">📞 ' + e.contact + '</div>' : '';
+        
+        return '<div style="display:flex;gap:1rem;padding:1rem;background:#fff;border:1px solid #D3D8D6;border-radius:10px;color:#3A2404;margin-bottom:1rem;font-family:Segoe UI,system-ui,sans-serif;flex-wrap:wrap;">' +
+          imgHtml +
+          '<div style="flex:1;min-width:0;">' +
+            '<div style="font-size:0.8rem;color:#A19B80;font-weight:600;margin-bottom:0.25rem;">' + dateStr + (e.time ? ' — ' + e.time : '') + '</div>' +
+            '<h3 style="font-size:1rem;margin:0 0 0.25rem;color:#3A2404;">' + title + '</h3>' +
+            (e.location ? '<div style="font-size:0.8rem;color:#B8B09A;">📍 ' + e.location + '</div>' : '') +
+            descHtml +
+            contactHtml +
+            (hasLink ? '<a href="' + e.link + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:0.5rem;font-size:0.8rem;color:#A19B80;">Plus d\'info →</a>' : '') +
+          '</div>' +
+          '</div>';
+      }).join('');
+    }
+
+    async function loadCommunityEvents() {
+      const l = list();
+      try {
+        l.innerHTML = '<p style="color:#B8B09A;font-style:italic;padding:2rem;">Chargement des événements…</p>';
+        const res = await fetch(SHEET_CSV);
+        const text = await res.text();
+        const lines = text.split(/\r?\n/);
+        if (lines.length < 2) { renderEvents([]); return; }
+
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        const dateIdx = headers.indexOf('event date');
+        const titleIdx = headers.indexOf('event name');
+        const descIdx = headers.indexOf('event description');
+        const timeIdx = headers.indexOf('start time');
+        const endTimeIdx = headers.indexOf('end time');
+        const locIdx = headers.indexOf('event location');
+        const urlIdx = headers.indexOf('event url');
+        const contactIdx = headers.indexOf('contact info');
+        const imageIdx = headers.indexOf('image');
+        const approvedIdx = headers.indexOf('approved');
+
+        const events = lines.slice(1).filter(l => l.trim()).map(line => {
+          const vals = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+          if ((vals[approvedIdx] || '').toUpperCase() !== 'TRUE') return null;
+          const parsed = new Date(vals[dateIdx] || '');
+          if (isNaN(parsed.getTime())) return null;
+          const rawImg = vals[imageIdx] || '';
+          let imgUrl = '';
+          if (rawImg) {
+            const dm = rawImg.match(/[?&]id=([a-zA-Z0-9_-]+)/) || rawImg.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            imgUrl = dm ? 'https://lh3.googleusercontent.com/d/' + dm[1] + '=w400' : rawImg;
+          }
+          const startTime = vals[timeIdx] ? new Date('2000-01-01 ' + vals[timeIdx]).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+          const endTime = vals[endTimeIdx] ? new Date('2000-01-01 ' + vals[endTimeIdx]).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+          const timeStr = startTime && endTime ? startTime + ' – ' + endTime : (startTime || endTime);
+          return {
+            title: vals[titleIdx] || '',
+            date: parsed.toISOString().split('T')[0],
+            time: timeStr,
+            location: vals[locIdx] || '',
+            description: vals[descIdx] || '',
+            contact: vals[contactIdx] || '',
+            image: imgUrl,
+            link: vals[urlIdx] || '#'
+          };
+        }).filter(Boolean).filter(e => new Date(e.date + 'T00:00:00') >= new Date().setHours(0,0,0,0))
+          .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        renderEvents(events);
+      } catch (e) { l.innerHTML = '<p class="loading-msg">Impossible de charger les événements.</p>'; }
+    }
+
+    document.addEventListener('languagechanged', () => loadCommunityEvents());
+  </script>
+</body>
+</html>

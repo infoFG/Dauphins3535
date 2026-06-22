@@ -1,5 +1,5 @@
 import { initMenu, initLanguage, initLightbox, initScrollReveal, initDayPlanners, initWasteCalendar } from './js/ui.js';
-import { initEventsCarousel, initBusinessGallery, reRenderEvents } from './js/api.js';
+import { initEventsCarousel, initBusinessGallery, reRenderEvents, initCommunityCarousel } from './js/api.js';
 import { initEnhancedCarousels, loadStaticCarouselImages, loadSectionBackground } from './js/carousel.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadSectionBackground('faq-pool', 'assets/Installations');
     await loadSectionBackground('faq-waste');
     await loadSectionBackground('galerie-commerciale', 'assets/Commereciale');
+    await loadSectionBackground('communaute', 'assets/Commereciale');
   } catch (error) {
     console.error("Asset loading failed:", error);
   }
@@ -40,6 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initScrollReveal();
   initDayPlanners(faqData);
   initWasteCalendar();
+  initCommunityCarousel();
 
   // Re-render dynamic content when language changes
   document.addEventListener('languagechanged', () => {
@@ -47,6 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initWasteCalendar();
     initBusinessGallery();
     reRenderEvents();
+    initCommunityCarousel();
   });
 
   document.querySelectorAll('.carousel-pips').forEach(pipsContainer => {

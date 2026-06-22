@@ -110,6 +110,29 @@ body {
   background: rgba(255,255,255,0.05);
 }
 
+.nav-separator {
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+  margin: 0.5rem 0.75rem;
+  border-left: none !important;
+  pointer-events: none;
+}
+
+.nav-sub {
+  border-left: none !important;
+  padding-left: 2rem !important;
+}
+.nav-sub a {
+  font-size: 0.85em;
+  opacity: 0.85;
+}
+
+.nav-page-link::after {
+  content: " ↗";
+  font-size: 0.85em;
+  opacity: 0.6;
+}
+
 .sidebar-nav a {
   display: flex;
   align-items: center;
@@ -437,6 +460,47 @@ body {
   font-size: 0.72rem;
   color: #5b9bd5;
   text-align: center;
+}
+
+/* ========== EVENTS LIST PAGE ========== */
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.event-list-item {
+  display: block;
+  padding: 1rem 1.25rem;
+  background: #fff;
+  border: 1px solid var(--bleu-pale);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--burn);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.event-list-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-color: var(--orange);
+}
+
+.event-list-date {
+  font-size: 0.8rem;
+  color: var(--orange);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.event-list-item h3 {
+  font-size: 1rem;
+  margin: 0 0 0.25rem;
+}
+
+.event-list-loc {
+  font-size: 0.8rem;
+  color: var(--bleu-moyen);
 }
 
 .now-indicator {

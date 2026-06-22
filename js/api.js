@@ -44,20 +44,20 @@ export async function initEventsCarousel() {
     // Deduplicate, filter past, sort chronologically
     const seen = new Set();
     const allUpcoming = events
-      .filter(e => new Date(e.date) >= now)
+      .filter(e => new Date(e.date + 'T00:00:00') >= now)
       .filter(e => {
         const key = (e.link || '').trim();
         if (!key || seen.has(key)) return false;
         seen.add(key);
         return true;
       })
-      .sort((a, b) => new Date(a.date) - new Date(b.date));
+      .sort((a, b) => new Date(a.date + 'T00:00:00') - new Date(b.date + 'T00:00:00'));
 
     // Show next 7 days first, then fill up to 12 with later events
     const nextWeek = new Date(now);
     nextWeek.setDate(nextWeek.getDate() + 7);
-    const withinWeek = allUpcoming.filter(e => new Date(e.date) <= nextWeek);
-    const later = allUpcoming.filter(e => new Date(e.date) > nextWeek);
+    const withinWeek = allUpcoming.filter(e => new Date(e.date + 'T00:00:00') <= nextWeek);
+    const later = allUpcoming.filter(e => new Date(e.date + 'T00:00:00') > nextWeek);
     const upcoming = [...withinWeek, ...later].slice(0, 12);
 
     if (upcoming.length === 0) {
@@ -110,6 +110,10 @@ export async function initEventsCarousel() {
       events = null;
     }
   }
+
+  // Always fetch community events (separate cache)
+  const communityEvents = await fetchCommunityEvents();
+  window._communityEvents = communityEvents;
 
   const displayed = render(events);
   if (displayed) {
@@ -261,6 +265,81 @@ function applyThumbToCard(card, url) {
   if (img) {
     img.src = url;
   }
+}
+
+async function fetchCommunityEvents() {
+  const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTns1Hpe-TBIjKUM7yjP_wI4cm75iy3R6Plfo7YR7r7TCA6H154T61O_B2sTV3Wj8V8Vf6ToslfSfKR/pub?gid=447995773&single=true&output=csv';
+  try {
+    const response = await fetch(SHEET_CSV);
+    if (!response.ok) return [];
+    const csvText = await response.text();
+    const lines = csvText.split(/\r?\n/);
+    if (lines.length < 2) return [];
+
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_'));
+    const dateIdx = headers.indexOf('event_date');
+    const titleIdx = headers.indexOf('event_name');
+    const timeIdx = headers.indexOf('start_time');
+    const endTimeIdx = headers.indexOf('end_time');
+    const imageIdx = headers.indexOf('image');
+    const approvedIdx = headers.indexOf('approved');
+    const urlIdx = headers.indexOf('event_url');
+    const locIdx = headers.indexOf('event_location');
+
+    return lines.slice(1).filter(l => l.trim()).map(line => {
+      const vals = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+      const approved = (vals[approvedIdx] || '').toUpperCase();
+      if (approved !== 'TRUE' && approved !== 'YES') return null;
+
+      const dateStr = vals[dateIdx] || '';
+      const parsed = new Date(dateStr);
+      if (isNaN(parsed.getTime())) return null;
+
+      const timeVal = vals[timeIdx] || '';
+      const endVal = vals[endTimeIdx] || '';
+      const displayTime = timeVal ? formatDisplayTime(timeVal, endVal) : '';
+      const rawImg = vals[imageIdx] || '';
+      const eventUrl = vals[urlIdx] || '';
+      const eventLoc = vals[locIdx] || '';
+
+      // Convert Google Drive links to embeddable images
+      let imgUrl = '';
+      if (rawImg) {
+        const driveMatch = rawImg.match(/[?&]id=([a-zA-Z0-9_-]+)/) || rawImg.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (driveMatch) {
+          imgUrl = `https://lh3.googleusercontent.com/d/${driveMatch[1]}=w400`;
+        } else {
+          imgUrl = rawImg;
+        }
+      }
+
+      return {
+        title: vals[titleIdx] || 'Événement communautaire',
+        title_en: vals[titleIdx] || 'Community Event',
+        date: parsed.toISOString().split('T')[0],
+        time: displayTime,
+        location: eventLoc || 'Immeuble',
+        location_en: eventLoc || 'Building',
+        source: 'Communauté',
+        source_en: 'Community',
+        link: eventUrl || '#',
+        image: imgUrl
+      };
+    }).filter(Boolean);
+  } catch (e) { console.warn('Community events fetch failed:', e); return []; }
+}
+
+function formatDisplayTime(start, end) {
+  const fmt = (val) => {
+    if (!val) return '';
+    const t = new Date('2000-01-01 ' + val);
+    if (isNaN(t.getTime())) return val;
+    return t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+  const s = fmt(start);
+  const e = fmt(end);
+  if (s && e) return s + '–' + e;
+  return s || e;
 }
 
 async function fetchStaticEvents() {
@@ -415,4 +494,53 @@ export async function initBusinessGallery() {
   } catch (error) {
     console.error('Erreur galerie:', error);
   }
+}
+
+// ---- Community Events Carousel (separate from main events) ----
+export function initCommunityCarousel() {
+  const track = document.getElementById('community-carousel-track');
+  const section = document.getElementById('communaute');
+  if (!track || !section) return;
+
+  const events = window._communityEvents || [];
+  if (events.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = '';
+  const lang = document.documentElement.lang || 'fr';
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+
+  const upcoming = events
+    .filter(e => new Date(e.date + 'T00:00:00') >= now)
+    .sort((a, b) => new Date(a.date + 'T00:00:00') - new Date(b.date + 'T00:00:00'));
+
+  // Show all upcoming community events (no 12-item cap)
+
+  if (upcoming.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  track.innerHTML = upcoming.map(event => {
+    const title = lang === 'en' && event.title_en ? event.title_en : event.title;
+    const dateStr = new Date(event.date + 'T00:00:00').toLocaleDateString(
+      lang === 'en' ? 'en-CA' : 'fr-CA',
+      { weekday: 'long', month: 'long', day: 'numeric' }
+    );
+    const img = event.image || getFallbackLocal(event);
+    const fallback = img !== getFallbackLocal(event) ? ` onerror="this.src='${escapeHtml(getFallbackLocal(event))}';this.onerror=null"` : '';
+    const hasLink = event.link && event.link !== '#';
+    return `
+    <a href="${escapeHtml(event.link)}" ${hasLink ? 'target="_blank" rel="noopener"' : ''} class="carousel-card" draggable="false">
+      <img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" loading="lazy"${fallback}>
+      <div class="card-content">
+        <div class="card-date">${dateStr}${event.time ? ` — ${event.time}` : ''}</div>
+        <h4 class="card-title">${escapeHtml(title)}</h4>
+        <div class="card-location">📍 ${escapeHtml(event.location_en && lang === 'en' ? event.location_en : event.location)}</div>
+      </div>
+    </a>`;
+  }).join('');
 }

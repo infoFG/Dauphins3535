@@ -28,11 +28,13 @@
         <li><a href="#apropos" data-i18n="nav_about">À propos</a></li>
         <li><a href="#installations" data-i18n="nav_amenities">Installations</a></li>
         <li><a href="#galerie-commerciale" data-i18n="nav_gallery">Galerie Commerciale</a></li>
+        <li><a href="#communaute" data-i18n="nav_community">Événements</a></li>
+        <li class="nav-sub"><a href="events.html" class="nav-page-link" data-i18n="nav_full_list">Liste complète</a></li>
         <li><a href="#valeurs" data-i18n="nav_values">Valeurs</a></li>
+        <li class="nav-sub"><a href="faq.html" data-i18n="nav_faq" class="nav-page-link">FAQ</a></li>
         <li><a href="#condoweb" data-i18n="nav_condoweb">CondoWeb</a></li>
-        <li><a href="faq.html" data-i18n="nav_faq">FAQ</a></li>
         <li><a href="#quartier" data-i18n="nav_neighborhood">Vie de quartier</a></li>
-        <!-- <li><a href="#unites">Unités à vendre</a></li> -->
+      </ul>
       </ul>
     </nav>
   </aside>
@@ -122,6 +124,23 @@
           <button class="carousel-btn prev">❮</button>
           <button class="carousel-btn next">❯</button>
           <div class="carousel-track" id="business-gallery-track"></div>
+          <div class="carousel-pips"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ÉVÉNEMENTS COMMUNAUTAIRES ===== -->
+    <section class="section" id="communaute" style="display:none;">
+      <div class="section-inner">
+        <div class="content-box">
+          <h2 class="section-title" data-i18n="title_community">Événements communautaires</h2>
+          <div class="section-content">
+            <p data-i18n="community_p1">Événements soumis par les résidents de l'immeuble.</p>
+            <a href="events.html" class="hero-cta" style="display:inline-block;padding:0.5rem 1.25rem; font-size:0.8rem; margin-top:0.75rem;" data-i18n="community_view_all">Voir tous les événements →</a>
+          </div>
+        </div>
+        <div class="carousel-container image-carousel">
+          <div class="carousel-track" id="community-carousel-track" data-no-clone></div>
           <div class="carousel-pips"></div>
         </div>
       </div>
