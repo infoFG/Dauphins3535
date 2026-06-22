@@ -287,7 +287,16 @@ async function fetchCommunityEvents() {
     const locIdx = headers.indexOf('event_location');
 
     return lines.slice(1).filter(l => l.trim()).map(line => {
-      const vals = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+      // Proper CSV parsing with quote handling
+      const vals = [];
+      let cur = '', inQ = false;
+      for (const ch of line) {
+        if (ch === '"') { inQ = !inQ; }
+        else if (ch === ',' && !inQ) { vals.push(cur.trim().replace(/^"|"$/g, '')); cur = ''; }
+        else { cur += ch; }
+      }
+      vals.push(cur.trim().replace(/^"|"$/g, ''));
+      
       const approved = (vals[approvedIdx] || '').toUpperCase();
       if (approved !== 'TRUE' && approved !== 'YES') return null;
 

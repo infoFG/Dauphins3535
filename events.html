@@ -139,7 +139,16 @@
         const approvedIdx = headers.indexOf('approved');
 
         const events = lines.slice(1).filter(l => l.trim()).map(line => {
-          const vals = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+          // Proper CSV parsing with quote handling
+          const vals = [];
+          let cur = '', inQ = false;
+          for (const ch of line) {
+            if (ch === '"') { inQ = !inQ; }
+            else if (ch === ',' && !inQ) { vals.push(cur.trim().replace(/^"|"$/g, '')); cur = ''; }
+            else { cur += ch; }
+          }
+          vals.push(cur.trim().replace(/^"|"$/g, ''));
+          
           if ((vals[approvedIdx] || '').toUpperCase() !== 'TRUE') return null;
           const parsed = new Date(vals[dateIdx] || '');
           if (isNaN(parsed.getTime())) return null;
