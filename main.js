@@ -44,10 +44,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   initCommunityCarousel();
 
   // Re-render dynamic content when language changes
-  document.addEventListener('languagechanged', () => {
+  document.addEventListener('languagechanged', async () => {
     initDayPlanners(faqData);
     initWasteCalendar();
-    initBusinessGallery();
+    await initBusinessGallery();
+    initEnhancedCarousels();
     reRenderEvents();
     initCommunityCarousel();
   });
