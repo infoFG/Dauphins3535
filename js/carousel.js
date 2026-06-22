@@ -203,6 +203,17 @@ export function initEnhancedCarousels() {
     track.addEventListener('pointermove', (e) => {
       if (!isDown || e.pointerId !== activePointerId) return;
       const dx = Math.abs(e.clientX - track.mouseDownX);
+      const dy = Math.abs(e.clientY - track.mouseDownY);
+      
+      // On touch: let native scroll handle it, don't override
+      if (e.pointerType === 'touch') {
+        if (dx > 10 && !track.classList.contains('dragging')) {
+          track.classList.add('dragging');
+        }
+        return; // native scroll-snap handles the rest
+      }
+      
+      // Mouse: custom drag with animation
       if (!track.classList.contains('dragging') && dx > 10) {
         track.classList.add('dragging');
         track.setPointerCapture(activePointerId);
@@ -215,7 +226,7 @@ export function initEnhancedCarousels() {
       }
     });
 
-    const stopDragging = () => {
+    const stopDragging = (e) => {
       if (!isDown) return;
       isDown = false;
       if (activePointerId !== null && track.hasPointerCapture(activePointerId)) {
@@ -226,6 +237,16 @@ export function initEnhancedCarousels() {
       
       const items = track.children;
       if (items.length === 0) return;
+
+      // Touch: let native scroll-snap handle settling
+      const isTouch = e && (e.pointerType === 'touch' || e.type === 'touchend');
+      if (isTouch) {
+        track.style.scrollSnapType = '';
+        startAutoPlay();
+        return;
+      }
+
+      // Mouse: custom snap animation
 
       const isInfinite = track.dataset.cloned === "true";
       const maxScroll = track.scrollWidth - track.offsetWidth;

@@ -56,4 +56,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const track = pipsContainer.closest('.carousel-container')?.querySelector('.carousel-track');
     if (track && track.updatePips) track.updatePips();
   });
+
+  // Handle hash-based navigation from other pages
+  if (window.location.hash) {
+    const targetId = window.location.hash.substring(1);
+    const target = document.getElementById(targetId);
+    if (target) {
+      // Delay to let dynamic content settle
+      setTimeout(() => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 500);
+    }
+  }
 });
