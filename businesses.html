@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commerces — Les Dauphins-sur-le-Parc</title>
+  <link rel="icon" type="image/webp" href="assets/logo-menu.webp">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body { font-family: 'Segoe UI', system-ui, sans-serif; color: #3A2404; background: #fafafa; }
+    .content-box { opacity: 1 !important; transform: none !important; }
+    .main-content { min-height: auto !important; display: flex; flex-direction: column; min-height: 100vh; }
+    #businesses-page { flex: 1; padding: 4rem 1rem 1rem !important; }
+    .biz-footer { flex-shrink: 0; height: 80px; display: flex; align-items: center; justify-content: center; }
+    .biz-card { display: flex; gap: 1rem; padding: 1rem; background: #fff; border: 1px solid #D3D8D6; border-radius: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
+    .biz-card img { flex-shrink: 0; width: 160px; height: 120px; object-fit: cover; border-radius: 6px; background: #f0f0f0; }
+    .biz-info { flex: 1; min-width: 200px; }
+    .biz-info h3 { margin: 0 0 0.25rem; color: #3A2404; font-size: 1.1rem; }
+    .biz-info p { margin: 0.25rem 0; font-size: 0.9rem; color: #606059; line-height: 1.5; }
+    .biz-hours { font-size: 0.8rem; color: #B8B09A; margin-top: 0.5rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.15rem 0.75rem; }
+    .biz-links { margin-top: 0.5rem; }
+    .biz-links a { font-size: 0.8rem; color: #A19B80; margin-right: 0.75rem; text-decoration: none; }
+    .biz-links a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body class="content-page">
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
+  <div class="lang-switch">
+    <button id="lang-fr" class="active">FR</button>
+    <button id="lang-en">EN</button>
+  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="assets/logo-menu.webp" alt="Les Dauphins-sur-le-Parc">
+      <h1>Les Dauphins-sur-le-Parc</h1>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li><a href="index.html#apropos" data-i18n="nav_about">À propos</a></li>
+        <li><a href="index.html#installations" data-i18n="nav_amenities">Installations</a></li>
+        <li><a href="index.html#galerie-commerciale" data-i18n="nav_gallery">Galerie Commerciale</a></li>
+        <li class="nav-sub"><a href="businesses.html" class="nav-page-link active">Liste complète</a></li>
+        <li><a href="index.html#communaute" data-i18n="nav_community">Événements</a></li>
+        <li class="nav-sub"><a href="events.html" class="nav-page-link">Liste complète</a></li>
+        <li><a href="index.html#valeurs" data-i18n="nav_values">Valeurs</a></li>
+        <li class="nav-sub"><a href="faq.html" data-i18n="nav_faq" class="nav-page-link">FAQ</a></li>
+        <li><a href="index.html#condoweb" data-i18n="nav_condoweb">CondoWeb</a></li>
+        <li><a href="index.html#quartier" data-i18n="nav_neighborhood">Vie de quartier</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <section class="section" id="businesses-page">
+      <div class="section-inner">
+        <div class="content-box" style="max-width:900px;margin:0 auto;">
+          <h1 class="section-title">Galerie Commerciale</h1>
+          <p style="margin-bottom:2rem;">Commerces et services au rez-de-chaussée du 3535 avenue Papineau.</p>
+          <div id="biz-list"></div>
+        </div>
+      </div>
+    </section>
+    <div class="biz-footer" style="text-align:center;">
+      <img src="assets/logo-menu.webp" alt="Les Dauphins-sur-le-Parc" style="width:60px;height:auto;opacity:0.5;">
+    </div>
+  </main>
+
+  <script src="translations.js"></script>
+  <script type="module">
+    import { initMenu, initLanguage } from './js/ui.js';
+    import { formatBusinessHours, getDayLabels } from './js/utils.js';
+    initMenu();
+    initLanguage();
+
+    const list = document.getElementById('biz-list');
+    const dayKeys = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+
+    async function loadBusinesses() {
+      const currentLang = document.documentElement.lang || 'fr';
+      try {
+        list.innerHTML = '<p style="color:#B8B09A;font-style:italic;padding:2rem;">Chargement…</p>';
+        const reg = await fetch('assets/Businesses/Registery.json').then(r => r.json());
+        const files = reg.Businesses || [];
+        
+        const businesses = await Promise.all(files.map(async f => {
+          const res = await fetch(`assets/Businesses/${f}`);
+          if (!res.ok) return null;
+          return res.json();
+        }));
+
+        const valid = businesses.filter(Boolean);
+        if (!valid.length) {
+          list.innerHTML = '<p style="color:#3A2404;padding:2rem;">Aucun commerce trouvé.</p>';
+          return;
+        }
+
+        const labels = getDayLabels(currentLang);
+
+        list.innerHTML = valid.map(biz => {
+          const img = biz.images?.[0] ? `assets/Businesses/${biz.images[0]}` : '';
+          const hoursHtml = biz.business_hours ? dayKeys.map((d, i) => {
+            const v = biz.business_hours[d];
+            return v ? `<span><strong>${labels[i].substring(0,3)}</strong> ${v}</span>` : '';
+          }).filter(Boolean).join('') : '';
+          
+          let linksHtml = '';
+          if (biz.website) linksHtml += `<a href="${biz.website.startsWith('http')?biz.website:'https://'+biz.website}" target="_blank" rel="noopener">🌐 Site web</a>`;
+          if (biz.social_media) {
+            const sm = biz.social_media;
+            if (sm.facebook) linksHtml += `<a href="${sm.facebook}" target="_blank" rel="noopener">📘 Facebook</a>`;
+            if (sm.instagram) linksHtml += `<a href="${sm.instagram}" target="_blank" rel="noopener">📸 Instagram</a>`;
+          }
+
+          return `
+          <div class="biz-card">
+            ${img ? `<img src="${img}" alt="${biz.name}" loading="lazy" onerror="this.style.display='none'">` : ''}
+            <div class="biz-info">
+              <h3>${biz.name}</h3>
+              ${biz.description ? `<p>${biz.description}</p>` : ''}
+              ${hoursHtml ? `<div class="biz-hours">${hoursHtml}</div>` : ''}
+              ${linksHtml ? `<div class="biz-links">${linksHtml}</div>` : ''}
+            </div>
+          </div>`;
+        }).join('');
+      } catch(e) { list.innerHTML = '<p style="color:#3A2404;padding:2rem;">Impossible de charger les commerces.</p>'; }
+    }
+
+    loadBusinesses();
+    document.addEventListener('languagechanged', () => loadBusinesses());
+
+    // Random background from Commereciale
+    (async () => {
+      try {
+        const res = await fetch('assets/Commereciale/images.json');
+        const images = await res.json();
+        const bg = images[Math.floor(Math.random() * images.length)];
+        document.getElementById('businesses-page').style.setProperty('--section-bg', 'url("../assets/Commereciale/' + bg + '")');
+      } catch(e) {}
+    })();
+  </script>
+</body>
+</html>
