@@ -49,6 +49,7 @@
         <li class="nav-sub"><a href="faq.html" data-i18n="nav_faq" class="nav-page-link">FAQ</a></li>
         <li><a href="index.html#condoweb" data-i18n="nav_condoweb">CondoWeb</a></li>
         <li><a href="index.html#quartier" data-i18n="nav_neighborhood">Vie de quartier</a></li>
+        <li class="nav-sub"><a href="events-list.html" class="nav-page-link">Événements à venir</a></li>
       </ul>
     </nav>
   </aside>
@@ -71,7 +72,7 @@
   <script src="translations.js"></script>
   <script type="module">
     import { initMenu, initLanguage } from './js/ui.js';
-    import { formatBusinessHours, getDayLabels } from './js/utils.js';
+    import { formatBusinessHours, getDayLabels, isCurrentlyOpen } from './js/utils.js';
     initMenu();
     initLanguage();
 
@@ -106,6 +107,11 @@
             return v ? `<span><strong>${labels[i].substring(0,3)}</strong> ${v}</span>` : '';
           }).filter(Boolean).join('') : '';
           
+          const status = biz.business_hours ? isCurrentlyOpen(biz.business_hours) : null;
+          const statusKey = 'status_' + status;
+          const statusText = (window.translations?.[currentLang]?.[statusKey]) || '';
+          const statusBadge = status ? `<p class="status-badge status-${status}">${statusText}</p>` : '';
+          
           let linksHtml = '';
           if (biz.website) linksHtml += `<a href="${biz.website.startsWith('http')?biz.website:'https://'+biz.website}" target="_blank" rel="noopener">🌐 Site web</a>`;
           if (biz.social_media) {
@@ -120,6 +126,7 @@
             <div class="biz-info">
               <h3>${biz.name}</h3>
               ${biz.description ? `<p>${biz.description}</p>` : ''}
+              ${statusBadge}
               ${hoursHtml ? `<div class="biz-hours">${hoursHtml}</div>` : ''}
               ${linksHtml ? `<div class="biz-links">${linksHtml}</div>` : ''}
             </div>

@@ -151,7 +151,19 @@ window.translations = {
     "robin_p1": "Le Robin des Bois est un restaurant bienfaiteur fondé en 2006, qui soutient la réinsertion sociale, la lutte contre l'isolement et la pauvreté. Il est installé au Chalet du Parc Lafontaine depuis quelques années et offre, en plus des créations de sa cuisine, une programmation culturelle dynamique et diversifiée. <a href='https://robindesbois.ca/programmation/' target='_blank' rel='noopener'>Voir la programmation <span style='font-size:0.85em;'>→</span></a>",
 
     "carousel_loading": "Chargement des événements...",
-    "carousel_empty": "Aucun événement trouvé pour le moment."
+    "carousel_empty": "Aucun événement trouvé pour le moment.",
+    "status_open": "🟢 Ouvert présentement",
+    "status_closing-soon": "🟡 Ferme bientôt",
+    "status_closed": "🔴 Fermé présentement",
+
+    "events_full_list_title": "Événements à venir",
+    "events_full_list_subtitle": "Événements au Plateau-Mont-Royal et aux alentours.",
+    "events_filter_all": "Tout",
+    "events_loading": "Chargement…",
+    "events_load_error": "Impossible de charger.",
+    "events_no_results": "Aucun événement trouvé.",
+    "events_page_info": "Page {current} / {total} — {count} événements",
+    "events_community_tag": "communauté"
   },
   en: {
     // Navigation
@@ -309,7 +321,19 @@ window.translations = {
     "robin_p1": "Robin des Bois is a charitable restaurant founded in 2006 that supports social reintegration and the fight against isolation and poverty. It has been located in the Chalet du Parc Lafontaine for several years.",
 
     "carousel_loading": "Loading events...",
-    "carousel_empty": "No events found at the moment."
+    "carousel_empty": "No events found at the moment.",
+    "status_open": "🟢 Open now",
+    "status_closing-soon": "🟡 Closing soon",
+    "status_closed": "🔴 Closed now",
+
+    "events_full_list_title": "Upcoming Events",
+    "events_full_list_subtitle": "Events in Plateau-Mont-Royal and surrounding areas.",
+    "events_filter_all": "All",
+    "events_loading": "Loading…",
+    "events_load_error": "Unable to load.",
+    "events_no_results": "No events found.",
+    "events_page_info": "Page {current} / {total} — {count} events",
+    "events_community_tag": "community"
   }
   // Adding Spanish later is as simple as:
   // es: { ... }

@@ -1,4 +1,4 @@
-import { formatBusinessHours, escapeHtml, getDayLabels } from './utils.js';
+import { formatBusinessHours, escapeHtml, getDayLabels, isCurrentlyOpen } from './utils.js';
 
 /* ========== SIDEBAR MENU ========== */
 export function initMenu() {
@@ -219,6 +219,12 @@ export function initDayPlanners(faqData = {}) {
         noteHtml = `<p class="cleaning-note">${escapeHtml(data[noteKey])}</p>`;
       }
       infoBox.innerHTML = `<div class="hours-list">${formatBusinessHours(hoursData, lang)}</div>${noteHtml}`;
+
+      // Add open/closed/closing-soon status
+      const status = isCurrentlyOpen(hoursData, closuresData);
+      const statusKey = 'status_' + status;
+      const statusText = window.translations?.[lang]?.[statusKey] || status;
+      infoBox.innerHTML += `<p class="status-badge status-${status}">${statusText}</p>`;
     }
 
     const { axis, grid } = generateTimeAxisHtml(config.start, config.end);
@@ -260,7 +266,7 @@ export function initDayPlanners(faqData = {}) {
             ${barHtml}
             ${isToday && nowPos >= 0 && nowPos <= 100 ? `<div class="now-indicator" style="top:${nowPos}%"></div>` : ''}
           </div>
-          <div class="day-label">${label}</div>
+          <div class="day-label">${label.substring(0, 3)}</div>
         </div>`;
     }).join('');
 

@@ -347,6 +347,7 @@ body {
   .faq-flex-wrapper {
     flex-direction: column;
     align-items: center;
+    gap: 1rem;
   }
 
   .faq-info {
@@ -360,6 +361,33 @@ body {
 
   .planner-wrapper {
     max-width: 100%;
+    padding: 0.75rem;
+    margin: 0;
+  }
+
+  .day-planner {
+    height: 180px;
+  }
+
+  #faq-admin .content-box,
+  #faq-pool .content-box,
+  #faq-waste .content-box {
+    max-width: 100%;
+    padding: 0.75rem;
+  }
+
+  #waste-calendar {
+    max-width: 100%;
+    border-radius: 8px;
+  }
+
+  .calendar-day-name {
+    font-size: 0.6rem;
+    padding: 0.35rem 0.1rem;
+  }
+
+  .calendar-day {
+    padding: 0.2rem;
   }
 }
 
@@ -1288,6 +1316,29 @@ body {
   height: 140px;
   object-fit: cover;
   background: var(--bleu-pale);
+}
+
+/* ========== STATUS BADGE (open/closed) ========== */
+.status-badge {
+  display: inline-block;
+  width: fit-content;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+.status-open {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.status-closing-soon {
+  background: #fff8e1;
+  color: #e65100;
+}
+.status-closed {
+  background: #fbe9e7;
+  color: #c62828;
 }
 
 .business-carousel-card {

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Événements à venir — Les Dauphins-sur-le-Parc</title>
+  <link rel="icon" type="image/webp" href="assets/logo-menu.webp">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body { font-family: 'Segoe UI', system-ui, sans-serif; color: #3A2404; background: #fafafa; }
+    .content-box { opacity: 1 !important; transform: none !important; }
+    .main-content { min-height: auto !important; display: flex; flex-direction: column; min-height: 100vh; }
+    #events-page { flex: 1; padding: 4rem 1rem 1rem !important; }
+    .ev-footer { flex-shrink: 0; height: 80px; display: flex; align-items: center; justify-content: center; }
+    .date-group { margin-bottom: 2rem; }
+    .date-group h3 { color: #A19B80; font-size: 1.1rem; margin: 0 0 0.75rem; padding-bottom: 0.25rem; border-bottom: 1px solid #D3D8D6; }
+    .ev-card { display: flex; gap: 1rem; padding: 0.85rem 1rem; background: #fff; border: 1px solid #D3D8D6; border-radius: 8px; margin-bottom: 0.5rem; text-decoration: none; color: inherit; transition: transform 0.15s; align-items: center; }
+    .ev-card:hover { transform: translateX(4px); border-color: #A19B80; }
+    .ev-card .ev-img { flex-shrink: 0; width: 80px; height: 80px; border-radius: 6px; overflow: hidden; background: #f0f0f0; }
+    .ev-card .ev-img img { width: 100%; height: 100%; object-fit: cover; }
+    .ev-card .ev-time { flex-shrink: 0; width: 70px; font-size: 0.82rem; color: #A19B80; font-weight: 600; }
+    .ev-card .ev-info { flex: 1; min-width: 0; }
+    .ev-card .ev-info h4 { margin: 0; font-size: 1.05rem; color: #3A2404; }
+    .ev-card .ev-info .ev-loc { font-size: 0.82rem; color: #B8B09A; margin-top: 0.15rem; }
+    .ev-card .ev-info .ev-desc { font-size: 0.8rem; color: #89897C; margin: 0.3rem 0 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .filter-bar { margin-bottom: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .filter-bar button { padding: 0.35rem 0.75rem; border: 1px solid #D3D8D6; border-radius: 20px; background: #fff; color: #606059; cursor: pointer; font-size: 0.8rem; }
+    .filter-bar button.active { background: #A19B80; color: #fff; border-color: #A19B80; }
+    .pagination { display: flex; gap: 0.35rem; justify-content: center; margin: 1.5rem 0; flex-wrap: wrap; }
+    .pagination button { padding: 0.35rem 0.7rem; border: 1px solid #D3D8D6; border-radius: 6px; background: #fff; color: #606059; cursor: pointer; font-size: 0.8rem; min-width: 36px; }
+    .pagination button.active { background: #A19B80; color: #fff; border-color: #A19B80; }
+    .pagination button:disabled { opacity: 0.4; cursor: default; }
+    .pg-ellipsis { padding: 0.35rem 0.2rem; color: #B8B09A; align-self: center; }
+    .pg-info { display: block; width: 100%; text-align: center; font-size: 0.7rem; color: #A19B80; margin-top: 0.25rem; }
+
+    @media (max-width: 640px) {
+      .date-group h3 { font-size: 0.95rem; }
+      .ev-card { gap: 0.6rem; padding: 0.65rem 0.7rem; align-items: flex-start; }
+      .ev-card .ev-img { width: 55px; height: 55px; }
+      .ev-card .ev-time { width: 48px; font-size: 0.72rem; }
+      .ev-card .ev-info h4 { font-size: 0.9rem; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      .ev-card .ev-info .ev-loc { font-size: 0.7rem; }
+      .ev-card .ev-info .ev-desc { font-size: 0.7rem; -webkit-line-clamp: 2; }
+      .filter-bar { gap: 0.35rem; }
+      .filter-bar button { padding: 0.3rem 0.6rem; font-size: 0.7rem; }
+      .pagination button { padding: 0.3rem 0.5rem; font-size: 0.72rem; min-width: 30px; }
+      .pg-info { font-size: 0.65rem; }
+    }
+  </style>
+</head>
+<body class="content-page">
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
+  <div class="lang-switch">
+    <button id="lang-fr" class="active">FR</button>
+    <button id="lang-en">EN</button>
+  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="assets/logo-menu.webp" alt="Les Dauphins-sur-le-Parc">
+      <h1>Les Dauphins-sur-le-Parc</h1>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li><a href="index.html#apropos" data-i18n="nav_about">À propos</a></li>
+        <li><a href="index.html#installations" data-i18n="nav_amenities">Installations</a></li>
+        <li><a href="index.html#galerie-commerciale" data-i18n="nav_gallery">Galerie Commerciale</a></li>
+        <li class="nav-sub"><a href="businesses.html" class="nav-page-link">Liste complète</a></li>
+        <li><a href="index.html#communaute" data-i18n="nav_community">Événements</a></li>
+        <li class="nav-sub"><a href="events.html" class="nav-page-link">Communauté</a></li>
+        <li><a href="index.html#valeurs" data-i18n="nav_values">Valeurs</a></li>
+        <li class="nav-sub"><a href="faq.html" data-i18n="nav_faq" class="nav-page-link">FAQ</a></li>
+        <li><a href="index.html#condoweb" data-i18n="nav_condoweb">CondoWeb</a></li>
+        <li><a href="index.html#quartier" data-i18n="nav_neighborhood">Vie de quartier</a></li>
+        <li class="nav-sub"><a href="events-list.html" class="nav-page-link active" data-i18n="events_full_list_title">Événements à venir</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <section class="section" id="events-page">
+      <div class="section-inner">
+        <div class="content-box" style="max-width:900px;margin:0 auto;">
+          <h1 class="section-title" data-i18n="events_full_list_title">Événements à venir</h1>
+          <p style="margin-bottom:1rem;" data-i18n="events_full_list_subtitle">Événements au Plateau-Mont-Royal et aux alentours.</p>
+          <div class="filter-bar" id="filter-bar">
+            <button data-filter="all" class="active" data-i18n="events_filter_all">Tout</button>
+            <button data-filter="Parc La Fontaine">Parc La Fontaine</button>
+            <button data-filter="Théâtre de Verdure">Théâtre de Verdure</button>
+          </div>
+          <div id="events-list"></div>
+        </div>
+      </div>
+    </section>
+    <div class="ev-footer" style="text-align:center;">
+      <img src="assets/logo-menu.webp" alt="Les Dauphins-sur-le-Parc" style="width:60px;height:auto;opacity:0.5;">
+    </div>
+  </main>
+
+  <script src="translations.js"></script>
+  <script type="module">
+    import { initMenu, initLanguage } from './js/ui.js';
+    import { getPrimaryImage, fetchEventTime, fetchEventThumbnail } from './js/api.js';
+    initMenu();
+    initLanguage();
+
+    const list = document.getElementById('events-list');
+    const filterBar = document.getElementById('filter-bar');
+    const PER_PAGE = 10;
+    let allEvents = [];
+    let activeFilter = 'all';
+    let currentPage = 1;
+
+    function getImage(event) {
+      return getPrimaryImage(event);
+    }
+
+    function formatTime(rawTime) {
+      if (!rawTime || !rawTime.trim()) return '';
+      const t = rawTime.trim();
+      // Already French format like "10h00"
+      if (/^\d{1,2}h\d{2}$/.test(t)) return t;
+      // Parse "10:00:00 AM" or "14:30:00" or "10:00" or "10:00 AM"
+      const parsed = new Date('2000-01-01 ' + t);
+      if (isNaN(parsed.getTime())) return t;
+      const lang = document.documentElement.lang || 'fr';
+      if (lang === 'fr') {
+        const h = parsed.getHours().toString().padStart(2, '0');
+        const m = parsed.getMinutes().toString().padStart(2, '0');
+        return h + 'h' + m;
+      }
+      return parsed.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function t(key) {
+      const lang = document.documentElement.lang || 'fr';
+      return (window.translations && window.translations[lang] && window.translations[lang][key]) || key;
+    }
+
+    function renderEvents() {
+      const currentLang = document.documentElement.lang || 'fr';
+      const now = new Date(); now.setHours(0,0,0,0);
+      
+      let filtered = allEvents.filter(e => new Date(e.date + 'T00:00:00') >= now);
+      if (activeFilter !== 'all') {
+        filtered = filtered.filter(e => {
+          const src = (e.source || e.location || '').toLowerCase();
+          return src.includes(activeFilter.toLowerCase()) || 
+                 (e.location || '').toLowerCase().includes(activeFilter.toLowerCase());
+        });
+      }
+      filtered.sort((a, b) => new Date(a.date + 'T00:00:00') - new Date(b.date + 'T00:00:00'));
+
+      const totalPages = Math.ceil(filtered.length / PER_PAGE) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+      const start = (currentPage - 1) * PER_PAGE;
+      const pageEvents = filtered.slice(start, start + PER_PAGE);
+
+      if (!pageEvents.length) {
+        list.innerHTML = '<p style="color:#3A2404;padding:2rem;">' + t('events_no_results') + '</p>';
+        return;
+      }
+
+      const groups = {};
+      pageEvents.forEach(e => {
+        const dateStr = new Date(e.date + 'T00:00:00').toLocaleDateString(
+          currentLang === 'en' ? 'en-CA' : 'fr-CA',
+          { weekday: 'long', month: 'long', day: 'numeric' }
+        );
+        if (!groups[dateStr]) groups[dateStr] = [];
+        groups[dateStr].push(e);
+      });
+
+      let html = '';
+      Object.entries(groups).forEach(([dateStr, events]) => {
+        html += `<div class="date-group"><h3>${dateStr}</h3>`;
+        events.forEach(e => {
+          const title = currentLang === 'en' && e.title_en ? e.title_en : e.title;
+          const loc = currentLang === 'en' && e.location_en ? e.location_en : (e.location || '');
+          const src = e.source || '';
+          const hasLink = e.link && e.link !== '#';
+          const tag = src === 'Communauté' ? ' <span style="font-size:0.65rem;background:#A19B80;color:#fff;padding:1px 6px;border-radius:10px;margin-left:0.25rem;">' + t('events_community_tag') + '</span>' : '';
+          const desc = (e.description || '').trim();
+          const imgUrl = getImage(e);
+          const imgHtml = imgUrl ? `<div class="ev-img"><img src="${imgUrl}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div>` : '<div class="ev-img" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem;">📍</div>';
+          html += `<a href="${e.link || '#'}" ${hasLink ? 'target="_blank" rel="noopener"' : ''} class="ev-card">
+            ${formatTime(e.time) ? `<div class="ev-time">${formatTime(e.time)}</div>` : ''}
+            ${imgHtml}
+            <div class="ev-info"><h4>${title}${tag}</h4>${loc ? `<div class="ev-loc">📍 ${loc}</div>` : ''}${desc ? `<p class="ev-desc">${desc}</p>` : ''}</div>
+          </a>`;
+        });
+        html += '</div>';
+      });
+
+      html += '<div class="pagination">';
+      html += `<button ${currentPage === 1 ? 'disabled' : ''} data-page="${currentPage - 1}">←</button>`;
+
+      // Windowed page numbers: show first, last, and ±1 around current
+      const maxVisible = 7;
+      if (totalPages <= maxVisible) {
+        for (let p = 1; p <= totalPages; p++) {
+          html += `<button class="${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`;
+        }
+      } else {
+        html += `<button class="${1 === currentPage ? 'active' : ''}" data-page="1">1</button>`;
+        let prevGap = false;
+        for (let p = 2; p <= totalPages; p++) {
+          const near = Math.abs(p - currentPage) <= 1;
+          const edge = p === totalPages;
+          if (near || edge) {
+            if (prevGap) html += '<span class="pg-ellipsis">…</span>';
+            html += `<button class="${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`;
+            prevGap = false;
+          } else {
+            prevGap = true;
+          }
+        }
+      }
+
+      html += `<button ${currentPage === totalPages ? 'disabled' : ''} data-page="${currentPage + 1}">→</button>`;
+      const infoText = t('events_page_info').replace('{current}', currentPage).replace('{total}', totalPages).replace('{count}', filtered.length);
+      html += `<span class="pg-info">${infoText}</span>`;
+      html += '</div>';
+
+      list.innerHTML = html;
+
+      // Prevent scroll-to-top from showing hash in URL
+      list.removeAttribute('id');
+      list.setAttribute('id', 'events-list');
+    }
+
+    async function loadEvents() {
+      try {
+        list.innerHTML = '<p style="color:#B8B09A;font-style:italic;padding:2rem;">' + t('events_loading') + '</p>';
+        
+        // Load from main cache, or fetch if empty
+        const cached = JSON.parse(localStorage.getItem('dauphins_events_cache') || 'null');
+        let mainEvents = cached?.events || [];
+        
+        if (!mainEvents.length) {
+          // Cache is empty — fetch directly
+          try {
+            const [staticRes, csvMeta] = await Promise.all([
+              fetch('assets/Events/events.json').then(r => r.ok ? r.json() : []),
+              fetch('https://donnees.montreal.ca/api/3/action/package_show?id=evenements-publics').then(r => r.json())
+            ]);
+            const csvUrl = csvMeta?.result?.resources?.find(r => r.format === 'CSV')?.url;
+            if (csvUrl) {
+              const csvText = await fetch(csvUrl).then(r => r.text());
+              const lines = csvText.split(/\r?\n/);
+              const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+              mainEvents = lines.slice(1).filter(l => l.trim()).map(line => {
+                const vals = []; let cur = '', inQ = false;
+                for (const ch of line) {
+                  if (ch === '"') inQ = !inQ;
+                  else if (ch === ',' && !inQ) { vals.push(cur.trim().replace(/^"|"$/g, '')); cur = ''; }
+                  else cur += ch;
+                }
+                vals.push(cur.trim().replace(/^"|"$/g, ''));
+                const obj = {}; headers.forEach((h, i) => { obj[h] = vals[i] || ''; });
+                return obj;
+              }).filter(r => (r.arrondissement || '').toLowerCase() === 'le plateau-mont-royal')
+                .map(r => ({ title: r.titre || '', date: r.date_debut || '', link: r.url_fiche || '#', location: r.emplacement || '', source: r.emplacement || '', description: (r.description || '').replace(/<[^>]*>/g, '').substring(0, 200) }));
+              mainEvents = [...(staticRes || []), ...mainEvents];
+            }
+          } catch(e) {}
+        }
+
+        // Also fetch community events
+        let commEvents = [];
+        try {
+          const sheetRes = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTns1Hpe-TBIjKUM7yjP_wI4cm75iy3R6Plfo7YR7r7TCA6H154T61O_B2sTV3Wj8V8Vf6ToslfSfKR/pub?gid=447995773&single=true&output=csv');
+          const text = await sheetRes.text();
+          const lines = text.split(/\r?\n/);
+          if (lines.length > 1) {
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            const approvedIdx = headers.indexOf('approved');
+            commEvents = lines.slice(1).filter(l => l.trim()).map(line => {
+              const vals = [];
+              let cur = '', inQ = false;
+              for (const ch of line) {
+                if (ch === '"') inQ = !inQ;
+                else if (ch === ',' && !inQ) { vals.push(cur.trim().replace(/^"|"$/g, '')); cur = ''; }
+                else cur += ch;
+              }
+              vals.push(cur.trim().replace(/^"|"$/g, ''));
+              if ((vals[approvedIdx] || '').toUpperCase() !== 'TRUE') return null;
+              const parsed = new Date(vals[headers.indexOf('event date')] || '');
+              if (isNaN(parsed.getTime())) return null;
+              return {
+                title: vals[headers.indexOf('event name')] || '',
+                date: parsed.toISOString().split('T')[0],
+                time: vals[headers.indexOf('start time')] || '',
+                location: vals[headers.indexOf('event location')] || '',
+                source: 'Communauté',
+                link: vals[headers.indexOf('event url')] || '#',
+                description: (vals[headers.indexOf('description')] || '').substring(0, 200)
+              };
+            }).filter(Boolean);
+          }
+        } catch(e) {}
+
+        allEvents = [...mainEvents, ...commEvents].filter(e => e.source !== 'Communauté');
+        renderEvents();
+        enrichTimes();
+        enrichThumbnails();
+      } catch(e) { list.innerHTML = '<p style="color:#3A2404;padding:2rem;">' + t('events_load_error') + '</p>'; }
+    }
+
+    async function enrichTimes() {
+      const cards = list.querySelectorAll('.ev-card');
+      for (const card of cards) {
+        const href = card.getAttribute('href');
+        if (!href || href === '#') continue;
+        const timeEl = card.querySelector('.ev-time');
+        if (timeEl && timeEl.textContent.trim()) continue;
+        const time = await fetchEventTime(href);
+        if (time) {
+          const lang = document.documentElement.lang || 'fr';
+          const [h, m] = time.split(':');
+          const display = lang === 'fr'
+            ? h + 'h' + m
+            : new Date(2000, 0, 1, +h, +m).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+          // Update the DOM
+          if (timeEl) {
+            timeEl.textContent = display;
+          } else {
+            const newTime = document.createElement('div');
+            newTime.className = 'ev-time';
+            newTime.textContent = display;
+            card.insertBefore(newTime, card.firstChild);
+          }
+          // Store back into allEvents for persistence
+          const ev = allEvents.find(e => e.link === href);
+          if (ev) ev.time = display;
+        }
+      }
+    }
+
+    async function enrichThumbnails() {
+      const cards = list.querySelectorAll('.ev-card');
+      for (const card of cards) {
+        const href = card.getAttribute('href');
+        if (!href) continue;
+        const imgEl = card.querySelector('.ev-img img');
+        // If already has an og:image or explicit image, skip
+        if (imgEl && imgEl.src && !imgEl.src.includes('assets/Quartier/')) continue;
+        const thumb = await fetchEventThumbnail(href);
+        if (thumb && imgEl) {
+          imgEl.src = thumb;
+          // Store in allEvents so re-renders use it
+          const ev = allEvents.find(e => e.link === href);
+          if (ev) ev.image = thumb;
+        }
+      }
+    }
+
+    // Filter buttons
+    filterBar.addEventListener('click', e => {
+      if (e.target.tagName === 'BUTTON') {
+        filterBar.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        activeFilter = e.target.dataset.filter;
+        currentPage = 1;
+        renderEvents();
+      }
+    });
+
+    // Pagination clicks
+    list.addEventListener('click', e => {
+      if (e.target.tagName === 'BUTTON' && e.target.dataset.page) {
+        currentPage = parseInt(e.target.dataset.page);
+        renderEvents();
+        enrichTimes();
+        enrichThumbnails();
+        document.getElementById('events-list').scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+
+    loadEvents();
+    document.addEventListener('languagechanged', () => renderEvents());
+
+    // Background
+    (async () => {
+      try {
+        const res = await fetch('assets/Quartier/images.json');
+        const images = await res.json();
+        const bg = images[Math.floor(Math.random() * images.length)];
+        document.getElementById('events-page').style.setProperty('--section-bg', 'url("../assets/Quartier/' + bg + '")');
+      } catch(e) {}
+    })();
+  </script>
+</body>
+</html>

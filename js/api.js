@@ -1,28 +1,138 @@
-import { escapeHtml, formatBusinessHours } from './utils.js';
+import { escapeHtml, formatBusinessHours, isCurrentlyOpen } from './utils.js';
 
 const EVENTS_CACHE_KEY = 'dauphins_events_cache';
-const CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+const CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // Refresh from API weekly
+const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
 
-function getCachedEvents() {
-  try {
-    const raw = localStorage.getItem(EVENTS_CACHE_KEY);
-    if (!raw) return null;
-    const cached = JSON.parse(raw);
-    if (Date.now() - cached.timestamp > CACHE_TTL) {
-      localStorage.removeItem(EVENTS_CACHE_KEY);
-      return null;
-    }
-    return cached.events;
-  } catch (e) { return null; }
+function formatTimeForDisplay(raw) {
+  if (!raw || !raw.trim()) return '';
+  const t = raw.trim();
+  const parsed = new Date('2000-01-01 ' + t);
+  if (isNaN(parsed.getTime())) return t;
+  const lang = document.documentElement.lang || 'fr';
+  if (lang === 'fr') {
+    return parsed.getHours().toString().padStart(2, '0') + 'h' + parsed.getMinutes().toString().padStart(2, '0');
+  }
+  return parsed.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 }
 
-function setCachedEvents(events) {
+const TIMES_CACHE_KEY = 'dauphins_event_times';
+
+function loadTimeCache() {
+  try { return JSON.parse(localStorage.getItem(TIMES_CACHE_KEY) || '{}'); }
+  catch { return {}; }
+}
+
+function saveTimeCache(cache) {
+  try { localStorage.setItem(TIMES_CACHE_KEY, JSON.stringify(cache)); }
+  catch { /* storage full */ }
+}
+
+async function fetchEventTime(url) {
+  if (!url || url === '#') return '';
+  const cache = loadTimeCache();
+  if (cache[url] !== undefined) return cache[url];
+
+  try {
+    const resp = await fetch(CORS_PROXY + encodeURIComponent(url));
+    if (!resp.ok) return '';
+    const html = await resp.text();
+    // Try JSON-LD startDate first
+    let match = html.match(/"startDate"\s*:\s*"([^"]+)"/);
+    if (!match) match = html.match(/datetime="(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})/);
+    if (match) {
+      const dt = new Date(match[1]);
+      if (!isNaN(dt.getTime())) {
+        const h = dt.getHours().toString().padStart(2, '0');
+        const m = dt.getMinutes().toString().padStart(2, '0');
+        const result = h + ':' + m; // Store as HH:MM, format at display time
+        cache[url] = result;
+        saveTimeCache(cache);
+        return result;
+      }
+    }
+    cache[url] = ''; // Cache negative result too
+    saveTimeCache(cache);
+    return '';
+  } catch { return ''; }
+}
+
+export { fetchEventTime };
+
+// ---- Thumbnail helpers exported for events-list ----
+export { getThumbCache };
+
+async function fetchEventThumbnail(url) {
+  if (!url || !url.includes('montreal.ca/evenements/')) return '';
+  const cache = getThumbCache();
+  if (cache[url]) return cache[url];
+  try {
+    const resp = await fetch(CORS_PROXY + encodeURIComponent(url));
+    const html = await resp.text();
+    const match = html.match(/<meta\s+property="og:image"\s+content="([^"]+)"/i);
+    if (match && match[1]) {
+      const thumbUrl = match[1].replace(/w_\d+,h_\d+/g, 'w_400,c_fill');
+      setThumbCache(url, thumbUrl);
+      return thumbUrl;
+    }
+  } catch { /* keep fallback */ }
+  return '';
+}
+
+export { fetchEventThumbnail };
+
+function loadCachedEvents() {
+  try {
+    const raw = localStorage.getItem(EVENTS_CACHE_KEY);
+    if (!raw) return [];
+    const cached = JSON.parse(raw);
+    // Clean past events, keep future ones
+    const now = new Date(); now.setHours(0,0,0,0);
+    const future = (cached.events || []).filter(e => new Date(e.date + 'T00:00:00') >= now);
+    return future;
+  } catch (e) { return []; }
+}
+
+function saveCachedEvents(events) {
   try {
     localStorage.setItem(EVENTS_CACHE_KEY, JSON.stringify({
       timestamp: Date.now(),
       events: events
     }));
-  } catch (e) { /* storage full, ignore */ }
+  } catch (e) { /* storage full */ }
+}
+
+async function refreshEventsFromAPI(cached) {
+  // Build map of cached events by link for merging
+  const cachedByLink = {};
+  cached.forEach(e => { if (e.link) cachedByLink[e.link] = e; });
+
+  const needsRefresh = !cached.length || Date.now() - (JSON.parse(localStorage.getItem(EVENTS_CACHE_KEY) || '{}').timestamp || 0) > CACHE_TTL;
+  
+  if (!needsRefresh) return cached;
+
+  try {
+    const [staticEvents, dynamicEvents] = await Promise.all([
+      fetchStaticEvents(),
+      fetchMontrealEvents()
+    ]);
+
+    // Merge: keep cached thumbnails, add new events
+    const fresh = [...(staticEvents || []), ...(dynamicEvents || [])];
+    const merged = fresh.map(e => {
+      // If we already have this event cached, preserve its image/thumbnail
+      if (e.link && cachedByLink[e.link]) {
+        return { ...e, image: cachedByLink[e.link].image || e.image };
+      }
+      return e;
+    });
+
+    // Also keep any cached events not in the fresh list (community events from sheets)
+    const freshLinks = new Set(fresh.map(e => e.link));
+    const uncached = Object.values(cachedByLink).filter(e => !freshLinks.has(e.link));
+
+    return [...merged, ...uncached];
+  } catch (e) { return cached; }
 }
 
 export async function initEventsCarousel() {
@@ -76,7 +186,7 @@ export async function initEventsCarousel() {
         lang === 'en' ? 'en-CA' : 'fr-CA',
         { weekday: 'long', month: 'long', day: 'numeric' }
       );
-      const timeStr = event.time ? ` — ${event.time}` : '';
+      const timeStr = event.time ? ` — ${formatTimeForDisplay(event.time)}` : '';
       const primary = getPrimaryImage(event);
 
       return `
@@ -93,23 +203,10 @@ export async function initEventsCarousel() {
     return upcoming;
   };
 
-  // Check cache first (7-day TTL)
-  let events = getCachedEvents();
-
-  if (!events) {
-    // Cache miss or expired — fetch fresh data
-    try {
-      const [staticEvents, dynamicEvents] = await Promise.all([
-        fetchStaticEvents(),
-        fetchMontrealEvents()
-      ]);
-      events = [...(staticEvents || []), ...(dynamicEvents || [])];
-      setCachedEvents(events);
-    } catch (e) {
-      console.warn('Could not load events:', e);
-      events = null;
-    }
-  }
+  // Smart cache: clean past events, merge fresh data preserving thumbnails
+  let cachedEvents = loadCachedEvents();
+  const events = await refreshEventsFromAPI(cachedEvents);
+  saveCachedEvents(events);
 
   // Always fetch community events (separate cache)
   const communityEvents = await fetchCommunityEvents();
@@ -136,7 +233,7 @@ export function reRenderEvents() {
         lang === 'en' ? 'en-CA' : 'fr-CA',
         { weekday: 'long', month: 'long', day: 'numeric' }
       );
-      const timeStr = event.time ? ` — ${event.time}` : '';
+      const timeStr = event.time ? ` — ${formatTimeForDisplay(event.time)}` : '';
       const primary = getPrimaryImage(event);
       return `
       <a href="${escapeHtml(event.link)}" target="_blank" rel="noopener" class="carousel-card" draggable="false">
@@ -153,7 +250,6 @@ export function reRenderEvents() {
 }
 
 // ---- Image strategy: try remote thumbnails, fallback to local ----
-const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
 
 const FALLBACK_THEATRE = [
   'assets/Quartier/quartier-theatre.webp',
@@ -171,10 +267,15 @@ const FALLBACK_GENERAL = [
   'assets/Quartier/quartier-user-4.webp'
 ];
 
-function getPrimaryImage(event) {
-  // Use Cloudinary URL if explicitly set in events.json
+export function getPrimaryImage(event) {
+  // 1. Explicit image (community events, static events)
   if (event.image) return event.image;
-  // Default: local fallback
+  // 2. Check persistent thumbnail cache (og:image scraped from event page)
+  if (event.link) {
+    const thumbCache = getThumbCache();
+    if (thumbCache[event.link]) return thumbCache[event.link];
+  }
+  // 3. Deterministic local fallback based on event link
   return getFallbackLocal(event);
 }
 
@@ -186,10 +287,12 @@ function getFallbackLocal(event) {
   } else if (loc.includes('parc') || loc.includes('fontaine') || loc.includes('park')) {
     pool = FALLBACK_PARC;
   }
-  if (pool.length > 0) {
-    return pool[Math.floor(Math.random() * pool.length)];
-  }
-  return '';
+  // Deterministic: hash the link so same event always gets same image
+  const key = event.link || event.title || '';
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) hash = ((hash << 5) - hash) + key.charCodeAt(i);
+  const idx = Math.abs(hash) % pool.length;
+  return pool[idx] || '';
 }
 
 // ---- Thumbnail cache (persistent, not tied to event cache TTL) ----
@@ -332,6 +435,7 @@ async function fetchCommunityEvents() {
         source: 'Communauté',
         source_en: 'Community',
         link: eventUrl || '#',
+        description: (vals[headers.indexOf('description')] || '').substring(0, 200),
         image: imgUrl
       };
     }).filter(Boolean);
@@ -339,14 +443,8 @@ async function fetchCommunityEvents() {
 }
 
 function formatDisplayTime(start, end) {
-  const fmt = (val) => {
-    if (!val) return '';
-    const t = new Date('2000-01-01 ' + val);
-    if (isNaN(t.getTime())) return val;
-    return t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-  const s = fmt(start);
-  const e = fmt(end);
+  const s = formatTimeForDisplay(start);
+  const e = formatTimeForDisplay(end);
   if (s && e) return s + '–' + e;
   return s || e;
 }
@@ -412,6 +510,7 @@ async function fetchMontrealEvents() {
         source: r.emplacement || '',
         source_en: r.emplacement || '',
         link: r.url_fiche || '#',
+        description: (r.description || '').replace(/<[^>]*>/g, '').substring(0, 200),
         image: ''
       }));
   } catch (e) { console.warn('Montreal events fetch failed:', e); return []; }
@@ -455,6 +554,11 @@ export async function initBusinessGallery() {
         const fallbackImageUrl = `assets/Businesses/${business.folder}/${image}`;
         const hoursHtml = business.business_hours ? formatBusinessHours(business.business_hours, lang) : '';
         
+        const status = business.business_hours ? isCurrentlyOpen(business.business_hours) : '';
+        const statusKey = 'status_' + status;
+        const statusText = status ? (window.translations?.[lang]?.[statusKey] || status) : '';
+        const statusBadge = status ? `<p class="status-badge status-${status}">${statusText}</p>` : '';
+        
         const ensureProtocol = (url) => (url && !url.startsWith('http')) ? `https://${url}` : url;
 
         let linksHtml = '';
@@ -482,6 +586,7 @@ export async function initBusinessGallery() {
             <div class="business-header">
               <div class="business-name">${escapeHtml(business.name)}</div>
               <div class="business-desc">${escapeHtml(business.description || '')}</div>
+              ${statusBadge}
             </div>
             <img src="${imageUrl}" alt="${escapeHtml(business.name)}" loading="lazy" draggable="false" class="lightbox-trigger" onerror="if (this.src !== '${fallbackImageUrl}') this.src='${fallbackImageUrl}'" />
             <div class="business-overlay">
@@ -546,7 +651,7 @@ export function initCommunityCarousel() {
     <a href="${escapeHtml(event.link)}" ${hasLink ? 'target="_blank" rel="noopener"' : ''} class="carousel-card" draggable="false">
       <img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" loading="lazy"${fallback}>
       <div class="card-content">
-        <div class="card-date">${dateStr}${event.time ? ` — ${event.time}` : ''}</div>
+        <div class="card-date">${dateStr}${event.time ? ` — ${formatTimeForDisplay(event.time)}` : ''}</div>
         <h4 class="card-title">${escapeHtml(title)}</h4>
         <div class="card-location">📍 ${escapeHtml(event.location_en && lang === 'en' ? event.location_en : event.location)}</div>
       </div>
