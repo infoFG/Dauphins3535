@@ -1,0 +1,19 @@
+{
+  "name": "Aime-toi",
+  "description": "Centre esthétique — Soins du visage, du corps et bien-être.",
+  "business_hours": {
+    "monday": "08:00 AM - 06:00 PM",
+    "tuesday": "08:00 AM - 03:00 PM",
+    "wednesday": "08:00 AM - 03:00 PM",
+    "thursday": "08:00 AM - 06:00 PM",
+    "friday": "08:00 AM - 06:00 PM",
+    "saturday": "09:00 AM - 06:00 PM",
+    "sunday": "Closed"
+  },
+  "images": [],
+  "website": "https://www.m-toi.com/",
+  "social_media": {
+    "facebook": null,
+    "instagram": null
+  }
+}

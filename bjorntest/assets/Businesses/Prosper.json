@@ -1,0 +1,23 @@
+{
+  "name": "Prosper Fitness",
+  "description": "Studio d'entraînement semi-privé spécialisé en musculation, situé en face du Parc La Fontaine.",
+  "business_hours": {
+    "monday": "07:00 AM - 08:00 PM",
+    "tuesday": "07:00 AM - 08:00 PM",
+    "wednesday": "07:00 AM - 08:00 PM",
+    "thursday": "07:00 AM - 08:00 PM",
+    "friday": "07:00 AM - 08:00 PM",
+    "saturday": "09:00 AM - 04:00 PM",
+    "sunday": "Closed"
+  },
+  "images": [
+    "Prosper_01.jpg"
+  ],
+  "website": "https://prosperfitness.net",
+  "social_media": {
+    "instagram": null,
+    "facebook": null,
+    "twitter": null,
+    "linkedin": null
+  }
+}

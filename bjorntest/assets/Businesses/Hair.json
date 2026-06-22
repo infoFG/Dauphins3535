@@ -1,0 +1,23 @@
+{
+  "name": "Salon Splendide Coiffure",
+  "description": "Salon de coiffure pour elle et lui.",
+  "business_hours": {
+    "monday": "Closed",
+    "tuesday": "09:00 AM - 05:00 PM",
+    "wednesday": "09:00 AM - 05:00 PM",
+    "thursday": "09:00 AM - 08:00 PM",
+    "friday": "09:00 AM - 05:00 PM",
+    "saturday": "09:00 AM - 05:00 PM",
+    "sunday": "Closed"
+  },
+  "images": [
+    "HairSalon_01.jpg"
+  ],
+  "website": null,
+  "social_media": {
+    "instagram": null,
+    "facebook": null,
+    "twitter": null,
+    "linkedin": null
+  }
+}
