@@ -144,6 +144,7 @@ body {
   position: relative;
   background: #fff;
   overflow: hidden;
+  scroll-margin-top: 5rem;
 }
 
 /* Fixed Background Layer */
@@ -177,51 +178,6 @@ body {
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Desktop Alternating Layout */
-@media (min-width: 1100px) {
-  .section-inner {
-    gap: 5rem;
-    flex-wrap: nowrap; /* Side-by-side on desktop */
-  }
-
-  /* Standard zig-zag logic for all sections */
-  .section:nth-of-type(odd) .section-inner {
-    flex-direction: row-reverse;
-  }
-
-  .content-box {
-    flex: 1.2 1 40%; /* Proportional basis + room for gap */
-    margin-bottom: 0;
-  }
-
-  .carousel-container {
-    flex: 1.5 1 50%; /* Proportional basis + room for gap */
-    margin-top: 0;
-    min-width: 350px;
-  }
-
-  /* Specific logic for complex sections like #quartier */
-  #quartier .section-inner {
-    flex-wrap: wrap;
-    flex-direction: row; /* Intro text left, Gallery right */
-    align-items: flex-start;
-  }
-
-  /* Ensure Intro & Gallery take their 1.2:1.5 shares even in a wrapping container */
-  #quartier .section-inner > .content-box:first-child { flex: 1.2 1 40%; }
-  #quartier .section-inner > .carousel-container:nth-child(2) { flex: 1.5 1 50%; }
-
-  /* Sub-categories (3rd child onwards) occupy full width */
-  #quartier .section-inner > :nth-child(n+3) {
-    flex: 0 0 100%;
-    max-width: 100%;
-    transform: translateY(30px);
-  }
-
-  #quartier .section-inner > :nth-child(n+3).revealed {
-    transform: translateY(0);
-  }
-}
 
 /* Content Boxes for Readability */
 .content-box {
@@ -241,27 +197,27 @@ body {
 
 /* Section Specific Backgrounds */
 #apropos { 
-  --section-bg: url('../assets/apropos-1.webp');
+  --section-bg: none;
   --box-bg: rgba(255, 253, 250, 0.92); /* Warm Marble */
 }
 #installations { 
-  --section-bg: url('../assets/install-1.webp');
+  --section-bg: none;
   --box-bg: rgba(240, 245, 248, 0.92); /* Pool Blue/Gray */
 }
 #galerie-commerciale { 
-  --section-bg: url('../assets/commerciale-1.webp');
+  --section-bg: none;
   --box-bg: rgba(253, 250, 245, 0.92); /* Warm Wood/Gallery */
 }
 #valeurs { 
-  --section-bg: url('../assets/hero-batiment.jpg');
+  --section-bg: none;
   --box-bg: rgba(245, 247, 250, 0.92); /* Sky/Exterior */
 }
 #condoweb { 
-  --section-bg: url('../assets/apropos-3.webp');
+  --section-bg: none;
   --box-bg: rgba(255, 252, 248, 0.92); /* Interior Warmth */
 }
 #quartier { 
-  --section-bg: url('../assets/quartier-parc.webp');
+  --section-bg: none;
   --box-bg: rgba(245, 252, 245, 0.92); /* Park Green */
 }
 
@@ -291,7 +247,7 @@ body {
   scrollbar-color: var(--orange) transparent;
   cursor: grab;
   user-select: none;
-  scroll-behavior: smooth;
+  touch-action: pan-x pan-y;
 }
 
 /* Class added by JS to make dragging smooth */
@@ -320,6 +276,10 @@ body {
   user-drag: none; /* Non-standard but helpful */
   -webkit-user-drag: none;
   user-select: none;
+}
+
+.image-carousel img.lightbox-trigger {
+  cursor: pointer;
 }
 
 /* ========== RESPONSIVE DESKTOP OVERRIDES ========== */
@@ -362,9 +322,30 @@ body {
   .section:nth-of-type(odd) .content-box { transform: translateX(50px); }
   .section:nth-of-type(odd) .carousel-container { transform: translateX(-50px); }
 
-  /* Override initial offsets for #quartier to match Text Left layout */
+  /* Override for #quartier: First row side-by-side, rest stacked */
+  #quartier .section-inner {
+    flex-wrap: wrap;
+  }
+
+  /* Force children from the 3rd one onwards to take 100% width */
+  #quartier .section-inner > :nth-child(n+3) {
+    flex: 1 1 100% !important;
+    max-width: 100% !important;
+  }
+
   #quartier .content-box:first-child { transform: translateX(-50px); }
   #quartier .carousel-container:nth-child(2) { transform: translateX(50px); }
+
+  /* Wide aspect ratio for full-width carousels (Events and extra galleries) */
+  #events-carousel .carousel-track img {
+    aspect-ratio: 21 / 9 !important;
+  }
+
+  /* Quartier park carousel: match Installations carousel size */
+  #quartier-park-carousel-track img {
+    aspect-ratio: 1 / 1 !important;
+    max-height: 450px;
+  }
 }
 
 /* Ensure revealed elements always reset their transforms and opacity across all devices */
@@ -404,8 +385,10 @@ body {
 .carousel-pips {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 8px;
-  margin-top: 1rem;
+  margin: 1.5rem 0;
+  min-height: 20px;
 }
 
 .pip {
@@ -439,6 +422,14 @@ body {
 
 .lightbox.open { display: flex; }
 .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; cursor: default; }
+
+.lightbox-caption {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
 
 .lightbox-close {
   background: rgba(255, 255, 255, 0.2);
@@ -492,9 +483,28 @@ body {
   }
 }
 
+.gallery-mosaic {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.gallery-mosaic img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery-mosaic img:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+}
+
 .gallery-mosaic .gallery-wide {
   grid-column: span 2;
-  height: 260px;
 }
 
 .gallery-mosaic .gallery-tall {
@@ -507,12 +517,11 @@ body {
   .gallery-mosaic {
     grid-template-columns: 1fr;
   }
-  .gallery-mosaic .gallery-wide {
-    grid-column: span 1;
+  .gallery-mosaic img {
     height: 200px;
   }
-  .gallery-mosaic .gallery-item {
-    height: 200px;
+  .gallery-mosaic .gallery-wide {
+    grid-column: span 1;
   }
 }
 
@@ -602,7 +611,7 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
-.lang-switch a {
+.lang-switch button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -611,15 +620,17 @@ body {
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--bleu-pale);
-  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
   transition: all var(--transition);
 }
 
-.lang-switch a:hover {
+.lang-switch button:hover {
   background: rgba(255,255,255,0.1);
 }
 
-.lang-switch a.active {
+.lang-switch button.active {
   background: var(--orange);
   color: #fff;
 }
@@ -658,7 +669,7 @@ body {
   justify-content: center;
   text-align: center;
   padding: 2rem;
-  background: linear-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.4)), url('../assets/quartier-parc.webp');
+  background: linear-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.4)), url('/assets/Quartier/quartier-parc.webp');
   background-attachment: fixed;
   background-size: cover;
   background-position: center;
@@ -755,6 +766,7 @@ body {
 
 .carousel-track {
   display: flex;
+  align-items: center;
   gap: 1.25rem;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -798,6 +810,121 @@ body {
   background: var(--bleu-pale);
 }
 
+.business-carousel-card {
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 85%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  scroll-snap-align: center;
+  border-radius: 16px;
+  box-shadow: 0 20px 45px rgba(0,0,0,0.18);
+  height: 420px;
+  min-height: 420px;
+  margin-right: 1.25rem;
+  background: #e9e9e9;
+}
+
+.business-carousel-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  flex: 1 1 auto;
+  aspect-ratio: auto;
+  object-fit: cover;
+}
+
+/* Business overlay shown on top of carousel images */
+.business-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.85rem 1rem;
+  background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 80%, transparent 100%);
+  color: #fff;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 50%; /* Increased space to ensure hours and links fit */
+  overflow: auto;
+}
+
+.business-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 1.25rem 1rem 2.5rem; /* Increased bottom padding for gradient coverage */
+  background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%); /* Stronger gradient */
+  z-index: 2;
+  pointer-events: none; /* Allows clicks to pass through to the image */
+  display: flex; /* Added flex for internal layout */
+  flex-direction: column;
+  gap: 0.25rem; /* Gap between name and description */
+}
+
+.business-name {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  pointer-events: auto; /* Allow text selection for the name */
+}
+
+.business-desc {
+  font-size: 0.9rem; /* Slightly smaller for header */
+  color: rgba(255,255,255,0.9);
+  line-height: 1.3;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4); /* Add shadow for readability */
+  pointer-events: auto; /* Allow text selection/copy */
+  max-height: 3.9em; /* Approx 3 lines (1.3 * 3 = 3.9) */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box; /* For multi-line ellipsis */
+  -webkit-line-clamp: 3; /* Limit to 3 lines for webkit browsers */
+  -webkit-box-orient: vertical;
+}
+
+.business-hours .bh-row {
+  font-size: 0.78rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem; /* Place day and time side-by-side with a gap */
+  color: rgba(255,255,255,0.9);
+}
+
+.business-hours .bh-row .bh-day {
+  flex-grow: 0;
+}
+
+.business-links {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: flex-start; /* Aligned left, opposite the right-aligned hours */
+  flex-wrap: wrap; /* Allow links to wrap if many */
+  gap: 0.5rem;
+}
+
+.business-links a {
+  color: #fff;
+  background: rgba(255,255,255,0.12);
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  display: flex; /* For icon and text alignment */
+  align-items: center;
+  gap: 0.3rem; /* Gap between icon and text */
+}
+
+.business-links a .icon {
+  font-size: 0.9em; /* Adjust icon size relative to text */
+}
+
 .card-content {
   padding: 1rem;
   display: flex;
@@ -830,4 +957,23 @@ body {
   color: var(--bleu-moyen);
   font-style: italic;
   padding: 1rem 0;
+}
+
+/* ========== SPLIT ROW (half-screen bubbles) ========== */
+.content-box-row {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+}
+
+.content-box-col {
+  flex: 1;
+  min-width: 0;
+}
+
+/* On mobile, stack the columns */
+@media (max-width: 768px) {
+  .content-box-row {
+    flex-direction: column;
+  }
 }
