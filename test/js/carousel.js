@@ -66,25 +66,21 @@ function smoothScrollTo(el, target, duration, teleportTarget = null, onFinish = 
     }
     const elapsed = currentTime - startTime;
     const progress = Math.min(elapsed / duration, 1);
-    const ease = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
+    // Cubic ease-out: smooth deceleration, no overshoot
+    const ease = 1 - Math.pow(1 - progress, 3);
     el.scrollLeft = start + change * ease;
     if (progress < 1) {
       el.scrollRequestID = requestAnimationFrame(animate);
     } else {
       el.classList.remove('is-animating');
-      if (teleportTarget !== null) {
-        el.scrollLeft = teleportTarget;
-        // Defer snap restoration so teleport position sticks
-        requestAnimationFrame(() => {
-          el.style.scrollSnapType = '';
-          el.scrollRequestID = null;
-          if (onFinish) onFinish();
-        });
-      } else {
+      // Blend to exact snap position, then re-enable native snap
+      const finalPos = teleportTarget !== null ? teleportTarget : target;
+      el.scrollLeft = Math.round(finalPos);
+      requestAnimationFrame(() => {
         el.style.scrollSnapType = '';
         el.scrollRequestID = null;
         if (onFinish) onFinish();
-      }
+      });
     }
   }
   el.scrollRequestID = requestAnimationFrame(animate);
@@ -96,8 +92,8 @@ function getSnapPosition(track, item) {
   if (align === 'start' || align.startsWith('start')) {
     return item.offsetLeft;
   }
-  // Default: center alignment
-  return item.offsetLeft - (track.offsetWidth - item.offsetWidth) / 2;
+  // Default: center alignment — round to prevent sub-pixel snap jitter
+  return Math.round(item.offsetLeft - (track.offsetWidth - item.offsetWidth) / 2);
 }
 
 function navigate(track, direction, duration = 1000) {
@@ -188,6 +184,7 @@ export function initEnhancedCarousels() {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       // On touch: let the browser handle native scrolling
       if (e.pointerType === 'touch') {
+        isDown = true;
         stopAutoPlay();
         track.isAnimationCanceled = true;
         return;
@@ -244,11 +241,41 @@ export function initEnhancedCarousels() {
       const items = track.children;
       if (items.length === 0) return;
 
-      // Touch: let native scroll-snap handle settling
+      // Touch: let native scroll-snap handle momentum + centering
       const isTouch = e && (e.pointerType === 'touch' || e.type === 'touchend');
       if (isTouch) {
-        track.style.scrollSnapType = '';
         startAutoPlay();
+        const isInfinite = track.dataset.cloned === 'true';
+        if (isInfinite) {
+          // Let native snap do its thing, then fix clone boundary if needed
+          track.style.scrollSnapType = ''; // ensure snap is active
+          const checkBoundary = () => {
+            track.removeEventListener('scrollend', checkBoundary);
+            const items = track.children;
+            if (items.length < 3) return;
+            const maxScroll = track.scrollWidth - track.offsetWidth;
+            // Only intervene if stuck on a clone
+            if (track.scrollLeft <= 5) {
+              track.style.scrollSnapType = 'none';
+              track.scrollLeft = getSnapPosition(track, items[items.length - 2]);
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => { track.style.scrollSnapType = ''; });
+              });
+            } else if (track.scrollLeft >= maxScroll - 5) {
+              track.style.scrollSnapType = 'none';
+              track.scrollLeft = getSnapPosition(track, items[1]);
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => { track.style.scrollSnapType = ''; });
+              });
+            }
+          };
+          track.addEventListener('scrollend', checkBoundary, { once: true });
+          // Fallback timeout
+          setTimeout(() => {
+            track.removeEventListener('scrollend', checkBoundary);
+            checkBoundary();
+          }, 800);
+        }
         return;
       }
 
