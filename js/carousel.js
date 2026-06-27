@@ -174,8 +174,8 @@ export function initEnhancedCarousels() {
     track.addEventListener('mouseenter', stopAutoPlay);
     track.addEventListener('mouseleave', startAutoPlay);
 
-    if (prevBtn) prevBtn.onclick = () => navigate(track, -1, 1000);
-    if (nextBtn) nextBtn.onclick = () => navigate(track, 1, 1000);
+    if (prevBtn) prevBtn.onclick = () => { stopAutoPlay(); navigate(track, -1, 1000); startAutoPlay(); };
+    if (nextBtn) nextBtn.onclick = () => { stopAutoPlay(); navigate(track, 1, 1000); startAutoPlay(); };
 
     // Dragging logic
     let isDown = false, startX, scrollLeft, activePointerId = null;
@@ -346,6 +346,7 @@ export function initEnhancedCarousels() {
           const pip = document.createElement('button');
           pip.className = i === activeIdx ? 'pip active' : 'pip';
           pip.onclick = () => {
+            stopAutoPlay();
             const target = items[track.dataset.cloned === "true" ? i + 1 : i];
             const s = target.offsetLeft - (track.offsetWidth - target.offsetWidth) / 2;
             smoothScrollTo(track, s, 750, null, startAutoPlay);
