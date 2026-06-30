@@ -646,14 +646,34 @@ export async function initBusinessGallery() {
           });
         }
 
+        // Package business data for detail modal
+        const bizData = encodeURIComponent(JSON.stringify({
+          title: business.name,
+          date: '',
+          time: '',
+          location: '',
+          description: (business.description_fr || business.description || ''),
+          link: business.website || '',
+          image: imageUrl,
+          isBusiness: true,
+          status: status || '',
+          statusText: statusText || '',
+          hours: business.business_hours || {},
+          links: {
+            website: business.website || '',
+            facebook: business.social_media?.facebook || '',
+            instagram: business.social_media?.instagram || ''
+          }
+        }));
+
         return `
-          <div class="business-carousel-card lightbox-trigger" aria-label="${escapeHtml(business.name)}">
+          <div class="business-carousel-card" data-ev="${escapeHtml(bizData)}" onclick="window._openEventDetail(this)" aria-label="${escapeHtml(business.name)}">
             <div class="business-header">
               <div class="business-name">${escapeHtml(business.name)}</div>
               <div class="business-desc">${escapeHtml(business.description_fr || business.description || '')}</div>
               ${statusBadge}
             </div>
-            <img src="${imageUrl}" alt="${escapeHtml(business.name)}" loading="lazy" draggable="false" class="lightbox-trigger" />
+            <img src="${imageUrl}" alt="${escapeHtml(business.name)}" loading="lazy" draggable="false" />
             <div class="business-overlay">
               <div class="business-hours">${hoursHtml}</div>
               <div class="business-links">${linksHtml}</div>
@@ -735,39 +755,77 @@ export function initCommunityCarousel() {
   }).join('');
 }
 
-// Event detail modal
+function renderHoursColumns(hours) {
+  const lang = document.documentElement.lang || 'fr';
+  const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+  const labels = (window.translations?.[lang]?.['day_monday']) ? 
+    days.map(d => (window.translations[lang]['day_' + d] || '').substring(0,3)) :
+    ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  const now = new Date();
+  const todayIdx = (now.getDay() + 6) % 7;
+
+  // Build week dates for holiday check
+  const monday = new Date(now); monday.setDate(now.getDate() - todayIdx);
+  const weekDates = days.map((_, i) => {
+    const d = new Date(monday); d.setDate(monday.getDate() + i);
+    return d.toISOString().split('T')[0];
+  });
+
+  return `<div class="ev-hours-grid">` + days.map((d, i) => {
+    const val = hours[d];
+    if (!val) return '';
+    const isToday = i === todayIdx;
+    const cls = isToday ? ' ev-hours-today' : '';
+    return `<div class="ev-hours-row${cls}"><span class="ev-hours-day">${labels[i]}</span><span>${escapeHtml(val)}</span></div>`;
+  }).filter(Boolean).join('') + `</div>`;
+}
+
+// Event/Business detail modal
 window._openEventDetail = function(card) {
   const raw = card.getAttribute('data-ev');
   if (!raw) return;
   const lang = document.documentElement.lang || 'fr';
   const e = JSON.parse(decodeURIComponent(raw));
-  const title = lang === 'en' && e.title_en ? e.title_en : e.title;
-  const loc = lang === 'en' && e.location_en ? e.location_en : e.location;
-  const dateStr = new Date(e.date + 'T00:00:00').toLocaleDateString(
-    lang === 'en' ? 'en-CA' : 'fr-CA',
-    { weekday: 'long', month: 'long', day: 'numeric' }
-  );
+  const title = e.title || '';
+  const isBiz = e.isBusiness;
 
   const existing = document.querySelector('.ev-detail-overlay');
   if (existing) existing.remove();
 
   const overlay = document.createElement('div');
   overlay.className = 'ev-detail-overlay';
-  const hasLink = e.link && e.link !== '#';
-  const calData = encodeURIComponent(JSON.stringify({ title:e.title, date:e.date, time:e.time, location:e.location, description:e.description }));
+
+  let dateLocHtml = '';
+  let actionsHtml = '';
+  if (isBiz) {
+    if (e.links?.website) actionsHtml += `<a href="${escapeHtml(e.links.website)}" target="_blank" rel="noopener" class="cal-add-btn" style="text-decoration:none;display:inline-block;color:#fff;">🌐 ${lang==='en'?'Website':'Site web'}</a>`;
+    if (e.links?.facebook) actionsHtml += `<a href="${escapeHtml(e.links.facebook)}" target="_blank" rel="noopener" class="cal-add-btn" style="text-decoration:none;display:inline-block;background:#1e3a6b;color:#fff;">📘 Facebook</a>`;
+    if (e.links?.instagram) actionsHtml += `<a href="${escapeHtml(e.links.instagram)}" target="_blank" rel="noopener" class="cal-add-btn" style="text-decoration:none;display:inline-block;background:#8a1a40;color:#fff;">📸 Instagram</a>`;
+  } else {
+    const loc = lang === 'en' && e.location_en ? e.location_en : e.location;
+    const dateStr = e.date ? new Date(e.date + 'T00:00:00').toLocaleDateString(
+      lang === 'en' ? 'en-CA' : 'fr-CA',
+      { weekday: 'long', month: 'long', day: 'numeric' }
+    ) : '';
+    dateLocHtml = (dateStr ? `<div class="card-date">${dateStr}${e.time ? ` — ${e.time}` : ''}</div>` : '') +
+      (loc ? `<div class="card-location" style="margin-bottom:0.75rem;">📍 ${escapeHtml(loc)}</div>` : '');
+    const hasLink = e.link && e.link !== '#';
+    if (hasLink) actionsHtml += `<a href="${escapeHtml(e.link)}" target="_blank" rel="noopener" class="cal-add-btn" style="text-decoration:none;display:inline-block;">${lang==='en'?'More info':'Plus d\'info'} →</a>`;
+    const calData = encodeURIComponent(JSON.stringify({ title:e.title, date:e.date, time:e.time, location:e.location, description:e.description }));
+    actionsHtml += `<button class="cal-add-btn" data-cal="${escapeHtml(calData)}" onclick="window._addToCalendar(this)">📅 ${lang==='en'?'Add to Calendar':'Ajouter au calendrier'}</button>`;
+  }
+
   overlay.innerHTML = `
     <div class="ev-detail-card">
       <button class="ev-detail-close">✕</button>
       ${e.image ? `<img src="${escapeHtml(e.image)}" alt="${escapeHtml(title)}" class="ev-detail-img">` : ''}
       <div class="ev-detail-body">
-        <div class="card-date">${dateStr}${e.time ? ` — ${escapeHtml(e.time)}` : ''}</div>
+        ${dateLocHtml}
         <h2>${escapeHtml(title)}</h2>
-        ${loc ? `<div class="card-location" style="margin-bottom:0.75rem;">📍 ${escapeHtml(loc)}</div>` : ''}
+        ${isBiz && e.status ? `<p class="status-badge status-${e.status}">${escapeHtml(e.statusText)}</p>` : ''}
         ${e.description ? `<p class="ev-detail-desc">${escapeHtml(e.description)}</p>` : ''}
-        <div class="ev-detail-actions">
-          ${hasLink ? `<a href="${escapeHtml(e.link)}" target="_blank" rel="noopener" class="cal-add-btn" style="text-decoration:none;display:inline-block;">${lang==='en'?'More info':'Plus d\'info'} →</a>` : ''}
-          <button class="cal-add-btn" data-cal="${escapeHtml(calData)}" onclick="window._addToCalendar(this)">📅 ${lang==='en'?'Add to Calendar':'Ajouter au calendrier'}</button>
-        </div>
+        ${isBiz && e.hours ? renderHoursColumns(e.hours) : ''}
+        ${actionsHtml ? `<div class="ev-detail-actions">${actionsHtml}</div>` : ''}
       </div>
     </div>`;
   document.body.appendChild(overlay);
