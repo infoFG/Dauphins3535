@@ -1,0 +1,12 @@
+type,key,name,published_csv_url
+business,cafe,Café Lafontaine,
+business,dep,Dépanneur Le 35,
+business,hair,Salon Splendide Coiffure,
+business,jaji,JaJi santé clinique,
+business,palmas,Aime-toi,
+business,prosper,Prosper Fitness,
+business,sage,Sage Art Studio,
+business,delice,Le Délice glacé,
+business,toutou,Lave Toutou,
+office,admin,Bureau d'administration,
+pool,pool,Piscine & Gym,

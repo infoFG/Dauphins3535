@@ -187,6 +187,31 @@ function generateTimeAxisHtml(start, end) {
   return { axis: html + '</div>', grid };
 }
 
+/* Check if a specific date is a holiday */
+function isDateHoliday(holidays, dateStr, scope) {
+  if (!holidays || !holidays.length) return null;
+  const lang = document.documentElement.lang || 'fr';
+  const nameField = lang === 'fr' ? 'name_fr' : 'name_en';
+
+  for (const h of holidays) {
+    let match = false;
+    if (h.date && h.date.startsWith('--')) {
+      const [_, mm, dd] = h.date.split('-');
+      const d = new Date(dateStr);
+      match = (parseInt(mm) === d.getMonth() + 1 && parseInt(dd) === d.getDate());
+    } else if (h.date) {
+      match = h.date === dateStr;
+    }
+
+    if (match) {
+      const affectsKey = 'affects_' + (scope === 'admin' ? 'office' : scope);
+      const applies = h[affectsKey] === undefined || (h[affectsKey] && h[affectsKey].toLowerCase() !== 'false');
+      if (applies) return h[nameField] || h.name_fr || h.name_en || '';
+    }
+  }
+  return null;
+}
+
 export function initDayPlanners(faqData = {}) {
   const planners = document.querySelectorAll('.day-planner');
   const now = new Date();
@@ -210,6 +235,26 @@ export function initDayPlanners(faqData = {}) {
     const closuresData = data?.closures;
     if (!config || !hoursData) return;
 
+    // Check if today is a holiday for this scope
+    const holidays = data._holidays || [];
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    // Get the Monday of current week
+    const now = new Date();
+    const dayOfWeek = (now.getDay() + 6) % 7; // Monday=0
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - dayOfWeek);
+
+    // Build date strings for each day this week
+    const weekDates = dayKeys.map((_, i) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      return d.toISOString().split('T')[0];
+    });
+
+    // Check today's holiday for status badge
+    const todayHolidayName = isDateHoliday(holidays, todayStr, type);
+
     // Update the text info list on the left to match JSON data
     const infoBox = planner.closest('.content-box')?.querySelector('.faq-info');
     if (infoBox) {
@@ -218,12 +263,37 @@ export function initDayPlanners(faqData = {}) {
       if (data?.[noteKey]) {
         noteHtml = `<p class="cleaning-note">${escapeHtml(data[noteKey])}</p>`;
       }
-      infoBox.innerHTML = `<div class="hours-list">${formatBusinessHours(hoursData, lang)}</div>${noteHtml}`;
 
-      // Add open/closed/closing-soon status
-      const status = isCurrentlyOpen(hoursData, closuresData);
-      const statusKey = 'status_' + status;
-      const statusText = window.translations?.[lang]?.[statusKey] || status;
+      // Holiday note above hours list
+      let holidayNote = '';
+      if (todayHolidayName) {
+        holidayNote = `<p class="holiday-note">${lang === 'fr' ? 'Fermé aujourd\'hui — ' : 'Closed today — '}${escapeHtml(todayHolidayName)}</p>`;
+      }
+
+      // Build hours list with holiday annotations for this week
+      const hoursListHtml = dayKeys.map((d, i) => {
+        const val = hoursData[d];
+        if (!val) return '';
+        const dayHoliday = isDateHoliday(holidays, weekDates[i], type);
+        const display = dayHoliday
+          ? `${lang === 'fr' ? 'Fermé' : 'Closed'} — ${escapeHtml(dayHoliday)}`
+          : val;
+        const cls = (dayHoliday ? 'bh-holiday' : '') + (i === currentDay ? ' bh-today' : '');
+        return `<div class="bh-row${cls ? ' ' + cls : ''}"><span class="bh-day">${labels[i]}</span><span class="bh-time">${escapeHtml(display)}</span></div>`;
+      }).join('');
+
+      infoBox.innerHTML = `${holidayNote}<div class="hours-list">${hoursListHtml}</div>${noteHtml}`;
+
+      // Status: holiday overrides normal open/closed
+      let status, statusText;
+      if (todayHolidayName) {
+        status = 'closed';
+        statusText = todayHolidayName;
+      } else {
+        status = isCurrentlyOpen(hoursData, closuresData);
+        const statusKey = 'status_' + status;
+        statusText = window.translations?.[lang]?.[statusKey] || status;
+      }
       infoBox.innerHTML += `<p class="status-badge status-${status}">${statusText}</p>`;
     }
 
@@ -231,40 +301,46 @@ export function initDayPlanners(faqData = {}) {
     const range = config.end - config.start;
 
     const columnsHtml = labels.map((label, idx) => {
+      const isToday = idx === currentDay;
+      const dayDate = weekDates[idx];
+      const dayHolidayName = isDateHoliday(holidays, dayDate, type);
+
       const ranges = parseTimeRanges(hoursData[dayKeys[idx]]);
       const closures = closuresData ? parseTimeRanges(closuresData[dayKeys[idx]]) : null;
-      const isToday = idx === currentDay;
       const nowPos = ((currentTime - config.start) / range) * 100;
       
-      let barHtml = ''; 
-      if (ranges) {
-        barHtml = ranges.map(r => {
-          const barTop = Math.max(0, ((r.open - config.start) / range) * 100);
-          const barBottom = Math.min(100, ((r.close - config.start) / range) * 100);
-          const barHeight = barBottom - barTop;
-          if (barHeight > 0) {
-            return `<div class="time-bar" style="top:${barTop}%; height:${barHeight}%"></div>`;
-          }
-          return '';
-        }).join('');
-      }
-      if (closures) {
-        barHtml += closures.map(c => {
-          const barTop = Math.max(0, ((c.open - config.start) / range) * 100);
-          const barBottom = Math.min(100, ((c.close - config.start) / range) * 100);
-          const barHeight = barBottom - barTop;
-          if (barHeight > 0) {
-            return `<div class="time-bar closure" style="top:${barTop}%; height:${barHeight}%"></div>`;
-          }
-          return '';
-        }).join('');
+      let barHtml = '';
+      if (!dayHolidayName) {
+        if (ranges) {
+          barHtml = ranges.map(r => {
+            const barTop = Math.max(0, ((r.open - config.start) / range) * 100);
+            const barBottom = Math.min(100, ((r.close - config.start) / range) * 100);
+            const barHeight = barBottom - barTop;
+            if (barHeight > 0) {
+              return `<div class="time-bar" style="top:${barTop}%; height:${barHeight}%"></div>`;
+            }
+            return '';
+          }).join('');
+        }
+        if (closures) {
+          barHtml += closures.map(c => {
+            const barTop = Math.max(0, ((c.open - config.start) / range) * 100);
+            const barBottom = Math.min(100, ((c.close - config.start) / range) * 100);
+            const barHeight = barBottom - barTop;
+            if (barHeight > 0) {
+              return `<div class="time-bar closure" style="top:${barTop}%; height:${barHeight}%"></div>`;
+            }
+            return '';
+          }).join('');
+        }
       }
 
       return `
-        <div class="planner-column${isToday ? ' is-today' : ''}">
+        <div class="planner-column${isToday ? ' is-today' : ''}${dayHolidayName ? ' is-holiday' : ''}">
           <div class="time-track">
             ${barHtml}
-            ${isToday && nowPos >= 0 && nowPos <= 100 ? `<div class="now-indicator" style="top:${nowPos}%"></div>` : ''}
+            ${dayHolidayName ? `<div class="holiday-banner">${escapeHtml(dayHolidayName)}</div>` : ''}
+            ${isToday && !dayHolidayName && nowPos >= 0 && nowPos <= 100 ? `<div class="now-indicator" style="top:${nowPos}%"></div>` : ''}
           </div>
           <div class="day-label">${label.substring(0, 3)}</div>
         </div>`;

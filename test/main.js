@@ -1,6 +1,7 @@
 import { initMenu, initLanguage, initLightbox, initScrollReveal, initDayPlanners, initWasteCalendar } from './js/ui.js';
 import { initEventsCarousel, initBusinessGallery, reRenderEvents, initCommunityCarousel } from './js/api.js';
 import { initEnhancedCarousels, loadStaticCarouselImages, loadSectionBackground } from './js/carousel.js';
+import { fetchFAQData } from './js/gsheets.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   // 1. Initialize core UI
@@ -14,13 +15,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initEventsCarousel();
     await initBusinessGallery();
 
-    // Fetch FAQ Hours
-    const [adminRes, poolRes] = await Promise.all([
-      fetch('assets/FAQ/OfficeHours.json').then(r => r.json()).catch(() => null),
-      fetch('assets/FAQ/PoolHours.json').then(r => r.json()).catch(() => null)
-    ]);
-
-    faqData = { admin: adminRes, pool: poolRes };
+    // Fetch FAQ Hours — try Google Sheets first, fall back to JSON
+    try {
+      const sheetsData = await fetchFAQData();
+      if (sheetsData.admin || sheetsData.pool) {
+        faqData = {
+          admin: sheetsData.admin || (await fetch('assets/FAQ/OfficeHours.json').then(r => r.json()).catch(() => null)),
+          pool: sheetsData.pool || (await fetch('assets/FAQ/PoolHours.json').then(r => r.json()).catch(() => null))
+        };
+      }
+    } catch {
+      const [adminRes, poolRes] = await Promise.all([
+        fetch('assets/FAQ/OfficeHours.json').then(r => r.json()).catch(() => null),
+        fetch('assets/FAQ/PoolHours.json').then(r => r.json()).catch(() => null)
+      ]);
+      faqData = { admin: adminRes, pool: poolRes };
+    }
 
     // 3. Load static assets - removed leading slashes for better portability
     await loadStaticCarouselImages('apropos-carousel-track', 'assets/Apropos');
@@ -45,6 +55,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Re-render dynamic content when language changes
   document.addEventListener('languagechanged', async () => {
+    // Re-fetch FAQ data from sheets for fresh holiday names in current language
+    try {
+      const sheetsData = await fetchFAQData();
+      if (sheetsData.admin || sheetsData.pool) {
+        faqData.admin = sheetsData.admin || faqData.admin;
+        faqData.pool = sheetsData.pool || faqData.pool;
+      }
+    } catch {}
     initDayPlanners(faqData);
     initWasteCalendar();
     await initBusinessGallery();
