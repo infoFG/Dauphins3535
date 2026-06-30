@@ -49,7 +49,7 @@
   </style>
   <script>
 (function(){
-if(sessionStorage.getItem('_pw')==='1')return;
+if(sessionStorage.getItem('_pw')==='1'||location.hostname==='localhost'||location.hostname==='127.0.0.1')return;
 function init(){
 var o=document.createElement('div');
 o.id='pw-gate';
@@ -297,19 +297,33 @@ if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)
         try {
           const sheetRes = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTns1Hpe-TBIjKUM7yjP_wI4cm75iy3R6Plfo7YR7r7TCA6H154T61O_B2sTV3Wj8V8Vf6ToslfSfKR/pub?gid=447995773&single=true&output=csv');
           const text = await sheetRes.text();
-          const lines = text.split(/\r?\n/);
-          if (lines.length > 1) {
-            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+
+          // Parse CSV with proper quote handling (supports multi-line fields)
+          const rows = [];
+          let row = [], cell = '', inQ = false;
+          for (let i = 0; i < text.length; i++) {
+            const ch = text[i];
+            if (inQ) {
+              if (ch === '"') { if (text[i+1] === '"') { cell += '"'; i++; } else inQ = false; }
+              else cell += ch;
+            } else {
+              if (ch === '"') inQ = true;
+              else if (ch === ',') { row.push(cell.trim()); cell = ''; }
+              else if (ch === '\n' || (ch === '\r' && text[i+1] === '\n')) {
+                row.push(cell.trim());
+                if (row.some(c => c !== '')) rows.push(row);
+                row = []; cell = '';
+                if (ch === '\r') i++;
+              } else cell += ch;
+            }
+          }
+          row.push(cell.trim());
+          if (row.some(c => c !== '')) rows.push(row);
+
+          if (rows.length > 1) {
+            const headers = rows[0].map(h => h.trim().toLowerCase());
             const approvedIdx = headers.indexOf('approved');
-            commEvents = lines.slice(1).filter(l => l.trim()).map(line => {
-              const vals = [];
-              let cur = '', inQ = false;
-              for (const ch of line) {
-                if (ch === '"') inQ = !inQ;
-                else if (ch === ',' && !inQ) { vals.push(cur.trim().replace(/^"|"$/g, '')); cur = ''; }
-                else cur += ch;
-              }
-              vals.push(cur.trim().replace(/^"|"$/g, ''));
+            commEvents = rows.slice(1).map(vals => {
               if ((vals[approvedIdx] || '').toUpperCase() !== 'TRUE') return null;
               const parsed = new Date(vals[headers.indexOf('event date')] || '');
               if (isNaN(parsed.getTime())) return null;
@@ -326,7 +340,7 @@ if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)
           }
         } catch(e) {}
 
-        allEvents = [...mainEvents, ...commEvents].filter(e => e.source !== 'Communauté');
+        allEvents = [...mainEvents, ...commEvents];
         renderEvents();
         enrichTimes();
         enrichThumbnails();
