@@ -376,10 +376,33 @@ async function fetchCommunityEvents() {
     const response = await fetch(SHEET_CSV);
     if (!response.ok) return [];
     const csvText = await response.text();
-    const lines = csvText.split(/\r?\n/);
-    if (lines.length < 2) return [];
+    
+    // Parse CSV with proper quote handling (supports embedded newlines)
+    const rows = [];
+    let row = [], cell = '', inQuotes = false;
+    for (let i = 0; i < csvText.length; i++) {
+      const ch = csvText[i];
+      if (inQuotes) {
+        if (ch === '"') {
+          if (csvText[i + 1] === '"') { cell += '"'; i++; }
+          else inQuotes = false;
+        } else cell += ch;
+      } else {
+        if (ch === '"') inQuotes = true;
+        else if (ch === ',') { row.push(cell.trim()); cell = ''; }
+        else if (ch === '\n' || (ch === '\r' && csvText[i + 1] === '\n')) {
+          row.push(cell.trim());
+          if (row.length > 0 && row.some(c => c !== '')) rows.push(row);
+          row = []; cell = '';
+          if (ch === '\r') i++;
+        } else cell += ch;
+      }
+    }
+    row.push(cell.trim());
+    if (row.length > 0 && row.some(c => c !== '')) rows.push(row);
 
-    const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_'));
+    if (rows.length < 2) return [];
+    const headers = rows[0].map(h => h.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_'));
     const dateIdx = headers.indexOf('event_date');
     const titleIdx = headers.indexOf('event_name');
     const timeIdx = headers.indexOf('start_time');
@@ -388,18 +411,9 @@ async function fetchCommunityEvents() {
     const approvedIdx = headers.indexOf('approved');
     const urlIdx = headers.indexOf('event_url');
     const locIdx = headers.indexOf('event_location');
+    const descIdx = headers.indexOf('event_description');
 
-    return lines.slice(1).filter(l => l.trim()).map(line => {
-      // Proper CSV parsing with quote handling
-      const vals = [];
-      let cur = '', inQ = false;
-      for (const ch of line) {
-        if (ch === '"') { inQ = !inQ; }
-        else if (ch === ',' && !inQ) { vals.push(cur.trim().replace(/^"|"$/g, '')); cur = ''; }
-        else { cur += ch; }
-      }
-      vals.push(cur.trim().replace(/^"|"$/g, ''));
-      
+    return rows.slice(1).map(vals => {
       const approved = (vals[approvedIdx] || '').toUpperCase();
       if (approved !== 'TRUE' && approved !== 'YES') return null;
 
@@ -414,15 +428,11 @@ async function fetchCommunityEvents() {
       const eventUrl = vals[urlIdx] || '';
       const eventLoc = vals[locIdx] || '';
 
-      // Convert Google Drive links to embeddable images
       let imgUrl = '';
       if (rawImg) {
         const driveMatch = rawImg.match(/[?&]id=([a-zA-Z0-9_-]+)/) || rawImg.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (driveMatch) {
-          imgUrl = `https://lh3.googleusercontent.com/d/${driveMatch[1]}=w400`;
-        } else {
-          imgUrl = rawImg;
-        }
+        if (driveMatch) imgUrl = `https://lh3.googleusercontent.com/d/${driveMatch[1]}=w400`;
+        else imgUrl = rawImg;
       }
 
       return {
@@ -435,7 +445,7 @@ async function fetchCommunityEvents() {
         source: 'Communauté',
         source_en: 'Community',
         link: eventUrl || '#',
-        description: (vals[headers.indexOf('description')] || '').substring(0, 200),
+        description: (vals[descIdx] || '').substring(0, 200),
         image: imgUrl
       };
     }).filter(Boolean);
@@ -699,14 +709,101 @@ export function initCommunityCarousel() {
     const img = event.image || getFallbackLocal(event);
     const fallback = img !== getFallbackLocal(event) ? ` onerror="this.src='${escapeHtml(getFallbackLocal(event))}';this.onerror=null"` : '';
     const hasLink = event.link && event.link !== '#';
+
+    if (hasLink) {
+      return `
+      <a href="${escapeHtml(event.link)}" target="_blank" rel="noopener" class="carousel-card" draggable="false">
+        <img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" loading="lazy"${fallback}>
+        <div class="card-content">
+          <div class="card-date">${dateStr}${event.time ? ` — ${formatTimeForDisplay(event.time)}` : ''}</div>
+          <h4 class="card-title">${escapeHtml(title)}</h4>
+          <div class="card-location">📍 ${escapeHtml(event.location_en && lang === 'en' ? event.location_en : event.location)}</div>
+        </div>
+      </a>`;
+    }
+
+    // No link → "Add to Calendar" button
+    const calData = encodeURIComponent(JSON.stringify({
+      title: event.title,
+      date: event.date,
+      time: event.time || '',
+      location: event.location || '',
+      description: event.description || ''
+    }));
     return `
-    <a href="${escapeHtml(event.link)}" ${hasLink ? 'target="_blank" rel="noopener"' : ''} class="carousel-card" draggable="false">
+    <div class="carousel-card" draggable="false">
       <img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" loading="lazy"${fallback}>
       <div class="card-content">
         <div class="card-date">${dateStr}${event.time ? ` — ${formatTimeForDisplay(event.time)}` : ''}</div>
         <h4 class="card-title">${escapeHtml(title)}</h4>
         <div class="card-location">📍 ${escapeHtml(event.location_en && lang === 'en' ? event.location_en : event.location)}</div>
+        <button class="cal-add-btn" data-cal="${escapeHtml(calData)}" onclick="window._addToCalendar(this)" title="${lang === 'en' ? 'Add to Calendar' : 'Ajouter au calendrier'}">
+          📅 ${lang === 'en' ? 'Add to Calendar' : 'Ajouter au calendrier'}
+        </button>
       </div>
-    </a>`;
+    </div>`;
   }).join('');
+}
+
+// Global "Add to Calendar" handler — confirmation then Google Calendar
+window._addToCalendar = function(btn) {
+  const lang = document.documentElement.lang || 'fr';
+  const raw = btn.getAttribute('data-cal');
+  if (!raw) return;
+  const data = JSON.parse(decodeURIComponent(raw));
+
+  const existing = document.querySelector('.cal-confirm-overlay');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'cal-confirm-overlay';
+  overlay.innerHTML = `
+    <div class="cal-confirm-box">
+      <p>${lang === 'en' ? 'Add to your calendar?' : 'Ajouter à votre calendrier ?'}</p>
+      <p class="cal-confirm-title">${escapeHtml(data.title || '')}</p>
+      <p class="cal-confirm-sub">${lang === 'en' ? 'Opens in Google Calendar' : 'Ouvre dans Google Calendar'}</p>
+      <div class="cal-confirm-actions">
+        <button class="cal-confirm-yes">${lang === 'en' ? 'Add' : 'Ajouter'}</button>
+        <button class="cal-confirm-no">${lang === 'en' ? 'Cancel' : 'Annuler'}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const close = () => overlay.remove();
+  overlay.querySelector('.cal-confirm-no').onclick = close;
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  overlay.querySelector('.cal-confirm-yes').onclick = () => {
+    close();
+    const title = encodeURIComponent(data.title || '');
+    const loc = encodeURIComponent(data.location || '');
+    const desc = encodeURIComponent(data.description || '');
+    const startStr = toCalDate(data.date, data.time, true);
+    const endStr = toCalDate(data.date, data.time, false);
+    const dates = startStr + '/' + endStr;
+    window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${desc}&location=${loc}`, '_blank');
+  };
+};
+
+function toCalDate(dateStr, timeStr, isStart) {
+  if (!dateStr) return '';
+  const d = dateStr.replace(/-/g, '');
+  if (!timeStr) return isStart ? d : d;
+
+  let h = 0, m = 0;
+  const t = timeStr.trim();
+  if (t.includes(':')) {
+    const parts = t.split(':');
+    h = parseInt(parts[0]);
+    m = parseInt(parts[1]);
+    if (t.toUpperCase().includes('PM') && h < 12) h += 12;
+    if (t.toUpperCase().includes('AM') && h === 12) h = 0;
+  } else if (t.includes('h')) {
+    const parts = t.split('h');
+    h = parseInt(parts[0]);
+    m = parseInt(parts[1]) || 0;
+  }
+  if (!isStart) h += 1; // default 1-hour duration
+  const pad = n => String(n).padStart(2, '0');
+  return d + 'T' + pad(h) + pad(m) + '00';
 }
