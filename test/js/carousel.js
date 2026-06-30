@@ -61,7 +61,8 @@ function smoothScrollTo(el, target, duration, teleportTarget = null, onFinish = 
   function animate(currentTime) {
     if (el.isAnimationCanceled) {
       el.classList.remove('is-animating');
-      el.style.scrollSnapType = '';
+      // Keep snap disabled so the user's drag isn't fighting native snap
+      el.style.scrollSnapType = 'none';
       return;
     }
     const elapsed = currentTime - startTime;
@@ -96,8 +97,19 @@ function getSnapPosition(track, item) {
   return Math.round(item.offsetLeft - (track.offsetWidth - item.offsetWidth) / 2);
 }
 
+function cancelSmoothScroll(track) {
+  if (track.scrollRequestID) {
+    cancelAnimationFrame(track.scrollRequestID);
+    track.scrollRequestID = null;
+  }
+  track.isAnimationCanceled = true;
+  track.classList.remove('is-animating');
+  // Keep snap disabled so native touch / mouse drag can take over without fighting
+  track.style.scrollSnapType = 'none';
+}
+
 function navigate(track, direction, duration = 1000) {
-  if (track.classList.contains('is-animating')) return;
+  if (track.classList.contains('is-animating') || track.classList.contains('dragging')) return;
   const items = Array.from(track.children);
   if (items.length === 0) return;
   const scrollCenter = track.scrollLeft + track.offsetWidth / 2;
@@ -182,18 +194,35 @@ export function initEnhancedCarousels() {
 
     track.addEventListener('pointerdown', (e) => {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
-      // Let clicks on interactive elements pass through
+
+      // Let clicks on interactive elements pass through without starting a drag.
+      // Still cancel any running animation so it doesn't fight the browser's
+      // native touch scroll, but restore snap immediately since no drag follows.
       if (e.target.closest('button, a, .cal-add-btn, [data-ev]')) {
+        stopAutoPlay();
+        if (track.scrollRequestID) {
+          cancelAnimationFrame(track.scrollRequestID);
+          track.scrollRequestID = null;
+        }
+        track.isAnimationCanceled = true;
+        track.classList.remove('is-animating');
+        track.style.scrollSnapType = '';
         isDown = false;
         track.mouseDownX = undefined;
         track.mouseDownY = undefined;
+        // Restart autoplay shortly after the interaction settles
+        clearTimeout(track._interactiveRestoreTimer);
+        track._interactiveRestoreTimer = setTimeout(() => startAutoPlay(), 3000);
         return;
       }
       // On touch: let the browser handle native scrolling
       if (e.pointerType === 'touch') {
         isDown = true;
+        activePointerId = e.pointerId;
         stopAutoPlay();
-        track.isAnimationCanceled = true;
+        cancelSmoothScroll(track);
+        track.mouseDownX = e.clientX;
+        track.mouseDownY = e.clientY;
         return;
       }
       // Mouse: prevent link drag behavior
@@ -203,7 +232,7 @@ export function initEnhancedCarousels() {
       isDown = true;
       activePointerId = e.pointerId;
       stopAutoPlay();
-      track.isAnimationCanceled = true;
+      cancelSmoothScroll(track);
       startX = e.clientX - track.getBoundingClientRect().left;
       scrollLeft = track.scrollLeft;
       track.mouseDownX = e.clientX;
@@ -252,10 +281,10 @@ export function initEnhancedCarousels() {
       const isTouch = e && (e.pointerType === 'touch' || e.type === 'touchend');
       if (isTouch) {
         startAutoPlay();
+        // Always restore native snap after touch drag ends
+        track.style.scrollSnapType = '';
         const isInfinite = track.dataset.cloned === 'true';
         if (isInfinite) {
-          // Let native snap do its thing, then fix clone boundary if needed
-          track.style.scrollSnapType = ''; // ensure snap is active
           const checkBoundary = () => {
             track.removeEventListener('scrollend', checkBoundary);
             const items = track.children;
