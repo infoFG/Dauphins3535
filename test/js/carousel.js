@@ -182,6 +182,8 @@ export function initEnhancedCarousels() {
 
     track.addEventListener('pointerdown', (e) => {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
+      // Let button/link taps pass through on all devices
+      if (e.target.closest('button, a, .cal-add-btn')) return;
       // On touch: let the browser handle native scrolling
       if (e.pointerType === 'touch') {
         isDown = true;

@@ -1547,6 +1547,84 @@ body {
   margin-top: 0.2rem;
 }
 
+.cal-add-btn {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--orange, #e67e22);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  align-self: flex-start;
+}
+.cal-add-btn:hover {
+  background: #d35400;
+}
+
+.cal-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s;
+}
+.cal-confirm-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 320px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+}
+.cal-confirm-box p {
+  margin: 0 0 0.5rem;
+  color: #3A2404;
+  font-size: 0.95rem;
+}
+.cal-confirm-title {
+  font-weight: 700;
+  font-size: 1rem !important;
+  margin-bottom: 0.25rem !important;
+}
+.cal-confirm-sub {
+  font-size: 0.75rem !important;
+  color: #888 !important;
+  margin-bottom: 1rem !important;
+}
+.cal-confirm-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+.cal-confirm-actions button {
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cal-confirm-yes {
+  background: var(--orange, #e67e22);
+  color: #fff;
+}
+.cal-confirm-no {
+  background: #eee;
+  color: #666;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .card-source {
   font-size: 0.7rem;
   color: var(--orange);
