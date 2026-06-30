@@ -710,42 +710,72 @@ export function initCommunityCarousel() {
     const fallback = img !== getFallbackLocal(event) ? ` onerror="this.src='${escapeHtml(getFallbackLocal(event))}';this.onerror=null"` : '';
     const hasLink = event.link && event.link !== '#';
 
-    if (hasLink) {
-      return `
-      <a href="${escapeHtml(event.link)}" target="_blank" rel="noopener" class="carousel-card" draggable="false">
-        <img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" loading="lazy"${fallback}>
-        <div class="card-content">
-          <div class="card-date">${dateStr}${event.time ? ` — ${formatTimeForDisplay(event.time)}` : ''}</div>
-          <h4 class="card-title">${escapeHtml(title)}</h4>
-          <div class="card-location">📍 ${escapeHtml(event.location_en && lang === 'en' ? event.location_en : event.location)}</div>
-        </div>
-      </a>`;
-    }
-
-    // No link → "Add to Calendar" button
-    const calData = encodeURIComponent(JSON.stringify({
+    // Store full event data for detail modal
+    const evData = encodeURIComponent(JSON.stringify({
       title: event.title,
+      title_en: event.title_en || '',
       date: event.date,
       time: event.time || '',
       location: event.location || '',
-      description: event.description || ''
+      location_en: event.location_en || '',
+      description: event.description || '',
+      link: event.link || '',
+      image: img
     }));
+
     return `
-    <div class="carousel-card" draggable="false">
+    <div class="carousel-card" draggable="false" data-ev="${escapeHtml(evData)}" onclick="window._openEventDetail(this)">
       <img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" loading="lazy"${fallback}>
       <div class="card-content">
         <div class="card-date">${dateStr}${event.time ? ` — ${formatTimeForDisplay(event.time)}` : ''}</div>
         <h4 class="card-title">${escapeHtml(title)}</h4>
         <div class="card-location">📍 ${escapeHtml(event.location_en && lang === 'en' ? event.location_en : event.location)}</div>
-        <button class="cal-add-btn" data-cal="${escapeHtml(calData)}" onclick="window._addToCalendar(this)" title="${lang === 'en' ? 'Add to Calendar' : 'Ajouter au calendrier'}">
-          📅 ${lang === 'en' ? 'Add to Calendar' : 'Ajouter au calendrier'}
-        </button>
       </div>
     </div>`;
   }).join('');
 }
 
-// Global "Add to Calendar" handler — confirmation then Google Calendar
+// Event detail modal
+window._openEventDetail = function(card) {
+  const raw = card.getAttribute('data-ev');
+  if (!raw) return;
+  const lang = document.documentElement.lang || 'fr';
+  const e = JSON.parse(decodeURIComponent(raw));
+  const title = lang === 'en' && e.title_en ? e.title_en : e.title;
+  const loc = lang === 'en' && e.location_en ? e.location_en : e.location;
+  const dateStr = new Date(e.date + 'T00:00:00').toLocaleDateString(
+    lang === 'en' ? 'en-CA' : 'fr-CA',
+    { weekday: 'long', month: 'long', day: 'numeric' }
+  );
+
+  const existing = document.querySelector('.ev-detail-overlay');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'ev-detail-overlay';
+  const hasLink = e.link && e.link !== '#';
+  const calData = encodeURIComponent(JSON.stringify({ title:e.title, date:e.date, time:e.time, location:e.location, description:e.description }));
+  overlay.innerHTML = `
+    <div class="ev-detail-card">
+      <button class="ev-detail-close">✕</button>
+      ${e.image ? `<img src="${escapeHtml(e.image)}" alt="${escapeHtml(title)}" class="ev-detail-img">` : ''}
+      <div class="ev-detail-body">
+        <div class="card-date">${dateStr}${e.time ? ` — ${escapeHtml(e.time)}` : ''}</div>
+        <h2>${escapeHtml(title)}</h2>
+        ${loc ? `<div class="card-location" style="margin-bottom:0.75rem;">📍 ${escapeHtml(loc)}</div>` : ''}
+        ${e.description ? `<p class="ev-detail-desc">${escapeHtml(e.description)}</p>` : ''}
+        <div class="ev-detail-actions">
+          ${hasLink ? `<a href="${escapeHtml(e.link)}" target="_blank" rel="noopener" class="cal-add-btn" style="text-decoration:none;display:inline-block;">${lang==='en'?'More info':'Plus d\'info'} →</a>` : ''}
+          <button class="cal-add-btn" data-cal="${escapeHtml(calData)}" onclick="window._addToCalendar(this)">📅 ${lang==='en'?'Add to Calendar':'Ajouter au calendrier'}</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const close = () => overlay.remove();
+  overlay.querySelector('.ev-detail-close').onclick = close;
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+};
 window._addToCalendar = function(btn) {
   const lang = document.documentElement.lang || 'fr';
   const raw = btn.getAttribute('data-cal');
