@@ -75,6 +75,10 @@ if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)
         <div class="content-box">
           <h1 class="section-title">Événements communautaires</h1>
           <p style="margin-bottom:2rem;">Événements soumis par les résidents de l'immeuble.</p>
+          <p style="margin-bottom:1.5rem;" id="subscribe-line">
+            <button class="cal-add-btn" onclick="window._subscribeCalendar();return false;" style="font-size:0.85rem;">📅 S'abonner au calendrier</button>
+            <span style="color:#B8B09A;font-size:0.75rem;margin-left:0.5rem;">Google Calendar, Outlook, Apple</span>
+          </p>
           <div id="events-list" class="events-list">
             <p class="loading-msg">Chargement des événements…</p>
           </div>
@@ -105,6 +109,7 @@ if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)
       } catch(e) {}
       
       setTimeout(loadCommunityEvents, 100);
+      setTimeout(updateSubscribeText, 200);
     });
 
     const lang = () => document.documentElement.lang || 'fr';
@@ -181,6 +186,24 @@ if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)
       }).join('');
     }
 
+    window._subscribeCalendar = function() {
+      const l = lang();
+      const ICAL_URL = 'https://calendar.google.com/calendar/ical/8168f0b1875c929ea015c3c1ffa067d559215c6e6b3350518809bbf1905f86ce%40group.calendar.google.com/public/basic.ics';
+      const existing = document.querySelector('.cal-confirm-overlay');
+      if (existing) existing.remove();
+      const overlay = document.createElement('div');
+      overlay.className = 'cal-confirm-overlay';
+      overlay.innerHTML = '<div class="cal-confirm-box"><p>' + (l==='en'?'Subscribe to the events calendar?':'S\'abonner au calendrier des événements ?') + '</p><p class="cal-confirm-title">Les Dauphins-sur-le-Parc</p><div class="cal-confirm-actions"><button class="cal-confirm-yes">' + (l==='en'?'Subscribe':'S\'abonner') + '</button><button class="cal-confirm-no">' + (l==='en'?'Cancel':'Annuler') + '</button></div></div>';
+      document.body.appendChild(overlay);
+      const close = () => overlay.remove();
+      overlay.querySelector('.cal-confirm-no').onclick = close;
+      overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+      overlay.querySelector('.cal-confirm-yes').onclick = () => {
+        close();
+        window.open('https://calendar.google.com/calendar/render?cid=' + encodeURIComponent(ICAL_URL), '_blank');
+      };
+    };
+
     async function loadCommunityEvents() {
       const l = list();
       try {
@@ -254,7 +277,18 @@ if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)
       } catch (e) { l.innerHTML = '<p class="loading-msg">Impossible de charger les événements.</p>'; }
     }
 
-    document.addEventListener('languagechanged', () => loadCommunityEvents());
+    document.addEventListener('languagechanged', () => {
+      loadCommunityEvents();
+      updateSubscribeText();
+    });
+
+    function updateSubscribeText() {
+      const el = document.getElementById('subscribe-line');
+      if (!el) return;
+      const l = lang();
+      const btn = el.querySelector('button');
+      if (btn) btn.textContent = '📅 ' + (l === 'en' ? 'Subscribe to calendar' : "S'abonner au calendrier");
+    }
   </script>
 </body>
 </html>

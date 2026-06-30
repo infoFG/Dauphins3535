@@ -1054,6 +1054,12 @@ body {
 .gallery-mosaic .gallery-wide {
   grid-column: span 2;
   height: 260px;
+  max-width: 100%;
+}
+
+.gallery-mosaic img {
+  max-width: 100%;
+  height: auto;
 }
 
 .gallery-mosaic .gallery-tall {
@@ -1069,9 +1075,11 @@ body {
   .gallery-mosaic .gallery-wide {
     grid-column: span 1;
     height: 200px;
+    max-width: 100%;
   }
   .gallery-mosaic .gallery-item {
     height: 200px;
+    max-width: 100%;
   }
 }
 
@@ -1547,21 +1555,23 @@ body {
   margin-top: 0.2rem;
 }
 
-.cal-add-btn {
+.cal-add-btn, a.cal-add-btn {
   margin-top: 0.5rem;
   padding: 0.4rem 0.75rem;
   font-size: 0.75rem;
   font-weight: 600;
   color: #fff;
-  background: var(--orange, #e67e22);
+  background: #9b3d00;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s;
   align-self: flex-start;
+  text-decoration: none;
 }
-.cal-add-btn:hover {
-  background: #d35400;
+.cal-add-btn:hover, a.cal-add-btn:hover {
+  background: #7a3000;
+  color: #fff;
 }
 
 .cal-confirm-overlay {
@@ -1612,7 +1622,7 @@ body {
   cursor: pointer;
 }
 .cal-confirm-yes {
-  background: var(--orange, #e67e22);
+  background: #9b3d00;
   color: #fff;
 }
 .cal-confirm-no {
@@ -1690,6 +1700,29 @@ body {
   gap: 0.5rem;
   flex-wrap: wrap;
   margin-top: 1rem;
+}
+
+.ev-hours-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0.75rem 0;
+  font-size: 0.85rem;
+  color: #606059;
+}
+.ev-hours-row {
+  display: flex;
+  justify-content: space-between;
+}
+.ev-hours-day {
+  font-weight: 600;
+  color: #3A2404;
+  min-width: 2rem;
+}
+.ev-hours-today {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #3A2404;
 }
 
 .card-source {
