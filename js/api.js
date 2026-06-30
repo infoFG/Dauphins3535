@@ -1,4 +1,4 @@
-import { escapeHtml, formatBusinessHours, isCurrentlyOpen } from './utils.js';
+import { escapeHtml, formatBusinessHours, isCurrentlyOpen, getDayLabels } from './utils.js';
 
 const EVENTS_CACHE_KEY = 'dauphins_events_cache';
 const CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // Refresh from API weekly
@@ -519,7 +519,6 @@ async function fetchMontrealEvents() {
 export async function initBusinessGallery() {
   const galleryTrack = document.getElementById('business-gallery-track');
   if (!galleryTrack) return;
-  // Reset carousel state so initEnhancedCarousels will re-clone after rebuild
   const container = galleryTrack.closest('.carousel-container');
   if (container) {
     delete container.dataset.listenersAttached;
@@ -527,51 +526,101 @@ export async function initBusinessGallery() {
     clearInterval(container.autoPlayTimer);
   }
   const lang = document.documentElement.lang || 'fr';
+  const dayKeys = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+
+  // Helper: check holiday for a specific date
+  function isDateHoliday(holidays, dateStr) {
+    if (!holidays || !holidays.length) return null;
+    const nameField = lang === 'fr' ? 'name_fr' : 'name_en';
+    for (const h of holidays) {
+      let match = false;
+      if (h.date && h.date.startsWith('--')) {
+        const [_, mm, dd] = h.date.split('-');
+        const d = new Date(dateStr);
+        match = (parseInt(mm) === d.getMonth() + 1 && parseInt(dd) === d.getDate());
+      } else if (h.date) match = h.date === dateStr;
+      if (match) return h[nameField] || h.name_fr || h.name_en || '';
+    }
+    return null;
+  }
+
+  // Build week dates
+  const now = new Date();
+  const todayIdx = (now.getDay() + 6) % 7;
+  const monday = new Date(now); monday.setDate(now.getDate() - todayIdx);
+  const weekDates = dayKeys.map((_, i) => {
+    const d = new Date(monday); d.setDate(monday.getDate() + i);
+    return d.toISOString().split('T')[0];
+  });
+  const todayStr = now.toISOString().split('T')[0];
 
   try {
-    const registryResponse = await fetch('assets/Businesses/Registery.json');
-    if (!registryResponse.ok) {
-      console.warn('Business registry not found.');
-      galleryTrack.innerHTML = '<p class="loading-msg">Galerie temporairement indisponible.</p>';
-      return;
-    }
-    const registry = await registryResponse.json();
-    const businessFiles = registry?.Businesses || [];
-
-    const businessData = await Promise.all(businessFiles.map(async (filename) => {
-      const response = await fetch(`assets/Businesses/${filename}`);
-      if (!response.ok) return null;
-      const data = await response.json();
-      return { ...data, folder: filename.replace('.json', '') };
-    }));
-
-    const firstValidBusiness = businessData.find(b => b && b.images && b.images.length > 0);
-    if (firstValidBusiness) {
-      const section = galleryTrack.closest('.section');
-      if (section) {
-        // We use ../ here because relative paths in CSS variables used in a stylesheet 
-        // are resolved relative to the stylesheet's location (/css/styles.css)
-        section.style.setProperty('--section-bg', `url("../assets/Businesses/${firstValidBusiness.images[0]}")`);
+    // Try Google Sheets first, fall back to JSON
+    let businessData = [];
+    try {
+      const { fetchBusinesses } = await import('./gsheets.js');
+      businessData = await fetchBusinesses();
+    } catch {
+      const registryResponse = await fetch('assets/Businesses/Registery.json');
+      if (registryResponse.ok) {
+        const registry = await registryResponse.json();
+        const files = registry?.Businesses || [];
+        const results = await Promise.all(files.map(async f => {
+          const res = await fetch(`assets/Businesses/${f}`);
+          if (!res.ok) return null;
+          return res.json();
+        }));
+        businessData = results.filter(Boolean);
       }
     }
 
-    const cards = businessData.filter(Boolean).flatMap((business) => {
+    if (!businessData.length) {
+      galleryTrack.innerHTML = '<p class="loading-msg">Galerie temporairement indisponible.</p>';
+      return;
+    }
+
+    const firstWithImage = businessData.find(b => b && b.images && b.images.length > 0);
+    if (firstWithImage) {
+      const section = galleryTrack.closest('.section');
+      if (section) {
+        section.style.setProperty('--section-bg', `url("../assets/Businesses/${firstWithImage.images[0]}")`);
+      }
+    }
+
+    const cards = businessData.flatMap((business) => {
+      const bizHolidays = business._holidays || [];
       return (business.images || []).map((image) => {
-        const imageUrl = `assets/Businesses/${image}`;
-        const fallbackImageUrl = `assets/Businesses/${business.folder}/${image}`;
-        const hoursHtml = business.business_hours ? formatBusinessHours(business.business_hours, lang) : '';
-        
-        const status = business.business_hours ? isCurrentlyOpen(business.business_hours) : '';
-        const statusKey = 'status_' + status;
-        const statusText = status ? (window.translations?.[lang]?.[statusKey] || status) : '';
+        const imageUrl = image.startsWith('http') ? image : `assets/Businesses/${image}`;
+
+        // Build hours list with holiday annotations
+        const hoursHtml = business.business_hours ? dayKeys.map((d, i) => {
+          const v = business.business_hours[d];
+          if (!v) return '';
+          const dayHoliday = isDateHoliday(bizHolidays, weekDates[i]);
+          const display = dayHoliday
+            ? (lang === 'fr' ? 'Fermé — ' : 'Closed — ') + dayHoliday
+            : v;
+          const cls = (dayHoliday ? 'biz-holiday' : '') + (i === todayIdx ? ' bh-today' : '');
+          return `<div class="bh-row${cls ? ' ' + cls : ''}"><span class="bh-day">${(getDayLabels(lang)[i] || '').substring(0,3)}</span><span> ${display}</span></div>`;
+        }).filter(Boolean).join('') : '';
+
+        // Status with holiday check
+        const todayHoliday = isDateHoliday(bizHolidays, todayStr);
+        let status, statusText;
+        if (todayHoliday) {
+          status = 'closed';
+          statusText = todayHoliday;
+        } else {
+          status = business.business_hours ? isCurrentlyOpen(business.business_hours) : '';
+          statusText = status ? (window.translations?.[lang]?.['status_' + status] || status) : '';
+        }
         const statusBadge = status ? `<p class="status-badge status-${status}">${statusText}</p>` : '';
-        
+
         const ensureProtocol = (url) => (url && !url.startsWith('http')) ? `https://${url}` : url;
 
         let linksHtml = '';
         if (business.website) {
-          const siteUrl = ensureProtocol(business.website);
-          linksHtml += `<a href="${escapeHtml(siteUrl)}" target="_blank" rel="noopener"><span class="icon">🌐</span> Site web</a>`;
+          linksHtml += `<a href="${escapeHtml(ensureProtocol(business.website))}" target="_blank" rel="noopener"><span class="icon">🌐</span> ${lang === 'fr' ? 'Site web' : 'Website'}</a>`;
         }
         if (business.social_media) {
           const platforms = {
@@ -582,8 +631,7 @@ export async function initBusinessGallery() {
           };
           Object.entries(business.social_media).forEach(([key, url]) => {
             if (url && platforms[key] && typeof url === 'string') {
-              const socialUrl = ensureProtocol(url);
-              linksHtml += `<a href="${escapeHtml(socialUrl)}" target="_blank" rel="noopener"><span class="icon">${platforms[key].icon}</span> ${platforms[key].label}</a>`;
+              linksHtml += `<a href="${escapeHtml(ensureProtocol(url))}" target="_blank" rel="noopener"><span class="icon">${platforms[key].icon}</span> ${platforms[key].label}</a>`;
             }
           });
         }
@@ -592,18 +640,15 @@ export async function initBusinessGallery() {
           <div class="business-carousel-card lightbox-trigger" aria-label="${escapeHtml(business.name)}">
             <div class="business-header">
               <div class="business-name">${escapeHtml(business.name)}</div>
-              <div class="business-desc">${escapeHtml(business.description || '')}</div>
+              <div class="business-desc">${escapeHtml(business.description_fr || business.description || '')}</div>
               ${statusBadge}
             </div>
-            <img src="${imageUrl}" alt="${escapeHtml(business.name)}" loading="lazy" draggable="false" class="lightbox-trigger" onerror="if (this.src !== '${fallbackImageUrl}') this.src='${fallbackImageUrl}'" />
+            <img src="${imageUrl}" alt="${escapeHtml(business.name)}" loading="lazy" draggable="false" class="lightbox-trigger" />
             <div class="business-overlay">
               <div class="business-hours">${hoursHtml}</div>
-              <div class="business-links">
-                ${linksHtml}
-              </div>
+              <div class="business-links">${linksHtml}</div>
             </div>
-          </div>
-        `;
+          </div>`;
       });
     });
 

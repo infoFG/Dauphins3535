@@ -331,6 +331,16 @@ body {
   color: var(--bleu-fonce);
 }
 
+.hours-list .bh-holiday {
+  color: #c62828;
+  font-weight: 600;
+}
+
+.hours-list .bh-today {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
 /* ========== DAY PLANNER GRAPH ========== */
 .planner-wrapper {
   flex: 1 1 320px;
@@ -546,6 +556,31 @@ body {
   font-weight: 800;
 }
 
+.planner-column.is-holiday {
+  background: rgba(200, 50, 50, 0.08);
+  border-radius: 8px;
+}
+
+.planner-column.is-holiday .day-label {
+  color: #c62828;
+  font-weight: 800;
+}
+
+.holiday-banner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #c62828;
+  text-align: center;
+  padding: 4px;
+  line-height: 1.2;
+  z-index: 5;
+}
+
 .day-label {
   font-size: 0.65rem;
   font-weight: 700;
@@ -582,6 +617,17 @@ body {
   font-size: 0.8rem;
   color: #5b9bd5;
   font-style: italic;
+}
+
+.holiday-note {
+  margin-bottom: 0.75rem;
+  padding: 0.4rem 0.6rem;
+  background: rgba(200, 50, 50, 0.1);
+  border-left: 3px solid #c62828;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #c62828;
 }
 
 .planner-legend {
@@ -1431,6 +1477,16 @@ body {
 
 .business-hours .bh-row .bh-day {
   flex-grow: 0;
+}
+
+.business-hours .biz-holiday {
+  color: #ff8a80 !important;
+  font-weight: 600;
+}
+
+.business-hours .bh-today {
+  font-weight: 700;
+  font-size: 0.85rem;
 }
 
 .business-links {
