@@ -322,7 +322,13 @@ if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)
 
           if (rows.length > 1) {
             const headers = rows[0].map(h => h.trim().toLowerCase());
-            const approvedIdx = headers.indexOf('approved');
+            const approvedIdx = headers.findIndex(h => h.includes('approved'));
+            const dateIdx = headers.findIndex(h => h.includes('event date'));
+            const titleIdx = headers.findIndex(h => h.includes('event name'));
+            const timeIdx = headers.findIndex(h => h.includes('start time'));
+            const locIdx = headers.findIndex(h => h.includes('event location'));
+            const urlIdx = headers.findIndex(h => h.includes('event url'));
+            const descIdx = headers.findIndex(h => h.includes('description'));
 
             // Excel serial date helper
             const parseSerialDate = (val) => {
@@ -354,17 +360,17 @@ if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)
 
             commEvents = rows.slice(1).map(vals => {
               if ((vals[approvedIdx] || '').toUpperCase() !== 'TRUE') return null;
-              let parsed = new Date(vals[headers.indexOf('event date')] || '');
-              if (isNaN(parsed.getTime())) parsed = parseSerialDate(vals[headers.indexOf('event date')] || '');
+              let parsed = new Date(vals[dateIdx] || '');
+              if (isNaN(parsed.getTime())) parsed = parseSerialDate(vals[dateIdx] || '');
               if (!parsed || isNaN(parsed.getTime())) return null;
               return {
-                title: vals[headers.indexOf('event name')] || '',
+                title: vals[titleIdx] || '',
                 date: parsed.toISOString().split('T')[0],
-                time: parseTimeValue(vals[headers.indexOf('start time')] || ''),
-                location: vals[headers.indexOf('event location')] || '',
+                time: parseTimeValue(vals[timeIdx] || ''),
+                location: vals[locIdx] || '',
                 source: 'Communauté',
-                link: vals[headers.indexOf('event url')] || '#',
-                description: (vals[headers.indexOf('description')] || '').substring(0, 200)
+                link: vals[urlIdx] || '#',
+                description: (vals[descIdx] || '').substring(0, 200)
               };
             }).filter(Boolean);
           }
