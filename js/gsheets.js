@@ -335,8 +335,8 @@ export async function fetchFAQData() {
       poolData = {
         business_hours: sheetToHours(parsed),
         closures: hasClosures ? parsed.closures : null,
-        cleaning_note_fr: parsed.info.cleaning_note_fr || '',
-        cleaning_note_en: parsed.info.cleaning_note_en || ''
+        cleaning_note_fr: parsed.info.cleaning_note_fr || parsed.info.description_fr || parsed.info.description || '',
+        cleaning_note_en: parsed.info.cleaning_note_en || parsed.info.description_en || parsed.info.description || ''
       };
       poolHolidays = parsed.holidays;
     } catch {}
