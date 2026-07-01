@@ -195,10 +195,11 @@ export function initEnhancedCarousels() {
     track.addEventListener('pointerdown', (e) => {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
 
-      // Let clicks on interactive elements pass through without starting a drag.
-      // Still cancel any running animation so it doesn't fight the browser's
-      // native touch scroll, but restore snap immediately since no drag follows.
-      if (e.target.closest('button, a, .cal-add-btn, [data-ev]')) {
+      // Reset drag-vs-click tracking for this interaction
+      track._dragStarted = false;
+
+      // Actual buttons / calendar-add should always work, never start a drag
+      if (e.target.closest('button, .cal-add-btn')) {
         stopAutoPlay();
         if (track.scrollRequestID) {
           cancelAnimationFrame(track.scrollRequestID);
@@ -210,34 +211,41 @@ export function initEnhancedCarousels() {
         isDown = false;
         track.mouseDownX = undefined;
         track.mouseDownY = undefined;
-        // Restart autoplay shortly after the interaction settles
         clearTimeout(track._interactiveRestoreTimer);
         track._interactiveRestoreTimer = setTimeout(() => startAutoPlay(), 3000);
         return;
       }
+
+      // Cards (data-ev, a) and bare track: always cancel animation & start tracking.
+      // The click will be suppressed later only if a drag actually occurs.
+      stopAutoPlay();
+      cancelSmoothScroll(track);
+
       // On touch: let the browser handle native scrolling
       if (e.pointerType === 'touch') {
         isDown = true;
         activePointerId = e.pointerId;
-        stopAutoPlay();
-        cancelSmoothScroll(track);
         track.mouseDownX = e.clientX;
         track.mouseDownY = e.clientY;
         return;
       }
-      // Mouse: prevent link drag behavior
-      if (e.target.closest('a')) {
-        e.preventDefault();
-      }
+      // Mouse
       isDown = true;
       activePointerId = e.pointerId;
-      stopAutoPlay();
-      cancelSmoothScroll(track);
       startX = e.clientX - track.getBoundingClientRect().left;
       scrollLeft = track.scrollLeft;
       track.mouseDownX = e.clientX;
       track.mouseDownY = e.clientY;
     });
+
+    // Suppress click events on cards when the user was actually dragging
+    track.addEventListener('click', (e) => {
+      if (track._dragStarted) {
+        e.preventDefault();
+        e.stopPropagation();
+        track._dragStarted = false;
+      }
+    }, true);
 
     track.addEventListener('pointermove', (e) => {
       if (!isDown || e.pointerId !== activePointerId) return;
@@ -248,6 +256,7 @@ export function initEnhancedCarousels() {
       if (e.pointerType === 'touch') {
         if (dx > 10 && !track.classList.contains('dragging')) {
           track.classList.add('dragging');
+          track._dragStarted = true;
         }
         return; // native scroll-snap handles the rest
       }
@@ -255,6 +264,7 @@ export function initEnhancedCarousels() {
       // Mouse: custom drag with animation
       if (!track.classList.contains('dragging') && dx > 10) {
         track.classList.add('dragging');
+        track._dragStarted = true;
         track.setPointerCapture(activePointerId);
         track.style.scrollSnapType = 'none';
       }
@@ -315,7 +325,12 @@ export function initEnhancedCarousels() {
         return;
       }
 
-      // Mouse: custom snap animation
+      // Mouse: custom snap animation (skip if it was just a click, not a drag)
+      if (!track._dragStarted) {
+        track.style.scrollSnapType = '';
+        startAutoPlay();
+        return;
+      }
 
       const isInfinite = track.dataset.cloned === "true";
       const maxScroll = track.scrollWidth - track.offsetWidth;
