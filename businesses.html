@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commerces — Les Dauphins-sur-le-Parc</title>
+  <link rel="icon" type="image/webp" href="assets/logo-menu.webp">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body { font-family: 'Segoe UI', system-ui, sans-serif; color: #3A2404; background: #fafafa; }
+    .content-box { opacity: 1 !important; transform: none !important; }
+    .main-content { min-height: auto !important; display: flex; flex-direction: column; min-height: 100vh; }
+    #businesses-page { flex: 1; padding: 4rem 1rem 1rem !important; }
+    .biz-footer { flex-shrink: 0; height: 80px; display: flex; align-items: center; justify-content: center; }
+    .biz-card { display: flex; gap: 1rem; padding: 1rem; background: #fff; border: 1px solid #D3D8D6; border-radius: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
+    .biz-card img { flex-shrink: 0; width: 160px; height: 120px; object-fit: cover; border-radius: 6px; background: #f0f0f0; }
+    .biz-info { flex: 1; min-width: 200px; }
+    .biz-info h3 { margin: 0 0 0.25rem; color: #3A2404; font-size: 1.1rem; }
+    .biz-info p { margin: 0.25rem 0; font-size: 0.9rem; color: #606059; line-height: 1.5; }
+    .biz-hours { font-size: 0.8rem; color: #B8B09A; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.15rem; }
+    .biz-holiday { color: #c62828 !important; font-weight: 600; }
+    .bh-today { font-weight: 700; font-size: 0.85rem; }
+    .biz-links { margin-top: 0.5rem; }
+    .biz-links a { font-size: 0.8rem; color: #A19B80; margin-right: 0.75rem; text-decoration: none; }
+    .biz-links a:hover { text-decoration: underline; }
+  </style>
+  <script>
+(function(){
+if(sessionStorage.getItem('_pw')==='1'||location.hostname==='localhost'||location.hostname==='127.0.0.1')return;
+function init(){
+var o=document.createElement('div');
+o.id='pw-gate';
+o.innerHTML='<style>#pw-gate{position:fixed;inset:0;z-index:99999;background:rgba(58,36,4,0.95);display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif}#pw-gate form{background:#fff;padding:2.5rem;border-radius:12px;text-align:center;max-width:360px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3)}#pw-gate h2{margin:0 0 0.5rem;color:#3A2404;font-size:1.3rem}#pw-gate p{color:#89897C;font-size:0.85rem;margin:0 0 1.25rem}#pw-gate input{width:100%;padding:0.65rem 0.75rem;border:1px solid #D3D8D6;border-radius:8px;font-size:1rem;text-align:center;box-sizing:border-box;margin-bottom:0.75rem}#pw-gate button{width:100%;padding:0.65rem;background:#A19B80;color:#fff;border:none;border-radius:8px;font-size:0.95rem;cursor:pointer;font-weight:600}#pw-gate button:hover{background:#8a856e}#pw-gate .error{color:#c62828;font-size:0.8rem;margin-top:0.5rem;display:none}</style><form autocomplete="off"><h2>🔒 Accès restreint</h2><p>Ce site est en révision. Veuillez entrer le mot de passe.</p><input type="password" id="pw-input" placeholder="Mot de passe" autofocus><button type="submit">Accéder</button><div class="error" id="pw-error">Mot de passe incorrect.</div></form>';
+document.body.prepend(o);
+o.querySelector('form').addEventListener('submit',function(e){
+e.preventDefault();
+var pw=document.getElementById('pw-input').value;
+var hash=btoa(unescape(encodeURIComponent(pw)));
+if(hash==='ZGF1cGhpbnMyMDI2'){
+sessionStorage.setItem('_pw','1');o.remove();
+}else{
+document.getElementById('pw-error').style.display='block';
+document.getElementById('pw-input').value='';
+document.getElementById('pw-input').focus();
+}
+});
+}
+if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)}
+})();
+</script>
+</head>
+<body class="content-page">
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
+  <div class="lang-switch">
+    <button id="lang-fr" class="active">FR</button>
+    <button id="lang-en">EN</button>
+  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="assets/logo-menu.webp" alt="Les Dauphins-sur-le-Parc">
+      <h1>Les Dauphins-sur-le-Parc</h1>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li><a href="index.html#apropos" data-i18n="nav_about">À propos</a></li>
+        <li><a href="index.html#installations" data-i18n="nav_amenities">Installations</a></li>
+        <li><a href="index.html#galerie-commerciale" data-i18n="nav_gallery">Galerie Commerciale</a></li>
+        <li class="nav-sub"><a href="businesses.html" class="nav-page-link active" data-i18n="nav_full_list">Liste complète</a></li>
+        <li><a href="index.html#communaute" data-i18n="nav_community">Événements communautaires</a></li>
+        <li class="nav-sub"><a href="events.html" class="nav-page-link" data-i18n="nav_full_list">Liste complète</a></li>
+        <li><a href="index.html#valeurs" data-i18n="nav_values">Valeurs</a></li>
+        <li class="nav-sub"><a href="faq.html" data-i18n="nav_faq" class="nav-page-link">FAQ</a></li>
+        <li><a href="index.html#condoweb" data-i18n="nav_condoweb">CondoWeb</a></li>
+        <li><a href="index.html#quartier" data-i18n="nav_neighborhood">Vie de quartier</a></li>
+        <li class="nav-sub"><a href="events-list.html" class="nav-page-link" data-i18n="events_full_list_title">Événements à venir</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <section class="section" id="businesses-page">
+      <div class="section-inner">
+        <div class="content-box" style="max-width:900px;margin:0 auto;">
+          <h1 class="section-title">Galerie Commerciale</h1>
+          <p style="margin-bottom:2rem;">Commerces et services au rez-de-chaussée du 3535 avenue Papineau.</p>
+          <div id="biz-list"></div>
+        </div>
+      </div>
+    </section>
+    <div class="biz-footer" style="text-align:center;">
+      <img src="assets/logo-menu.webp" alt="Les Dauphins-sur-le-Parc" style="width:60px;height:auto;opacity:0.5;">
+    </div>
+  </main>
+
+  <script src="translations.js"></script>
+  <script type="module">
+    import { initMenu, initLanguage } from './js/ui.js';
+    import { formatBusinessHours, getDayLabels, isCurrentlyOpen } from './js/utils.js';
+    import { fetchBusinesses, fetchFAQData } from './js/gsheets.js';
+    initMenu();
+    initLanguage();
+
+    const list = document.getElementById('biz-list');
+    const dayKeys = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+
+    // Local-date helper (avoids UTC flip of toISOString after 8 PM ET)
+    function getLocalDateStr(date) {
+      const d = date || new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    // Check if a specific date matches a holiday
+    function isDateHoliday(holidays, dateStr) {
+      if (!holidays || !holidays.length) return null;
+      const lang = document.documentElement.lang || 'fr';
+      const nameField = lang === 'fr' ? 'name_fr' : 'name_en';
+      for (const h of holidays) {
+        let match = false;
+        if (h.date && h.date.startsWith('--')) {
+          const [_, mm, dd] = h.date.split('-');
+          const d = new Date(dateStr);
+          match = (parseInt(mm) === d.getMonth() + 1 && parseInt(dd) === d.getDate());
+        } else if (h.date) {
+          match = h.date === dateStr;
+        }
+        if (match) return h[nameField] || h.name_fr || h.name_en || '';
+      }
+      return null;
+    }
+
+    // Build this week's date strings (Monday–Sunday)
+    function getWeekDates() {
+      const now = new Date();
+      const dayOfWeek = (now.getDay() + 6) % 7;
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - dayOfWeek);
+      return { dates: dayKeys.map((_, i) => {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        return getLocalDateStr(d);
+      }), todayIdx: dayOfWeek };
+    }
+
+    async function loadBusinesses() {
+      const currentLang = document.documentElement.lang || 'fr';
+      try {
+        list.innerHTML = '<p style="color:#B8B09A;font-style:italic;padding:2rem;">' +
+          (currentLang === 'fr' ? 'Chargement…' : 'Loading…') + '</p>';
+
+        let businesses = [];
+
+        // Try Google Sheets first
+        try {
+          businesses = await fetchBusinesses();
+        } catch {
+          // Fallback: load from JSON files
+          const reg = await fetch('assets/Businesses/Registery.json').then(r => r.json());
+          const files = reg.Businesses || [];
+          const results = await Promise.all(files.map(async f => {
+            const res = await fetch(`assets/Businesses/${f}`);
+            if (!res.ok) return null;
+            return res.json();
+          }));
+          businesses = results.filter(Boolean);
+        }
+
+        if (!businesses.length) {
+          list.innerHTML = '<p style="color:#3A2404;padding:2rem;">' +
+            (currentLang === 'fr' ? 'Aucun commerce trouvé.' : 'No businesses found.') + '</p>';
+          return;
+        }
+
+        const labels = getDayLabels(currentLang);
+        const { dates: weekDates, todayIdx } = getWeekDates();
+        const todayStr = getLocalDateStr();
+
+        list.innerHTML = businesses.map(biz => {
+          const img = biz.images?.[0]
+            ? (biz.images[0].startsWith('http') ? biz.images[0] : `assets/Businesses/${biz.images[0]}`)
+            : '';
+          const bizHolidays = biz._holidays || [];
+
+          // Hours with holiday annotations for this week
+          const hoursHtml = biz.business_hours ? dayKeys.map((d, i) => {
+            const v = biz.business_hours[d];
+            if (!v) return '';
+            const dayHoliday = isDateHoliday(bizHolidays, weekDates[i]);
+            const display = dayHoliday
+              ? (currentLang === 'fr' ? 'Fermé — ' : 'Closed — ') + dayHoliday
+              : v;
+            const cls = (dayHoliday ? 'biz-holiday' : '') + (i === todayIdx ? ' bh-today' : '');
+            return `<span class="${cls}"><strong>${labels[i].substring(0,3)}</strong> ${display}</span>`;
+          }).filter(Boolean).join('') : '';
+
+          // Status: check today for holidays
+          const todayHoliday = isDateHoliday(bizHolidays, todayStr);
+          let status, statusText;
+          if (todayHoliday) {
+            status = 'closed';
+            statusText = todayHoliday;
+          } else {
+            status = biz.business_hours ? isCurrentlyOpen(biz.business_hours) : null;
+            statusText = status ? (window.translations?.[currentLang]?.['status_' + status]) || '' : '';
+          }
+          const statusBadge = status ? `<p class="status-badge status-${status}">${statusText}</p>` : '';
+
+          let linksHtml = '';
+          if (biz.website) linksHtml += `<a href="${biz.website.startsWith('http')?biz.website:'https://'+biz.website}" target="_blank" rel="noopener">🌐 ${currentLang === 'fr' ? 'Site web' : 'Website'}</a>`;
+          if (biz.social_media) {
+            const sm = biz.social_media;
+            if (sm.facebook) linksHtml += `<a href="${sm.facebook}" target="_blank" rel="noopener">📘 Facebook</a>`;
+            if (sm.instagram) linksHtml += `<a href="${sm.instagram}" target="_blank" rel="noopener">📸 Instagram</a>`;
+          }
+
+          // Description: prefer language-specific, fall back to generic
+          const descKey = currentLang === 'fr' ? 'description_fr' : 'description_en';
+          const desc = biz[descKey] || biz.description || '';
+
+          return `
+          <div class="biz-card">
+            ${img ? `<img src="${img}" alt="${biz.name}" loading="lazy" onerror="this.style.display='none'">` : ''}
+            <div class="biz-info">
+              <h3>${biz.name}</h3>
+              ${desc ? `<p>${desc}</p>` : ''}
+              ${statusBadge}
+              ${hoursHtml ? `<div class="biz-hours">${hoursHtml}</div>` : ''}
+              ${linksHtml ? `<div class="biz-links">${linksHtml}</div>` : ''}
+            </div>
+          </div>`;
+        }).join('');
+      } catch(e) {
+        list.innerHTML = '<p style="color:#3A2404;padding:2rem;">' +
+          (document.documentElement.lang === 'fr' ? 'Impossible de charger les commerces.' : 'Unable to load businesses.') + '</p>';
+      }
+    }
+
+    loadBusinesses();
+    document.addEventListener('languagechanged', () => loadBusinesses());
+
+    // Random background from Commereciale
+    (async () => {
+      try {
+        const res = await fetch('assets/Commereciale/images.json');
+        const images = await res.json();
+        const bg = images[Math.floor(Math.random() * images.length)];
+        document.getElementById('businesses-page').style.setProperty('--section-bg', 'url("../assets/Commereciale/' + bg + '")');
+      } catch(e) {}
+    })();
+  </script>
+</body>
+</html>
