@@ -97,6 +97,37 @@ function getSnapPosition(track, item) {
   return Math.round(item.offsetLeft - (track.offsetWidth - item.offsetWidth) / 2);
 }
 
+// Get the reference point in the viewport for finding the closest snap target.
+// For start-aligned items we use the left edge; for center-aligned we use the center.
+function getSnapReference(track) {
+  const items = track.children;
+  if (items.length === 0) return track.scrollLeft + track.offsetWidth / 2;
+  const align = getComputedStyle(items[0]).scrollSnapAlign;
+  if (align === 'start' || align.startsWith('start')) {
+    return track.scrollLeft;
+  }
+  return track.scrollLeft + track.offsetWidth / 2;
+}
+
+// Find the index of the item closest to the snap reference point
+function findClosestItem(track) {
+  const items = track.children;
+  if (items.length === 0) return 0;
+  const ref = getSnapReference(track);
+  let closestIdx = 0, minDistance = Infinity;
+  for (let i = 0; i < items.length; i++) {
+    // For start-aligned items, compare item's left edge to viewport's left edge
+    // For center-aligned items, compare item's center to viewport's center
+    const align = getComputedStyle(items[0]).scrollSnapAlign;
+    const itemRef = (align === 'start' || align.startsWith('start'))
+      ? items[i].offsetLeft
+      : items[i].offsetLeft + items[i].offsetWidth / 2;
+    const dist = Math.abs(itemRef - ref);
+    if (dist < minDistance) { minDistance = dist; closestIdx = i; }
+  }
+  return closestIdx;
+}
+
 function cancelSmoothScroll(track) {
   if (track.scrollRequestID) {
     cancelAnimationFrame(track.scrollRequestID);
@@ -112,16 +143,9 @@ function navigate(track, direction, duration = 1000) {
   if (track.classList.contains('is-animating') || track.classList.contains('dragging')) return;
   const items = Array.from(track.children);
   if (items.length === 0) return;
-  const scrollCenter = track.scrollLeft + track.offsetWidth / 2;
   const isInfinite = track.dataset.cloned === "true";
   
-  let currentIdx = 0;
-  let minDistance = Infinity;
-  for (let i = 0; i < items.length; i++) {
-    const itemCenter = items[i].offsetLeft + items[i].offsetWidth / 2;
-    const dist = Math.abs(itemCenter - scrollCenter);
-    if (dist < minDistance) { minDistance = dist; currentIdx = i; }
-  }
+  const currentIdx = findClosestItem(track);
 
   let nextIdx = currentIdx + direction;
   let teleportTo = null;
@@ -349,12 +373,7 @@ export function initEnhancedCarousels() {
         teleport = getSnapPosition(track, realFirst);
       } else {
         // Normal snap to closest
-        const scrollCenter = track.scrollLeft + track.offsetWidth / 2;
-        let closestIdx = 0, minDistance = Infinity;
-        for (let i = 0; i < items.length; i++) {
-          const dist = Math.abs((items[i].offsetLeft + items[i].offsetWidth / 2) - scrollCenter);
-          if (dist < minDistance) { minDistance = dist; closestIdx = i; }
-        }
+        const closestIdx = findClosestItem(track);
         targetScroll = getSnapPosition(track, items[closestIdx]);
         if (isInfinite) {
           if (closestIdx === 0) teleport = getSnapPosition(track, items[items.length - 2]);
@@ -378,19 +397,12 @@ export function initEnhancedCarousels() {
         pipsContainer.innerHTML = '';
         
         const realCount = track.dataset.cloned === "true" ? items.length - 2 : items.length;
-        const scrollCenter = track.scrollLeft + track.offsetWidth / 2;
-        let activeIdx = 0, minD = Infinity;
-
-        for (let j = 0; j < items.length; j++) {
-          const d = Math.abs((items[j].offsetLeft + items[j].offsetWidth / 2) - scrollCenter);
-          if (d < minD) {
-            minD = d;
-            if (track.dataset.cloned === "true") {
-              if (j === 0) activeIdx = realCount - 1;
-              else if (j === items.length - 1) activeIdx = 0;
-              else activeIdx = j - 1;
-            } else activeIdx = j;
-          }
+        let activeIdx = findClosestItem(track);
+        // Map from item index to real card index for infinite carousels
+        if (track.dataset.cloned === "true") {
+          if (activeIdx === 0) activeIdx = realCount - 1;
+          else if (activeIdx === items.length - 1) activeIdx = 0;
+          else activeIdx = activeIdx - 1;
         }
 
         for (let i = 0; i < realCount; i++) {

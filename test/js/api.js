@@ -138,6 +138,12 @@ async function refreshEventsFromAPI(cached) {
 export async function initEventsCarousel() {
   const track = document.getElementById('events-carousel-track');
   if (!track) return;
+  const container = track.closest('.carousel-container');
+  if (container) {
+    delete container.dataset.listenersAttached;
+    clearTimeout(container.autoPlayTimeout);
+    clearInterval(container.autoPlayTimer);
+  }
 
   const lang = document.documentElement.lang || 'fr';
 
@@ -223,6 +229,12 @@ export async function initEventsCarousel() {
 export function reRenderEvents() {
   const track = document.getElementById('events-carousel-track');
   if (track && track._events) {
+    const container = track.closest('.carousel-container');
+    if (container) {
+      delete container.dataset.listenersAttached;
+      clearTimeout(container.autoPlayTimeout);
+      clearInterval(container.autoPlayTimer);
+    }
     // Re-render with current language but don't re-fetch thumbnails
     const lang = document.documentElement.lang || 'fr';
     track.innerHTML = track._events.map(event => {
@@ -705,6 +717,12 @@ export function initCommunityCarousel() {
   }
 
   section.style.display = '';
+  const container = track.closest('.carousel-container');
+  if (container) {
+    delete container.dataset.listenersAttached;
+    clearTimeout(container.autoPlayTimeout);
+    clearInterval(container.autoPlayTimer);
+  }
   const lang = document.documentElement.lang || 'fr';
   const now = new Date();
   now.setHours(0, 0, 0, 0);
