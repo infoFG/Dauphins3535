@@ -16,13 +16,16 @@ jobs:
           ref: preview
 
       - name: Inject password gate
+        shell: bash
         run: |
-          python3 -c "
-with open('index.html', 'r') as f: html = f.read()
-with open('pw-gate-snippet.html', 'r') as f: gate = f.read()
-html = html.replace('</head>', gate + '\n</head>')
-with open('index.html', 'w') as f: f.write(html)
-"
+          if [ -f pw-gate-snippet.html ]; then
+            node -e "
+              const fs = require('fs');
+              const html = fs.readFileSync('index.html', 'utf8');
+              const gate = fs.readFileSync('pw-gate-snippet.html', 'utf8');
+              fs.writeFileSync('index.html', html.replace('</head>', gate + '\n</head>'));
+            "
+          fi
 
       - name: Deploy to gh-pages /test
         uses: peaceiris/actions-gh-pages@v4
