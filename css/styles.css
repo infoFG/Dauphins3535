@@ -500,6 +500,7 @@ body {
   display: flex;
   height: 220px;
   position: relative;
+  overflow: hidden;
 }
 
 .time-axis {
@@ -508,6 +509,7 @@ body {
   display: flex;
   flex-direction: column;
   border-right: 2px solid var(--bleu-pale);
+  height: calc(100% - 30px);
 }
 
 .time-axis-label {
@@ -527,12 +529,13 @@ body {
 
 .grid-line {
   position: absolute;
-  left: 0;
-  width: 100%;
+  left: 100%;
+  width: 2000px;
   height: 1px;
   background: var(--bleu-pale);
   opacity: 0.5;
   z-index: 0;
+  pointer-events: none;
 }
 
 .planner-column {
@@ -595,20 +598,20 @@ body {
   position: absolute;
   top: 0; bottom: 30px;
   width: 12px;
-  border-radius: 6px;
 }
 
 .time-bar {
   position: absolute;
   width: 100%;
   background: var(--orange);
-  border-radius: 6px;
+  border-radius: 4px;
   opacity: 0.9;
   z-index: 2;
 }
 
 .time-bar.closure {
   background: #5b9bd5;
+  border-radius: 0;
   opacity: 0.75;
 }
 

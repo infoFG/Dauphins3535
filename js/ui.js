@@ -176,15 +176,17 @@ function parseTimeRanges(value) {
 /* Helper for Day Planner Axis */
 function generateTimeAxisHtml(start, end) {
   let html = '<div class="time-axis">';
-  let grid = '';
   const step = (end - start) / 4;
   for (let i = 0; i <= 4; i++) {
     const h = start + (step * i);
     const top = (i / 4) * 100;
-    html += `<div class="time-axis-label" style="top: ${top}%">${Math.round(h)}h</div>`;
-    if (i < 4) grid += `<div class="grid-line" style="top: ${top}%"></div>`;
+    // Skip the very top (0%) grid line and label — grid at 6/12/18/24 only
+    if (i > 0) {
+      html += `<div class="time-axis-label" style="top: ${top}%">${Math.round(h)}h</div>`;
+      if (i < 4) html += `<div class="grid-line" style="top: ${top}%"></div>`;
+    }
   }
-  return { axis: html + '</div>', grid };
+  return { axis: html + '</div>' };
 }
 
 /* Check if a specific date is a holiday */
@@ -297,7 +299,7 @@ export function initDayPlanners(faqData = {}) {
       infoBox.innerHTML += `<p class="status-badge status-${status}">${statusText}</p>`;
     }
 
-    const { axis, grid } = generateTimeAxisHtml(config.start, config.end);
+    const { axis } = generateTimeAxisHtml(config.start, config.end);
     const range = config.end - config.start;
 
     const columnsHtml = labels.map((label, idx) => {
@@ -346,7 +348,7 @@ export function initDayPlanners(faqData = {}) {
         </div>`;
     }).join('');
 
-    planner.innerHTML = axis + `<div class="columns-container">${grid + columnsHtml}</div>`;
+    planner.innerHTML = axis + `<div class="columns-container">${columnsHtml}</div>`;
 
     // Add cleaning legend if closures exist
     if (closuresData && Object.values(closuresData).some(v => v)) {
