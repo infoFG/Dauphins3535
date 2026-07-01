@@ -83,22 +83,31 @@ function col(row, idx) {
 }
 
 /* ---------- Cache ---------- */
-const CACHE_PREFIX = 'dauphins_v2_';
-const CACHE_TTL = 30 * 1000; // 30 seconds — fast updates from Sheets
+const CACHE_PREFIX = 'dauphins_v3_';
+const CACHE_TTL = 60 * 60 * 1000; // 1 hour — data changes infrequently
 
 async function fetchCSV(url, cacheKey) {
+  // Try fresh cache from localStorage
   try {
-    const cached = JSON.parse(sessionStorage.getItem(cacheKey));
+    const cached = JSON.parse(localStorage.getItem(cacheKey));
     if (cached && Date.now() - cached.ts < CACHE_TTL) return cached.data;
   } catch {}
 
-  const resp = await fetch(url);
-  if (!resp.ok) throw new Error(`Fetch failed: ${resp.status}`);
-  const text = await resp.text();
-  const data = parseCSV(text);
-
-  try { sessionStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data })); } catch {}
-  return data;
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`Fetch failed: ${resp.status}`);
+    const text = await resp.text();
+    const data = parseCSV(text);
+    try { localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data })); } catch {}
+    return data;
+  } catch (e) {
+    // If fetch fails, try stale cache as fallback
+    try {
+      const stale = JSON.parse(localStorage.getItem(cacheKey));
+      if (stale) { console.warn('Using stale cache for', cacheKey); return stale.data; }
+    } catch {}
+    throw e;
+  }
 }
 
 /* ---------- URL Normalization ---------- */

@@ -384,6 +384,42 @@ function applyThumbToCard(card, url) {
 
 async function fetchCommunityEvents() {
   const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTns1Hpe-TBIjKUM7yjP_wI4cm75iy3R6Plfo7YR7r7TCA6H154T61O_B2sTV3Wj8V8Vf6ToslfSfKR/pub?gid=447995773&single=true&output=csv';
+
+  // Convert Excel serial date (e.g. 46203.59808) to Date object.
+  // Excel serial 1 = Jan 1, 1900. Subtract 25569 days to get Unix epoch.
+  function parseSerialDate(val) {
+    const n = parseFloat(val);
+    if (isNaN(n) || n < 1) return null;
+    // Only treat as serial if it looks like one (integer part > 365, meaning after year 1900)
+    if (n < 365) return null;
+    const days = n - 25569; // offset to Unix epoch
+    return new Date(days * 86400000);
+  }
+
+  // Parse a time value — could be Excel serial (0.33333 = 8:00 AM) or "HH:MM:SS AM/PM"
+  function parseTimeValue(val) {
+    if (!val || !val.trim()) return '';
+    const n = parseFloat(val);
+    // If it's a pure number between 0 and 1, treat as Excel time fraction
+    if (!isNaN(n) && n >= 0 && n < 1 && /^[\d.]+$/.test(val.trim())) {
+      const totalMinutes = Math.round(n * 24 * 60);
+      const h = Math.floor(totalMinutes / 60);
+      const m = totalMinutes % 60;
+      const period = h >= 12 ? 'PM' : 'AM';
+      const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+      return `${h12}:${String(m).padStart(2, '0')} ${period}`;
+    }
+    // Normalize 24h time strings to 12h AM/PM
+    const hhmm = val.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*$/);
+    if (hhmm) {
+      const h24 = parseInt(hhmm[1]), m = hhmm[2];
+      const period = h24 >= 12 ? 'PM' : 'AM';
+      const h12 = h24 === 0 ? 12 : h24 > 12 ? h24 - 12 : h24;
+      return `${h12}:${m} ${period}`;
+    }
+    // Strip seconds from AM/PM strings: "3:00:00 PM" → "3:00 PM"
+    return val.replace(/:\d{2}(?=\s*[APap][Mm])/, '');
+  }
   try {
     const response = await fetch(SHEET_CSV);
     if (!response.ok) return [];
@@ -430,11 +466,12 @@ async function fetchCommunityEvents() {
       if (approved !== 'TRUE' && approved !== 'YES') return null;
 
       const dateStr = vals[dateIdx] || '';
-      const parsed = new Date(dateStr);
-      if (isNaN(parsed.getTime())) return null;
+      let parsed = new Date(dateStr);
+      if (isNaN(parsed.getTime())) parsed = parseSerialDate(dateStr);
+      if (!parsed || isNaN(parsed.getTime())) return null;
 
-      const timeVal = vals[timeIdx] || '';
-      const endVal = vals[endTimeIdx] || '';
+      const timeVal = parseTimeValue(vals[timeIdx] || '');
+      const endVal = parseTimeValue(vals[endTimeIdx] || '');
       const displayTime = timeVal ? formatDisplayTime(timeVal, endVal) : '';
       const rawImg = vals[imageIdx] || '';
       const eventUrl = vals[urlIdx] || '';
