@@ -7,6 +7,18 @@ export function escapeHtml(value) {
     .replace(/'/g, '&#039;');
 }
 
+/**
+ * Returns YYYY-MM-DD in LOCAL timezone (not UTC like toISOString).
+ * Critical for holiday detection — avoids the date flipping at 8 PM ET.
+ */
+export function getLocalDateStr(date) {
+  const d = date || new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 const DAY_KEYS = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
 
 export function getDayLabels(lang = 'fr') {
