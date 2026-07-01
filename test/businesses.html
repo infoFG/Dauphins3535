@@ -106,6 +106,15 @@ if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)
     const list = document.getElementById('biz-list');
     const dayKeys = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
 
+    // Local-date helper (avoids UTC flip of toISOString after 8 PM ET)
+    function getLocalDateStr(date) {
+      const d = date || new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
     // Check if a specific date matches a holiday
     function isDateHoliday(holidays, dateStr) {
       if (!holidays || !holidays.length) return null;
@@ -134,7 +143,7 @@ if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)
       return { dates: dayKeys.map((_, i) => {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
-        return d.toISOString().split('T')[0];
+        return getLocalDateStr(d);
       }), todayIdx: dayOfWeek };
     }
 
@@ -169,7 +178,7 @@ if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)
 
         const labels = getDayLabels(currentLang);
         const { dates: weekDates, todayIdx } = getWeekDates();
-        const todayStr = new Date().toISOString().split('T')[0];
+        const todayStr = getLocalDateStr();
 
         list.innerHTML = businesses.map(biz => {
           const img = biz.images?.[0]

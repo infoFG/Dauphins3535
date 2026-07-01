@@ -1,4 +1,4 @@
-import { escapeHtml, formatBusinessHours, isCurrentlyOpen, getDayLabels } from './utils.js';
+import { escapeHtml, formatBusinessHours, isCurrentlyOpen, getDayLabels, getLocalDateStr } from './utils.js';
 
 const EVENTS_CACHE_KEY = 'dauphins_events_cache';
 const CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // Refresh from API weekly
@@ -560,9 +560,9 @@ export async function initBusinessGallery() {
   const monday = new Date(now); monday.setDate(now.getDate() - todayIdx);
   const weekDates = dayKeys.map((_, i) => {
     const d = new Date(monday); d.setDate(monday.getDate() + i);
-    return d.toISOString().split('T')[0];
+    return getLocalDateStr(d);
   });
-  const todayStr = now.toISOString().split('T')[0];
+  const todayStr = getLocalDateStr(now);
 
   try {
     // Try Google Sheets first, fall back to JSON
@@ -768,7 +768,7 @@ function renderHoursColumns(hours) {
   const monday = new Date(now); monday.setDate(now.getDate() - todayIdx);
   const weekDates = days.map((_, i) => {
     const d = new Date(monday); d.setDate(monday.getDate() + i);
-    return d.toISOString().split('T')[0];
+    return getLocalDateStr(d);
   });
 
   return `<div class="ev-hours-grid">` + days.map((d, i) => {

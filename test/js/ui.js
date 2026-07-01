@@ -1,4 +1,4 @@
-import { formatBusinessHours, escapeHtml, getDayLabels, isCurrentlyOpen } from './utils.js';
+import { formatBusinessHours, escapeHtml, getDayLabels, isCurrentlyOpen, getLocalDateStr } from './utils.js';
 
 /* ========== SIDEBAR MENU ========== */
 export function initMenu() {
@@ -237,7 +237,7 @@ export function initDayPlanners(faqData = {}) {
 
     // Check if today is a holiday for this scope
     const holidays = data._holidays || [];
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = getLocalDateStr();
 
     // Get the Monday of current week
     const now = new Date();
@@ -249,7 +249,7 @@ export function initDayPlanners(faqData = {}) {
     const weekDates = dayKeys.map((_, i) => {
       const d = new Date(monday);
       d.setDate(monday.getDate() + i);
-      return d.toISOString().split('T')[0];
+      return getLocalDateStr(d);
     });
 
     // Check today's holiday for status badge

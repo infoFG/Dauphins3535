@@ -29,6 +29,8 @@
 const REGISTRY_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTEqhVGaYrnP3sDL8JlMchTeE2a7L8RsZjLm_PjLSbL_TJxz8s3Jd8YPuoFe6yK2nxXn9hkZuKlU-dK/pub?gid=0&single=true&output=csv';
 // ────────────────────────────────────────────────────────────
 
+import { getLocalDateStr } from './utils.js';
+
 const DAY_KEYS = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
 
 /* ---------- Drive Image URL Resolver ---------- */
@@ -268,7 +270,7 @@ function sheetToHours(parsed) {
 function checkHoliday(holidayRows) {
   if (!holidayRows || !holidayRows.length) return { isHoliday: false, name: '' };
   const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
+  const todayStr = getLocalDateStr(today);
   const lang = document.documentElement.lang || 'fr';
   const nameField = lang === 'fr' ? 'name_fr' : 'name_en';
 
