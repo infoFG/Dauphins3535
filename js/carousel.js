@@ -202,7 +202,8 @@ export function initEnhancedCarousels() {
     // Autoplay logic
     const startAutoPlay = () => {
       if (track.scrollWidth <= track.offsetWidth) return;
-      container.autoPlayTimer = setInterval(() => navigate(track, 1, 4000), 8000);
+      clearInterval(container.autoPlayTimer);
+      container.autoPlayTimer = setInterval(() => navigate(track, 1, 4000), 10000);
     };
     const stopAutoPlay = () => clearInterval(container.autoPlayTimer);
     
