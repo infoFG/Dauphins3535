@@ -262,7 +262,6 @@ export function initDayPlanners(faqData = {}) {
     if (infoBox) {
       let noteHtml = '';
       const noteKey = `cleaning_note_${lang}`;
-      console.log('initDayPlanners POOL:', type, 'noteKey:', noteKey, 'data keys:', data ? Object.keys(data).filter(k => k.includes('cleaning') || k.includes('desc')) : 'null', 'noteValue:', JSON.stringify(data?.[noteKey]));
       if (data?.[noteKey]) {
         noteHtml = `<p class="cleaning-note">${escapeHtml(data[noteKey])}</p>`;
       }
