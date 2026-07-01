@@ -4,54 +4,64 @@ import { initEnhancedCarousels, loadStaticCarouselImages, loadSectionBackground 
 import { fetchFAQData } from './js/gsheets.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // 1. Initialize core UI
+  // 1. Core UI — instant, no data dependency
   initMenu();
   initLanguage();
   initLightbox();
+  initScrollReveal();
 
-  // 2 & 3. Load dynamic data and static assets
+  // 2. Attach carousel listeners to static tracks right away (they already exist in DOM)
+  initEnhancedCarousels();
+
+  // 3. Load all data in parallel — biggest speedup (was sequential before)
   let faqData = {};
   try {
-    await initEventsCarousel();
-    await initBusinessGallery();
-
-    // Fetch FAQ Hours — try Google Sheets first, fall back to JSON
-    try {
-      const sheetsData = await fetchFAQData();
-      if (sheetsData.admin || sheetsData.pool) {
-        faqData = {
-          admin: sheetsData.admin || (await fetch('assets/FAQ/OfficeHours.json').then(r => r.json()).catch(() => null)),
-          pool: sheetsData.pool || (await fetch('assets/FAQ/PoolHours.json').then(r => r.json()).catch(() => null))
-        };
-      }
-    } catch {
-      const [adminRes, poolRes] = await Promise.all([
-        fetch('assets/FAQ/OfficeHours.json').then(r => r.json()).catch(() => null),
-        fetch('assets/FAQ/PoolHours.json').then(r => r.json()).catch(() => null)
-      ]);
-      faqData = { admin: adminRes, pool: poolRes };
-    }
-
-    // 3. Load static assets - removed leading slashes for better portability
-    await loadStaticCarouselImages('apropos-carousel-track', 'assets/Apropos');
-    await loadStaticCarouselImages('installations-carousel-track', 'assets/Installations');
-    await loadStaticCarouselImages('quartier-park-carousel-track', 'assets/Quartier');
-    await loadSectionBackground('valeurs');
-    await loadSectionBackground('condoweb');
-    await loadSectionBackground('faq-admin');
-    await loadSectionBackground('faq-pool', 'assets/Installations');
-    await loadSectionBackground('faq-waste');
-    await loadSectionBackground('galerie-commerciale', 'assets/Commereciale');
-    await loadSectionBackground('communaute', 'assets/Commereciale');
+    await Promise.all([
+      initEventsCarousel(),
+      initBusinessGallery(),
+      // FAQ data: sheets first, fall back to JSON
+      (async () => {
+        try {
+          const sheetsData = await fetchFAQData();
+          if (sheetsData.admin || sheetsData.pool) {
+            faqData = {
+              admin: sheetsData.admin || (await fetch('assets/FAQ/OfficeHours.json').then(r => r.json()).catch(() => null)),
+              pool: sheetsData.pool || (await fetch('assets/FAQ/PoolHours.json').then(r => r.json()).catch(() => null))
+            };
+          }
+        } catch {
+          const [adminRes, poolRes] = await Promise.all([
+            fetch('assets/FAQ/OfficeHours.json').then(r => r.json()).catch(() => null),
+            fetch('assets/FAQ/PoolHours.json').then(r => r.json()).catch(() => null)
+          ]);
+          faqData = { admin: adminRes, pool: poolRes };
+        }
+      })(),
+      // Static carousel images (visible above the fold)
+      loadStaticCarouselImages('apropos-carousel-track', 'assets/Apropos'),
+      loadStaticCarouselImages('installations-carousel-track', 'assets/Installations'),
+      loadStaticCarouselImages('quartier-park-carousel-track', 'assets/Quartier'),
+    ]);
   } catch (error) {
     console.error("Asset loading failed:", error);
   }
-  // 4. Initialize carousel engine & animations
+
+  // 4. Re-init carousels for newly populated dynamic tracks (events, businesses)
   initEnhancedCarousels();
-  initScrollReveal();
   initDayPlanners(faqData);
   initWasteCalendar();
   initCommunityCarousel();
+
+  // 5. Decorative section backgrounds — fire-and-forget, don't block the page
+  Promise.all([
+    loadSectionBackground('valeurs'),
+    loadSectionBackground('condoweb'),
+    loadSectionBackground('faq-admin'),
+    loadSectionBackground('faq-pool', 'assets/Installations'),
+    loadSectionBackground('faq-waste'),
+    loadSectionBackground('galerie-commerciale', 'assets/Commereciale'),
+    loadSectionBackground('communaute', 'assets/Commereciale'),
+  ]).catch(() => {});
 
   // Re-render dynamic content when language changes
   document.addEventListener('languagechanged', async () => {
