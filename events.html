@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events at Le Dauphin — Les Dauphins-sur-le-Parc</title>
+  <link rel="icon" type="image/webp" href="assets/logo-menu.webp">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body { font-family: 'Segoe UI', system-ui, sans-serif; color: #3A2404; background: #fafafa; }
+    .content-box { opacity: 1 !important; transform: none !important; }
+    .main-content { min-height: auto !important; display: flex; flex-direction: column; min-height: 100vh; }
+    #events-page { flex: 1; padding: 4rem 1rem 1rem !important; }
+    .events-footer { flex-shrink: 0; height: 80px; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <script>
+(function(){
+if(sessionStorage.getItem('_pw')==='1'||location.hostname==='localhost'||location.hostname==='127.0.0.1')return;
+function init(){
+var o=document.createElement('div');
+o.id='pw-gate';
+o.innerHTML='<style>#pw-gate{position:fixed;inset:0;z-index:99999;background:rgba(58,36,4,0.95);display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif}#pw-gate form{background:#fff;padding:2.5rem;border-radius:12px;text-align:center;max-width:360px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3)}#pw-gate h2{margin:0 0 0.5rem;color:#3A2404;font-size:1.3rem}#pw-gate p{color:#89897C;font-size:0.85rem;margin:0 0 1.25rem}#pw-gate input{width:100%;padding:0.65rem 0.75rem;border:1px solid #D3D8D6;border-radius:8px;font-size:1rem;text-align:center;box-sizing:border-box;margin-bottom:0.75rem}#pw-gate button{width:100%;padding:0.65rem;background:#A19B80;color:#fff;border:none;border-radius:8px;font-size:0.95rem;cursor:pointer;font-weight:600}#pw-gate button:hover{background:#8a856e}#pw-gate .error{color:#c62828;font-size:0.8rem;margin-top:0.5rem;display:none}</style><form autocomplete="off"><h2>🔒 Accès restreint</h2><p>Ce site est en révision. Veuillez entrer le mot de passe.</p><input type="password" id="pw-input" placeholder="Mot de passe" autofocus><button type="submit">Accéder</button><div class="error" id="pw-error">Mot de passe incorrect.</div></form>';
+document.body.prepend(o);
+o.querySelector('form').addEventListener('submit',function(e){
+e.preventDefault();
+var pw=document.getElementById('pw-input').value;
+var hash=btoa(unescape(encodeURIComponent(pw)));
+if(hash==='ZGF1cGhpbnMyMDI2'){
+sessionStorage.setItem('_pw','1');o.remove();
+}else{
+document.getElementById('pw-error').style.display='block';
+document.getElementById('pw-input').value='';
+document.getElementById('pw-input').focus();
+}
+});
+}
+if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)}
+})();
+</script>
+</head>
+<body class="content-page">
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
+  <div class="lang-switch">
+    <button id="lang-fr" class="active">FR</button>
+    <button id="lang-en">EN</button>
+  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="assets/logo-menu.webp" alt="Les Dauphins-sur-le-Parc">
+      <h1>Les Dauphins-sur-le-Parc</h1>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li><a href="index.html#apropos" data-i18n="nav_about">À propos</a></li>
+        <li><a href="index.html#installations" data-i18n="nav_amenities">Installations</a></li>
+        <li><a href="index.html#galerie-commerciale" data-i18n="nav_gallery">Galerie Commerciale</a></li>
+        <li class="nav-sub"><a href="businesses.html" class="nav-page-link" data-i18n="nav_full_list">Liste complète</a></li>
+        <li><a href="index.html#communaute" data-i18n="nav_community">Événements communautaires</a></li>
+        <li class="nav-sub"><a href="events.html" class="nav-page-link active" data-i18n="nav_full_list">Liste complète</a></li>
+        <li><a href="index.html#valeurs" data-i18n="nav_values">Valeurs</a></li>
+        <li class="nav-sub"><a href="faq.html" data-i18n="nav_faq" class="nav-page-link">FAQ</a></li>
+        <li><a href="index.html#condoweb" data-i18n="nav_condoweb">CondoWeb</a></li>
+        <li><a href="index.html#quartier" data-i18n="nav_neighborhood">Vie de quartier</a></li>
+        <li class="nav-sub"><a href="events-list.html" class="nav-page-link" data-i18n="events_full_list_title">Événements à venir</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <section class="section" id="events-page">
+      <div class="section-inner">
+        <div class="content-box">
+          <h1 class="section-title">Événements communautaires</h1>
+          <p style="margin-bottom:2rem;">Événements soumis par les résidents de l'immeuble.</p>
+          <p style="margin-bottom:1.5rem;" id="subscribe-line">
+            <button class="cal-add-btn" onclick="window._subscribeCalendar();return false;" style="font-size:0.85rem;">📅 S'abonner au calendrier</button>
+            <span style="color:#B8B09A;font-size:0.75rem;margin-left:0.5rem;">Google Calendar, Outlook, Apple</span>
+          </p>
+          <div id="events-list" class="events-list">
+            <p class="loading-msg">Chargement des événements…</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="events-footer" style="text-align:center;">
+      <img src="assets/logo-menu.webp" alt="Les Dauphins-sur-le-Parc" style="width:60px; height:auto; opacity:0.5;" />
+    </div>
+  </main>
+
+  <script src="translations.js"></script>
+  <script type="module">
+    import { initMenu, initLanguage } from './js/ui.js';
+    initMenu();
+    initLanguage();
+  </script>
+  <script>
+    // Wait for UI module to initialize, then load community events
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Set random background from Commereciale images
+      try {
+        const res = await fetch('assets/Commereciale/images.json');
+        const images = await res.json();
+        const bg = images[Math.floor(Math.random() * images.length)];
+        document.getElementById('events-page').style.setProperty('--section-bg', 'url("../assets/Commereciale/' + bg + '")');
+      } catch(e) {}
+      
+      setTimeout(loadCommunityEvents, 100);
+      setTimeout(updateSubscribeText, 200);
+    });
+
+    const lang = () => document.documentElement.lang || 'fr';
+    const list = () => document.getElementById('events-list');
+    const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTns1Hpe-TBIjKUM7yjP_wI4cm75iy3R6Plfo7YR7r7TCA6H154T61O_B2sTV3Wj8V8Vf6ToslfSfKR/pub?gid=447995773&single=true&output=csv';
+
+    function toCalDate(dateStr, timeStr, isStart) {
+      if (!dateStr) return '';
+      const d = dateStr.replace(/-/g, '');
+      if (!timeStr) return isStart ? d : d;
+      let h = 0, m = 0;
+      const t = timeStr.trim();
+      if (t.includes(':')) {
+        const parts = t.split(':');
+        h = parseInt(parts[0]); m = parseInt(parts[1]);
+        if (t.toUpperCase().includes('PM') && h < 12) h += 12;
+        if (t.toUpperCase().includes('AM') && h === 12) h = 0;
+      }
+      if (!isStart) h += 1;
+      return d + 'T' + String(h).padStart(2,'0') + String(m).padStart(2,'0') + '00';
+    }
+
+    window._addToCalendar = function(btn) {
+      const l = lang();
+      const raw = btn.getAttribute('data-cal');
+      if (!raw) return;
+      const data = JSON.parse(decodeURIComponent(raw));
+      const existing = document.querySelector('.cal-confirm-overlay');
+      if (existing) existing.remove();
+      const overlay = document.createElement('div');
+      overlay.className = 'cal-confirm-overlay';
+      overlay.innerHTML = '<div class="cal-confirm-box"><p>' + (l==='en'?'Add to your calendar?':'Ajouter à votre calendrier ?') + '</p><p class="cal-confirm-title">' + (data.title||'') + '</p><p class="cal-confirm-sub">' + (l==='en'?'Opens in Google Calendar':'Ouvre dans Google Calendar') + '</p><div class="cal-confirm-actions"><button class="cal-confirm-yes">' + (l==='en'?'Add':'Ajouter') + '</button><button class="cal-confirm-no">' + (l==='en'?'Cancel':'Annuler') + '</button></div></div>';
+      document.body.appendChild(overlay);
+      const close = () => overlay.remove();
+      overlay.querySelector('.cal-confirm-no').onclick = close;
+      overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+      overlay.querySelector('.cal-confirm-yes').onclick = () => {
+        close();
+        const start = toCalDate(data.date, data.time, true);
+        const end = toCalDate(data.date, data.time, false);
+        window.open('https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(data.title||'') + '&dates=' + start + '/' + end + '&details=' + encodeURIComponent(data.description||'') + '&location=' + encodeURIComponent(data.location||''), '_blank');
+      };
+    };
+
+    function renderEvents(events) {
+      const l = list();
+      if (!events.length) {
+        l.innerHTML = '<p style="color:#3A2404;padding:2rem;">Aucun événement communautaire à venir.</p>';
+        return;
+      }
+      const currentLang = lang();
+      l.innerHTML = events.map(e => {
+        const title = currentLang === 'en' && e.title_en ? e.title_en : e.title;
+        const dateStr = new Date(e.date + 'T00:00:00').toLocaleDateString(
+          currentLang === 'en' ? 'en-CA' : 'fr-CA',
+          { weekday: 'long', month: 'long', day: 'numeric' }
+        );
+        const hasLink = e.link && e.link !== '#';
+        const imgHtml = e.image ? '<a href="' + (e.link || '#') + '" ' + (hasLink ? 'target="_blank" rel="noopener"' : '') + ' style="flex-shrink:0;width:240px;aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:#f0f0f0;"><img src="' + e.image + '" alt="" style="width:100%;height:100%;object-fit:contain;" loading="lazy" onerror="this.parentElement.style.display=\'none\'"></a>' : '';
+        const descHtml = e.description ? '<p style="font-size:0.9rem;color:#606059;margin:0.5rem 0;line-height:1.5;">' + e.description + '</p>' : '';
+        const contactHtml = e.contact ? '<div style="font-size:0.8rem;color:#B8B09A;margin-top:0.5rem;">📞 ' + e.contact + '</div>' : '';
+        
+        return '<div style="display:flex;gap:1rem;padding:1rem;background:#fff;border:1px solid #D3D8D6;border-radius:10px;color:#3A2404;margin-bottom:1rem;font-family:Segoe UI,system-ui,sans-serif;flex-wrap:wrap;">' +
+          imgHtml +
+          '<div style="flex:1;min-width:0;">' +
+            '<div style="font-size:0.8rem;color:#A19B80;font-weight:600;margin-bottom:0.25rem;">' + dateStr + (e.time ? ' — ' + e.time : '') + '</div>' +
+            '<h3 style="font-size:1rem;margin:0 0 0.25rem;color:#3A2404;">' + title + '</h3>' +
+            (e.location ? '<div style="font-size:0.8rem;color:#B8B09A;">📍 ' + e.location + '</div>' : '') +
+            descHtml +
+            contactHtml +
+            (hasLink ? '<a href="' + e.link + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:0.5rem;font-size:0.8rem;color:#A19B80;">Plus d\'info →</a>' : '<button class="cal-add-btn" data-cal="' + encodeURIComponent(JSON.stringify({title:e.title,date:e.date,time:e.time||'',location:e.location||'',description:e.description||''})) + '" onclick="window._addToCalendar(this)" style="margin-top:0.5rem;">📅 ' + (currentLang === 'en' ? 'Add to Calendar' : 'Ajouter au calendrier') + '</button>') +
+          '</div>' +
+          '</div>';
+      }).join('');
+    }
+
+    window._subscribeCalendar = function() {
+      const l = lang();
+      const ICAL_URL = 'https://calendar.google.com/calendar/ical/8168f0b1875c929ea015c3c1ffa067d559215c6e6b3350518809bbf1905f86ce%40group.calendar.google.com/public/basic.ics';
+      const existing = document.querySelector('.cal-confirm-overlay');
+      if (existing) existing.remove();
+      const overlay = document.createElement('div');
+      overlay.className = 'cal-confirm-overlay';
+      overlay.innerHTML = '<div class="cal-confirm-box"><p>' + (l==='en'?'Subscribe to the events calendar?':'S\'abonner au calendrier des événements ?') + '</p><p class="cal-confirm-title">Les Dauphins-sur-le-Parc</p><div class="cal-confirm-actions"><button class="cal-confirm-yes">' + (l==='en'?'Subscribe':'S\'abonner') + '</button><button class="cal-confirm-no">' + (l==='en'?'Cancel':'Annuler') + '</button></div></div>';
+      document.body.appendChild(overlay);
+      const close = () => overlay.remove();
+      overlay.querySelector('.cal-confirm-no').onclick = close;
+      overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+      overlay.querySelector('.cal-confirm-yes').onclick = () => {
+        close();
+        window.open('https://calendar.google.com/calendar/render?cid=' + encodeURIComponent(ICAL_URL), '_blank');
+      };
+    };
+
+    async function loadCommunityEvents() {
+      const l = list();
+      try {
+        l.innerHTML = '<p style="color:#B8B09A;font-style:italic;padding:2rem;">Chargement des événements…</p>';
+        const res = await fetch(SHEET_CSV);
+        const text = await res.text();
+
+        // Parse CSV with proper quote handling (supports multi-line fields)
+        const rows = [];
+        let row = [], cell = '', inQ = false;
+        for (let i = 0; i < text.length; i++) {
+          const ch = text[i];
+          if (inQ) {
+            if (ch === '"') { if (text[i+1] === '"') { cell += '"'; i++; } else inQ = false; }
+            else cell += ch;
+          } else {
+            if (ch === '"') inQ = true;
+            else if (ch === ',') { row.push(cell.trim()); cell = ''; }
+            else if (ch === '\n' || (ch === '\r' && text[i+1] === '\n')) {
+              row.push(cell.trim());
+              if (row.some(c => c !== '')) rows.push(row);
+              row = []; cell = '';
+              if (ch === '\r') i++;
+            } else cell += ch;
+          }
+        }
+        row.push(cell.trim());
+        if (row.some(c => c !== '')) rows.push(row);
+
+        if (rows.length < 2) { renderEvents([]); return; }
+
+        const headers = rows[0].map(h => h.trim().toLowerCase());
+        const dateIdx = headers.indexOf('event date');
+        const titleIdx = headers.indexOf('event name');
+        const descIdx = headers.indexOf('event description');
+        const timeIdx = headers.indexOf('start time');
+        const endTimeIdx = headers.indexOf('end time');
+        const locIdx = headers.indexOf('event location');
+        const urlIdx = headers.indexOf('event url');
+        const contactIdx = headers.indexOf('contact info');
+        const imageIdx = headers.indexOf('image');
+        const approvedIdx = headers.indexOf('approved');
+
+        const events = rows.slice(1).map(vals => {
+          if ((vals[approvedIdx] || '').toUpperCase() !== 'TRUE') return null;
+          const parsed = new Date(vals[dateIdx] || '');
+          if (isNaN(parsed.getTime())) return null;
+          const rawImg = vals[imageIdx] || '';
+          let imgUrl = '';
+          if (rawImg) {
+            const dm = rawImg.match(/[?&]id=([a-zA-Z0-9_-]+)/) || rawImg.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            imgUrl = dm ? 'https://lh3.googleusercontent.com/d/' + dm[1] + '=w400' : rawImg;
+          }
+          const startTime = vals[timeIdx] ? new Date('2000-01-01 ' + vals[timeIdx]).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+          const endTime = vals[endTimeIdx] ? new Date('2000-01-01 ' + vals[endTimeIdx]).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+          const timeStr = startTime && endTime ? startTime + ' – ' + endTime : (startTime || endTime);
+          return {
+            title: vals[titleIdx] || '',
+            date: parsed.toISOString().split('T')[0],
+            time: timeStr,
+            location: vals[locIdx] || '',
+            description: vals[descIdx] || '',
+            contact: vals[contactIdx] || '',
+            image: imgUrl,
+            link: vals[urlIdx] || '#'
+          };
+        }).filter(Boolean).filter(e => new Date(e.date + 'T00:00:00') >= new Date().setHours(0,0,0,0))
+          .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        renderEvents(events);
+      } catch (e) { l.innerHTML = '<p class="loading-msg">Impossible de charger les événements.</p>'; }
+    }
+
+    document.addEventListener('languagechanged', () => {
+      loadCommunityEvents();
+      updateSubscribeText();
+    });
+
+    function updateSubscribeText() {
+      const el = document.getElementById('subscribe-line');
+      if (!el) return;
+      const l = lang();
+      const btn = el.querySelector('button');
+      if (btn) btn.textContent = '📅 ' + (l === 'en' ? 'Subscribe to calendar' : "S'abonner au calendrier");
+    }
+  </script>
+</body>
+</html>

@@ -6,6 +6,30 @@
   <title>Les Dauphins-sur-le-Parc — Immeuble à condos &amp; galerie commerciale</title>
   <link rel="icon" type="image/webp" href="assets/logo-menu.webp">
   <link rel="stylesheet" href="css/styles.css">
+  <script>
+(function(){
+if(sessionStorage.getItem('_pw')==='1'||location.hostname==='localhost'||location.hostname==='127.0.0.1')return;
+function init(){
+var o=document.createElement('div');
+o.id='pw-gate';
+o.innerHTML='<style>#pw-gate{position:fixed;inset:0;z-index:99999;background:rgba(58,36,4,0.95);display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif}#pw-gate form{background:#fff;padding:2.5rem;border-radius:12px;text-align:center;max-width:360px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3)}#pw-gate h2{margin:0 0 0.5rem;color:#3A2404;font-size:1.3rem}#pw-gate p{color:#89897C;font-size:0.85rem;margin:0 0 1.25rem}#pw-gate input{width:100%;padding:0.65rem 0.75rem;border:1px solid #D3D8D6;border-radius:8px;font-size:1rem;text-align:center;box-sizing:border-box;margin-bottom:0.75rem}#pw-gate button{width:100%;padding:0.65rem;background:#A19B80;color:#fff;border:none;border-radius:8px;font-size:0.95rem;cursor:pointer;font-weight:600}#pw-gate button:hover{background:#8a856e}#pw-gate .error{color:#c62828;font-size:0.8rem;margin-top:0.5rem;display:none}</style><form autocomplete="off"><h2>🔒 Accès restreint</h2><p>Ce site est en révision. Veuillez entrer le mot de passe.</p><input type="password" id="pw-input" placeholder="Mot de passe" autofocus><button type="submit">Accéder</button><div class="error" id="pw-error">Mot de passe incorrect.</div></form>';
+document.body.prepend(o);
+o.querySelector('form').addEventListener('submit',function(e){
+e.preventDefault();
+var pw=document.getElementById('pw-input').value;
+var hash=btoa(unescape(encodeURIComponent(pw)));
+if(hash==='ZGF1cGhpbnMyMDI2'){
+sessionStorage.setItem('_pw','1');o.remove();
+}else{
+document.getElementById('pw-error').style.display='block';
+document.getElementById('pw-input').value='';
+document.getElementById('pw-input').focus();
+}
+});
+}
+if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)}
+})();
+</script>
 </head>
 <body>
 
@@ -27,11 +51,15 @@
       <ul>
         <li><a href="#apropos" data-i18n="nav_about">À propos</a></li>
         <li><a href="#installations" data-i18n="nav_amenities">Installations</a></li>
-        <li><a href="#galerie-commerciale" data-i18n="nav_gallery">Galerie commerciale</a></li>
+        <li><a href="#galerie-commerciale" data-i18n="nav_gallery">Galerie Commerciale</a></li>
+        <li class="nav-sub"><a href="businesses.html" class="nav-page-link" data-i18n="nav_full_list">Liste complète</a></li>
+        <li><a href="#communaute" data-i18n="nav_community">Événements communautaires</a></li>
+        <li class="nav-sub"><a href="events.html" class="nav-page-link" data-i18n="nav_full_list">Liste complète</a></li>
         <li><a href="#valeurs" data-i18n="nav_values">Valeurs</a></li>
+        <li class="nav-sub"><a href="faq.html" data-i18n="nav_faq" class="nav-page-link">FAQ</a></li>
         <li><a href="#condoweb" data-i18n="nav_condoweb">CondoWeb</a></li>
         <li><a href="#quartier" data-i18n="nav_neighborhood">Vie de quartier</a></li>
-        <!-- <li><a href="#unites">Unités à vendre</a></li> -->
+        <li class="nav-sub"><a href="events-list.html" class="nav-page-link" data-i18n="events_full_list_title">Événements à venir</a></li>
       </ul>
     </nav>
   </aside>
@@ -115,12 +143,30 @@
               <li data-i18n="gallery_item_8"><strong>Le Délice glacé</strong> — Crèmerie — <a href="https://www.facebook.com/61589163615629" target="_blank" rel="noopener">facebook.com/LeDéliceGlacé</a></li>
               <li data-i18n="gallery_item_9"><strong>Lave Toutou</strong> — Buanderie et lavage pour chiens — <a href="https://www.lavetoutou.ca/" target="_blank" rel="noopener">lavetoutou.ca</a></li>
             </ul>
+            <a href="businesses.html" class="hero-cta" style="display:inline-block;padding:0.5rem 1.25rem; font-size:0.8rem; margin-top:0.75rem;">Voir tous les commerces →</a>
           </div>
         </div>
         <div class="carousel-container image-carousel">
           <button class="carousel-btn prev">❮</button>
           <button class="carousel-btn next">❯</button>
           <div class="carousel-track" id="business-gallery-track"></div>
+          <div class="carousel-pips"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ÉVÉNEMENTS COMMUNAUTAIRES ===== -->
+    <section class="section" id="communaute" style="display:none;">
+      <div class="section-inner">
+        <div class="content-box">
+          <h2 class="section-title" data-i18n="title_community">Événements communautaires</h2>
+          <div class="section-content">
+            <p data-i18n="community_p1">Événements soumis par les résidents de l'immeuble.</p>
+            <a href="events.html" class="hero-cta" style="display:inline-block;padding:0.5rem 1.25rem; font-size:0.8rem; margin-top:0.75rem;" data-i18n="community_view_all">Voir tous les événements →</a>
+          </div>
+        </div>
+        <div class="carousel-container image-carousel">
+          <div class="carousel-track" id="community-carousel-track" data-no-clone></div>
           <div class="carousel-pips"></div>
         </div>
       </div>
@@ -140,6 +186,7 @@
               <li data-i18n="value_4">Animaux de compagnie autorisés sous conditions</li>
             </ul>
             <p style="margin-top:1rem;" data-i18n="values_rules">Le règlement complet est disponible sur CondoWeb.</p>
+            <p style="margin-top:1rem;"><a href="faq.html" data-i18n="values_faq_link">Consultez notre FAQ pour les horaires et la collecte des déchets →</a></p>
           </div>
         </div>
       </div>
@@ -177,6 +224,7 @@
           <h2 class="section-title" data-i18n="nav_neighborhood">Vie de quartier</h2>
           <div class="section-content">
             <p data-i18n="neighborhood_intro">Le Plateau-Mont-Royal est un quartier dynamique avec une variété d'espaces verts, de commerces de proximité et une offre culturelle variée. Les Dauphins sont à distance de marche des artères commerciales de la rue Ontario et de l'avenue du Mont-Royal, et la piétonisation de cette dernière de juin à septembre ajoute à la qualité de vie du quartier. Sur la rue Gauthier juste à côté, on trouve une épicerie, une boutique de produits pour animaux de compagnie, une boulangerie et un restaurant.</p>
+            <a href="events-list.html" class="hero-cta" style="display:inline-block;padding:0.5rem 1.25rem; font-size:0.8rem; margin-top:0.75rem;">Voir tous les événements →</a>
           </div>
         </div>
 
@@ -188,14 +236,19 @@
           <div class="carousel-pips"></div>
         </div>
 
+        <!-- Events Carousel -->
+        <div class="carousel-container image-carousel" style="margin-top: 2rem;">
+          <div class="carousel-track" id="events-carousel-track" data-no-clone></div>
+          <div class="carousel-pips"></div>
+        </div>
+
         <!-- Park Activities Bubble -->
         <div class="content-box">
           <h3 style="color:var(--bleu-fonce); font-size:1.1rem; margin-top:0;" data-i18n="park_title">Parc La Fontaine</h3>
           <p data-i18n="neighborhood_p1">Le parc La Fontaine, situé en face de l'immeuble, est un véritable poumon vert au cœur du Plateau-Mont-Royal. C'est un refuge pour une grande faune urbaine, qui abrite en bordure de ses deux bassins des colonies de canards et de chauves-souris, ainsi qu'une armée d'écureuils généralement assez inoffensifs. À l'occasion il reçoit des visites de grands hérons, de cormorans et d'oiseaux de proie.<br><br>Voici un aperçu de ce que le parc offre aux visiteurs.</p>
           <br>
-          <div class="gallery-grid-4">
-            <img src="assets/Quartier/quartier-parc-lafontaine.webp" alt="Parc La Fontaine" loading="lazy" class="lightbox-trigger" />
-            <img src="assets/Quartier/quartier-parc-lafontaine-2.webp" alt="Parc La Fontaine" loading="lazy" class="lightbox-trigger" />
+          <div class="gallery-mosaic" style="margin:0;">
+            <img src="assets/Quartier/quartier-parc-lafontaine.webp" class="gallery-item gallery-wide" alt="Parc La Fontaine" loading="lazy" />
           </div>
 
           <div style="margin-top:1.5rem; padding:1rem; background: rgba(255,255,255,0.5); border-radius:10px; border:1px solid var(--bleu-pale);">
@@ -240,11 +293,10 @@
         <!-- Borough Activities Box -->
         <div class="content-box">
           <h3 style="color:var(--bleu-fonce); font-size:1.1rem; margin-top:0;" data-i18n="borough_title">Activités de l'arrondissement</h3>
-          <p data-i18n="borough_intro">Le Plateau-Mont-Royal a une grande diversité d'activités, du sommet du Mont-Royal à l'ouest au Parc Baldwin à l'est. Plusieurs sont encadrées par l'administration de l'arrondissement.</p>
+          <p data-i18n="borough_intro">Le Plateau-Mont-Royal est un quartier dynamique qui a une grande diversité d'activités, du sommet du Mont-Royal à l'ouest au Parc Baldwin à l'est. Plusieurs de celles-ci sont encadrées par l'administration de l'arrondissement.</p>
           <br>
-          <div class="gallery-grid-4">
-            <img src="assets/Quartier/quartier-plateau.webp" alt="Vue du Plateau-Mont-Royal" loading="lazy" class="lightbox-trigger" />
-            <img src="assets/Quartier/quartier-arrondissement-2.webp" alt="Activités de l'arrondissement" loading="lazy" class="lightbox-trigger" />
+          <div class="gallery-mosaic" style="margin:0;">
+            <img src="assets/Quartier/quartier-plateau.webp" class="gallery-item gallery-wide" alt="Vue du Plateau-Mont-Royal" loading="lazy" />
           </div>
 
           <div style="margin-top:1.5rem; padding:1rem; background: rgba(255,255,255,0.5); border-radius:10px; border:1px solid var(--bleu-pale);">
@@ -254,13 +306,13 @@
 
           <div style="margin-top:1rem; padding:1rem; background: rgba(255,255,255,0.5); border-radius:10px; border:1px solid var(--bleu-pale);">
             <p style="margin-bottom:0.5rem;"><strong data-i18n="cultural_calendar_title">Calendrier culturel</strong></p>
-            <p data-i18n="cultural_calendar_p1"><span style="font-weight:500;">Le programme de soutien aux actions culturelles du Plateau (PSAC)</span> propose une programmation variée, festive, gratuite et qui saura ravir tous les publics. <a href="https://montreal.ca/articles/de-la-culture-partout-et-pour-tout-le-monde-sur-le-plateau-47212" target="_blank" rel="noopener">En voici un aperçu <span style="font-size:0.85em;">→</span></a></p>
+            <p data-i18n="cultural_calendar_p1"><span style="font-weight:500;">Le programme de soutien aux actions culturelles du Plateau (PSAC)</span> a une fois de plus cette année été riche en candidatures et de nombreux artistes ont répondu à l'appel de l'arrondissement. Il en résulte une programmation variée, festive, gratuite et qui saura ravir tous les publics. <a href="https://montreal.ca/articles/de-la-culture-partout-et-pour-tout-le-monde-sur-le-plateau-47212" target="_blank" rel="noopener">En voici un aperçu <span style="font-size:0.85em;">→</span></a></p>
           </div>
         </div>
 
         <!-- Theater Content Box -->
         <div class="content-box">
-          <p style="margin-bottom:0.5rem;"><strong>Théâtre de Verdure</strong></p>
+          <p style="margin-bottom:0.5rem;"><strong data-i18n="theater_title">Calendrier du Théâtre de Verdure</strong></p>
           <p data-i18n="theater_p1">Situé au cœur du Parc La Fontaine...</p>
           <div class="gallery-grid-4">
             <img src="assets/quartier-theatre.webp" alt="Théâtre de Verdure — Parc La Fontaine" loading="lazy" class="lightbox-trigger" />
@@ -272,7 +324,7 @@
 
         <!-- Robin des Bois Box -->
         <div class="content-box">
-          <p style="margin-bottom:0.5rem;"><strong>Robin des Bois</strong></p>
+          <p style="margin-bottom:0.5rem;"><strong data-i18n="robin_title">Calendrier du Robin des Bois</strong></p>
             <p data-i18n="robin_p1">Le Robin des Bois est un restaurant bienfaiteur...</p>
           <div class="gallery-grid-4">
             <img src="assets/robin-1.webp" alt="Robin des Bois — Chalet du Parc" loading="lazy" class="lightbox-trigger" />
@@ -311,6 +363,6 @@
   </div>
 
   <script src="translations.js"></script>
-  <script src="main.js"></script>
+  <script type="module" src="main.js"></script>
 </body>
 </html>
