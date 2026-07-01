@@ -396,7 +396,7 @@ async function fetchCommunityEvents() {
     return new Date(days * 86400000);
   }
 
-  // Parse a time value — could be Excel serial (0.33333 = 8:00 AM) or "HH:MM AM/PM"
+  // Parse a time value — could be Excel serial (0.33333 = 8:00 AM) or "HH:MM:SS AM/PM"
   function parseTimeValue(val) {
     if (!val || !val.trim()) return '';
     const n = parseFloat(val);
@@ -409,7 +409,16 @@ async function fetchCommunityEvents() {
       const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
       return `${h12}:${String(m).padStart(2, '0')} ${period}`;
     }
-    return val;
+    // Normalize 24h time strings to 12h AM/PM
+    const hhmm = val.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*$/);
+    if (hhmm) {
+      const h24 = parseInt(hhmm[1]), m = hhmm[2];
+      const period = h24 >= 12 ? 'PM' : 'AM';
+      const h12 = h24 === 0 ? 12 : h24 > 12 ? h24 - 12 : h24;
+      return `${h12}:${m} ${period}`;
+    }
+    // Strip seconds from AM/PM strings: "3:00:00 PM" → "3:00 PM"
+    return val.replace(/:\d{2}(?=\s*[APap][Mm])/, '');
   }
   try {
     const response = await fetch(SHEET_CSV);
