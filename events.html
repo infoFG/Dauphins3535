@@ -264,16 +264,16 @@ if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)
         if (rows.length < 2) { renderEvents([]); return; }
 
         const headers = rows[0].map(h => h.trim().toLowerCase());
-        const dateIdx = headers.indexOf('event date');
-        const titleIdx = headers.indexOf('event name');
-        const descIdx = headers.indexOf('event description');
-        const timeIdx = headers.indexOf('start time');
-        const endTimeIdx = headers.indexOf('end time');
-        const locIdx = headers.indexOf('event location');
-        const urlIdx = headers.indexOf('event url');
-        const contactIdx = headers.indexOf('contact info');
-        const imageIdx = headers.indexOf('image');
-        const approvedIdx = headers.indexOf('approved');
+        const dateIdx = headers.findIndex(h => h.includes('event date'));
+        const titleIdx = headers.findIndex(h => h.includes('event name'));
+        const descIdx = headers.findIndex(h => h.includes('event description'));
+        const timeIdx = headers.findIndex(h => h.includes('start time'));
+        const endTimeIdx = headers.findIndex(h => h.includes('end time'));
+        const locIdx = headers.findIndex(h => h.includes('event location'));
+        const urlIdx = headers.findIndex(h => h.includes('event url'));
+        const contactIdx = headers.findIndex(h => h.includes('contact info'));
+        const imageIdx = headers.findIndex(h => h.includes('image'));
+        const approvedIdx = headers.findIndex(h => h.includes('approved'));
 
         const events = rows.slice(1).map(vals => {
           if ((vals[approvedIdx] || '').toUpperCase() !== 'TRUE') return null;
