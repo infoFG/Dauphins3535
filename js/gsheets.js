@@ -162,7 +162,7 @@ function parseSheet(rows) {
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
-    if (isEmptyRow(row)) { section = null; continue; }
+    if (isEmptyRow(row)) { continue; }
 
     const a = col(row, 0).toLowerCase();
 
@@ -338,7 +338,6 @@ export async function fetchFAQData() {
         cleaning_note_fr: parsed.info.cleaning_note_fr || parsed.info.description_fr || parsed.info.description || '',
         cleaning_note_en: parsed.info.cleaning_note_en || parsed.info.description_en || parsed.info.description || ''
       };
-      console.log('POOL DEBUG: info keys:', Object.keys(parsed.info), 'cleaning_note_fr:', JSON.stringify(poolData.cleaning_note_fr), 'cleaning_note_en:', JSON.stringify(poolData.cleaning_note_en));
       poolHolidays = parsed.holidays;
     } catch {}
   }
