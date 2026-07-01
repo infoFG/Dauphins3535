@@ -116,6 +116,23 @@ if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)
     const list = () => document.getElementById('events-list');
     const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTns1Hpe-TBIjKUM7yjP_wI4cm75iy3R6Plfo7YR7r7TCA6H154T61O_B2sTV3Wj8V8Vf6ToslfSfKR/pub?gid=447995773&single=true&output=csv';
 
+    // Convert Excel serial date (e.g. 46203.59808) or regular date string to Date
+    function parseSerialDate(val) {
+      const n = parseFloat(val);
+      if (!isNaN(n) && n >= 365) return new Date((n - 25569) * 86400000);
+      return null;
+    }
+    function parseTimeValue(val) {
+      if (!val || !val.trim()) return '';
+      const n = parseFloat(val);
+      if (!isNaN(n) && n >= 0 && n < 1 && /^[\d.]+$/.test(val.trim())) {
+        const totalMin = Math.round(n * 24 * 60);
+        const h = Math.floor(totalMin / 60), m = totalMin % 60;
+        return `${h}:${String(m).padStart(2, '0')}`;
+      }
+      return val;
+    }
+
     function toCalDate(dateStr, timeStr, isStart) {
       if (!dateStr) return '';
       const d = dateStr.replace(/-/g, '');
@@ -249,16 +266,17 @@ if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)
 
         const events = rows.slice(1).map(vals => {
           if ((vals[approvedIdx] || '').toUpperCase() !== 'TRUE') return null;
-          const parsed = new Date(vals[dateIdx] || '');
-          if (isNaN(parsed.getTime())) return null;
+          let parsed = new Date(vals[dateIdx] || '');
+          if (isNaN(parsed.getTime())) parsed = parseSerialDate(vals[dateIdx] || '');
+          if (!parsed || isNaN(parsed.getTime())) return null;
           const rawImg = vals[imageIdx] || '';
           let imgUrl = '';
           if (rawImg) {
             const dm = rawImg.match(/[?&]id=([a-zA-Z0-9_-]+)/) || rawImg.match(/\/d\/([a-zA-Z0-9_-]+)/);
             imgUrl = dm ? 'https://lh3.googleusercontent.com/d/' + dm[1] + '=w400' : rawImg;
           }
-          const startTime = vals[timeIdx] ? new Date('2000-01-01 ' + vals[timeIdx]).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
-          const endTime = vals[endTimeIdx] ? new Date('2000-01-01 ' + vals[endTimeIdx]).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+          const startTime = vals[timeIdx] ? parseTimeValue(vals[timeIdx]) : '';
+          const endTime = vals[endTimeIdx] ? parseTimeValue(vals[endTimeIdx]) : '';
           const timeStr = startTime && endTime ? startTime + ' – ' + endTime : (startTime || endTime);
           return {
             title: vals[titleIdx] || '',

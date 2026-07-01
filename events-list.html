@@ -323,14 +323,33 @@ if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)
           if (rows.length > 1) {
             const headers = rows[0].map(h => h.trim().toLowerCase());
             const approvedIdx = headers.indexOf('approved');
+
+            // Excel serial date helper
+            const parseSerialDate = (val) => {
+              const n = parseFloat(val);
+              if (!isNaN(n) && n >= 365) return new Date((n - 25569) * 86400000);
+              return null;
+            };
+            const parseTimeValue = (val) => {
+              if (!val || !val.trim()) return '';
+              const n = parseFloat(val);
+              if (!isNaN(n) && n >= 0 && n < 1 && /^[\d.]+$/.test(val.trim())) {
+                const totalMin = Math.round(n * 24 * 60);
+                const h = Math.floor(totalMin / 60), m = totalMin % 60;
+                return `${h}:${String(m).padStart(2, '0')}`;
+              }
+              return val;
+            };
+
             commEvents = rows.slice(1).map(vals => {
               if ((vals[approvedIdx] || '').toUpperCase() !== 'TRUE') return null;
-              const parsed = new Date(vals[headers.indexOf('event date')] || '');
-              if (isNaN(parsed.getTime())) return null;
+              let parsed = new Date(vals[headers.indexOf('event date')] || '');
+              if (isNaN(parsed.getTime())) parsed = parseSerialDate(vals[headers.indexOf('event date')] || '');
+              if (!parsed || isNaN(parsed.getTime())) return null;
               return {
                 title: vals[headers.indexOf('event name')] || '',
                 date: parsed.toISOString().split('T')[0],
-                time: vals[headers.indexOf('start time')] || '',
+                time: parseTimeValue(vals[headers.indexOf('start time')] || ''),
                 location: vals[headers.indexOf('event location')] || '',
                 source: 'Communauté',
                 link: vals[headers.indexOf('event url')] || '#',
