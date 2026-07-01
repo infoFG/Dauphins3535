@@ -451,15 +451,15 @@ async function fetchCommunityEvents() {
 
     if (rows.length < 2) return [];
     const headers = rows[0].map(h => h.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_'));
-    const dateIdx = headers.indexOf('event_date');
-    const titleIdx = headers.indexOf('event_name');
-    const timeIdx = headers.indexOf('start_time');
-    const endTimeIdx = headers.indexOf('end_time');
-    const imageIdx = headers.indexOf('image');
-    const approvedIdx = headers.indexOf('approved');
-    const urlIdx = headers.indexOf('event_url');
-    const locIdx = headers.indexOf('event_location');
-    const descIdx = headers.indexOf('event_description');
+    const dateIdx = headers.findIndex(h => h.includes('event_date'));
+    const titleIdx = headers.findIndex(h => h.includes('event_name'));
+    const timeIdx = headers.findIndex(h => h.includes('start_time'));
+    const endTimeIdx = headers.findIndex(h => h.includes('end_time'));
+    const imageIdx = headers.findIndex(h => h.includes('image'));
+    const approvedIdx = headers.findIndex(h => h.includes('approved'));
+    const urlIdx = headers.findIndex(h => h.includes('event_url'));
+    const locIdx = headers.findIndex(h => h.includes('event_location'));
+    const descIdx = headers.findIndex(h => h.includes('event_description'));
 
     return rows.slice(1).map(vals => {
       const approved = (vals[approvedIdx] || '').toUpperCase();
