@@ -465,9 +465,15 @@ async function fetchCommunityEvents() {
       const approved = (vals[approvedIdx] || '').toUpperCase();
       if (approved !== 'TRUE' && approved !== 'YES') return null;
 
-      const dateStr = vals[dateIdx] || '';
-      let parsed = new Date(dateStr);
-      if (isNaN(parsed.getTime())) parsed = parseSerialDate(dateStr);
+      const dateStr = (vals[dateIdx] || '').trim();
+      let parsed;
+      // If it looks like an Excel serial number (pure number >= 365), use parseSerialDate directly.
+      // Avoid new Date() which may interpret "46204" as milliseconds-from-epoch.
+      if (/^\d+\.?\d*$/.test(dateStr) && parseFloat(dateStr) >= 365) {
+        parsed = parseSerialDate(dateStr);
+      } else {
+        parsed = new Date(dateStr);
+      }
       if (!parsed || isNaN(parsed.getTime())) return null;
 
       const timeVal = parseTimeValue(vals[timeIdx] || '');
