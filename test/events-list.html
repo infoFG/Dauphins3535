@@ -360,8 +360,13 @@ if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)
 
             commEvents = rows.slice(1).map(vals => {
               if ((vals[approvedIdx] || '').toUpperCase() !== 'TRUE') return null;
-              let parsed = new Date(vals[dateIdx] || '');
-              if (isNaN(parsed.getTime())) parsed = parseSerialDate(vals[dateIdx] || '');
+              const dateStr = (vals[dateIdx] || '').trim();
+              let parsed;
+              if (/^\d+\.?\d*$/.test(dateStr) && parseFloat(dateStr) >= 365) {
+                parsed = parseSerialDate(dateStr);
+              } else {
+                parsed = new Date(dateStr);
+              }
               if (!parsed || isNaN(parsed.getTime())) return null;
               return {
                 title: vals[titleIdx] || '',
