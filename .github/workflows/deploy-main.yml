@@ -20,6 +20,9 @@ jobs:
         with:
           ref: main
 
+      - name: Ensure deploy commit
+        run: date > .deploy-timestamp
+
       - name: Deploy to gh-pages root
         uses: peaceiris/actions-gh-pages@v4
         with:
