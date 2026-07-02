@@ -3,6 +3,7 @@ name: Deploy preview to /test
 on:
   push:
     branches: [preview]
+  workflow_dispatch:
 
 concurrency:
   group: pages-deploy

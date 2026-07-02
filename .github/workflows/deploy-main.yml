@@ -3,6 +3,7 @@ name: Deploy main to root
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: pages-deploy
