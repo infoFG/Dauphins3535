@@ -1,25 +1,5 @@
 import { formatBusinessHours, escapeHtml, getDayLabels, isCurrentlyOpen, getLocalDateStr } from './utils.js';
 
-/* ========== USER SCROLL DETECTION ========== */
-let userScrolled = false;
-let scrollTimeout = null;
-
-function onUserScroll() {
-  userScrolled = true;
-  clearTimeout(scrollTimeout);
-  scrollTimeout = setTimeout(() => { userScrolled = false; }, 3000);
-}
-
-window.addEventListener('wheel', onUserScroll, { passive: true });
-window.addEventListener('touchmove', onUserScroll, { passive: true });
-window.addEventListener('keydown', (e) => {
-  if (['ArrowUp','ArrowDown','PageUp','PageDown','Home','End','Space'].includes(e.key)) {
-    onUserScroll();
-  }
-});
-
-export { userScrolled };
-
 /* ========== SIDEBAR MENU ========== */
 export function initMenu() {
   const sidebar = document.getElementById('sidebar');
@@ -54,11 +34,9 @@ export function initMenu() {
         const targetId = href.substring(1);
         const target = document.getElementById(targetId);
         closeMenu();
-        if (target && !userScrolled) {
+        if (target) {
           setTimeout(() => {
-            if (!userScrolled) {
-              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }, 350);
         }
       }

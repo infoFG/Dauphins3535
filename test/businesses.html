@@ -24,7 +24,30 @@
     .biz-links a { font-size: 0.8rem; color: #A19B80; margin-right: 0.75rem; text-decoration: none; }
     .biz-links a:hover { text-decoration: underline; }
   </style>
-
+  <script>
+(function(){
+if(sessionStorage.getItem('_pw')==='1'||location.hostname==='localhost'||location.hostname==='127.0.0.1')return;
+function init(){
+var o=document.createElement('div');
+o.id='pw-gate';
+o.innerHTML='<style>#pw-gate{position:fixed;inset:0;z-index:99999;background:rgba(58,36,4,0.95);display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif}#pw-gate form{background:#fff;padding:2.5rem;border-radius:12px;text-align:center;max-width:360px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3)}#pw-gate h2{margin:0 0 0.5rem;color:#3A2404;font-size:1.3rem}#pw-gate p{color:#89897C;font-size:0.85rem;margin:0 0 1.25rem}#pw-gate input{width:100%;padding:0.65rem 0.75rem;border:1px solid #D3D8D6;border-radius:8px;font-size:1rem;text-align:center;box-sizing:border-box;margin-bottom:0.75rem}#pw-gate button{width:100%;padding:0.65rem;background:#A19B80;color:#fff;border:none;border-radius:8px;font-size:0.95rem;cursor:pointer;font-weight:600}#pw-gate button:hover{background:#8a856e}#pw-gate .error{color:#c62828;font-size:0.8rem;margin-top:0.5rem;display:none}</style><form autocomplete="off"><h2>🔒 Accès restreint</h2><p>Ce site est en révision. Veuillez entrer le mot de passe.</p><input type="password" id="pw-input" placeholder="Mot de passe" autofocus><button type="submit">Accéder</button><div class="error" id="pw-error">Mot de passe incorrect.</div></form>';
+document.body.prepend(o);
+o.querySelector('form').addEventListener('submit',function(e){
+e.preventDefault();
+var pw=document.getElementById('pw-input').value;
+var hash=btoa(unescape(encodeURIComponent(pw)));
+if(hash==='ZGF1cGhpbnMyMDI2'){
+sessionStorage.setItem('_pw','1');o.remove();
+}else{
+document.getElementById('pw-error').style.display='block';
+document.getElementById('pw-input').value='';
+document.getElementById('pw-input').focus();
+}
+});
+}
+if(document.body){init()}else{document.addEventListener('DOMContentLoaded',init)}
+})();
+</script>
 </head>
 <body class="content-page">
 

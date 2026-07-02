@@ -1,4 +1,4 @@
-import { initMenu, initLanguage, initLightbox, initScrollReveal, initDayPlanners, initWasteCalendar, userScrolled } from './js/ui.js';
+import { initMenu, initLanguage, initLightbox, initScrollReveal, initDayPlanners, initWasteCalendar } from './js/ui.js';
 import { initEventsCarousel, initBusinessGallery, reRenderEvents, initCommunityCarousel } from './js/api.js';
 import { initEnhancedCarousels, loadStaticCarouselImages, loadSectionBackground } from './js/carousel.js';
 import { fetchFAQData } from './js/gsheets.js';
@@ -93,15 +93,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Handle hash-based navigation from other pages
-  if (window.location.hash && !userScrolled) {
+  if (window.location.hash) {
     const targetId = window.location.hash.substring(1);
     const target = document.getElementById(targetId);
     if (target) {
       // Delay to let dynamic content settle
       setTimeout(() => {
-        if (!userScrolled) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 500);
     }
   }
