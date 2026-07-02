@@ -4,6 +4,10 @@ on:
   push:
     branches: [preview]
 
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: false
+
 jobs:
   deploy-test:
     runs-on: ubuntu-latest
