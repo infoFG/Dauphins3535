@@ -78,6 +78,12 @@ body {
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
+.sidebar-logo-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
 .sidebar-logo img {
   max-width: 140px;
   height: auto;
