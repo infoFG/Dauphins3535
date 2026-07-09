@@ -1,0 +1,46 @@
+name: 🚇 Tunnel BjornTest
+
+on:
+  push:
+    branches: [BjornTest]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔀 Checkout BjornTest
+        uses: actions/checkout@v4
+        with:
+          ref: BjornTest
+          path: bjorntest-source
+
+      - name: 🔀 Checkout main (cible)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main-branch
+
+      - name: 📦 Copier BjornTest → bjorntest/
+        run: |
+          rm -rf main-branch/bjorntest
+          mkdir -p main-branch/bjorntest
+          rsync -av --exclude='.git' --exclude='.github' bjorntest-source/ main-branch/bjorntest/
+          echo "BjornTest déployé le $(date '+%Y-%m-%d %H:%M UTC')" > main-branch/bjorntest/.deploy-info
+
+      - name: 🚀 Push sur main
+        run: |
+          cd main-branch
+          git config user.name "JC"
+          git config user.email "jcvd@fragatagosselin.com"
+          git add -A
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "Aucun changement — BjornTest identique à la dernière version"
+          else
+            git commit -m "🚇 Tunnel: déploiement BjornTest $(date '+%Y-%m-%d %H:%M')"
+            git push origin main
+            echo "✅ BjornTest déployé sur www.dauphinssurleparc.com/bjorntest/"
+          fi
