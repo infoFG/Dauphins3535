@@ -85,7 +85,8 @@ body {
   margin: 0 auto 0.75rem;
 }
 
-.sidebar-logo h1 {
+.sidebar-logo h1,
+.sidebar-logo .sidebar-logo-title {
   color: #fff;
   font-size: 1.1rem;
   font-weight: 600;
